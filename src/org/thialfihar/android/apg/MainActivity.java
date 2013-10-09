@@ -206,7 +206,8 @@ public class MainActivity extends BaseActivity {
                 TextView message = (TextView) layout.findViewById(R.id.message);
 
                 message.setText("Changes:\n" +
-                                "* \n" +
+                                "* More secure random numbers (thanks, Dominik)\n" +
+                                "* Fixed selection of multiple recipients for encryption\n" +
                                 "\n" +
                                 "WARNING: be careful editing your existing keys, as they " +
                                 "WILL be stripped of certificates right now.\n" +
