@@ -205,16 +205,12 @@ public class MainActivity extends BaseActivity {
                 View layout = inflater.inflate(R.layout.info, null);
                 TextView message = (TextView) layout.findViewById(R.id.message);
 
-                message.setText("Changes:\n" +
+                message.setText("This is a minor bugfix upgrade. More new development will follow soon.\n" +
+                                "Thanks for the continued feedback and support during the long break.\n" +
+                                "\n" +
+                                "Changes:\n" +
                                 "* More secure random numbers (thanks, Dominik)\n" +
                                 "* Fixed selection of multiple recipients for encryption\n" +
-                                "\n" +
-                                "WARNING: be careful editing your existing keys, as they " +
-                                "WILL be stripped of certificates right now.\n" +
-                                "\n" +
-                                "Also: key cross-certification is NOT supported, so signing " +
-                                "with those keys will get a warning when the signature is " +
-                                "checked.\n" +
                                 "\n" +
                                 "I hope APG continues to be useful to you, please send " +
                                 "bug reports, feature wishes, feedback.");
