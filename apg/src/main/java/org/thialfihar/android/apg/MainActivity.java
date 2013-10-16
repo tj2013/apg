@@ -36,59 +36,137 @@ import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.CursorAdapter;
 import android.widget.EditText;
+import android.widget.GridView;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 public class MainActivity extends BaseActivity {
 
+    static class LauncherIcon {
+        final String text;
+        final int imgId;
+        final OnClickListener clickListener;
+
+        public LauncherIcon(int imgId, String text, OnClickListener clickListener) {
+            super();
+            this.imgId = imgId;
+            this.text = text;
+            this.clickListener = clickListener;
+        }
+    }
+
+    static class DashboardAdapter extends BaseAdapter {
+        private Context mContext;
+        private LauncherIcon[] mIcons;
+
+        public DashboardAdapter(Context c, LauncherIcon[] icons) {
+            mContext = c;
+            mIcons = icons;
+        }
+
+        @Override
+        public int getCount() {
+            return mIcons.length;
+        }
+
+        @Override
+        public LauncherIcon getItem(int position) {
+            return null;
+        }
+
+        @Override
+        public long getItemId(int position) {
+            return 0;
+        }
+
+        static class ViewHolder {
+            public ImageView icon;
+            public TextView text;
+        }
+
+        // Create a new ImageView for each item referenced by the Adapter
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            View v = convertView;
+            ViewHolder holder;
+            if (v == null) {
+                LayoutInflater vi = (LayoutInflater) mContext.getSystemService(
+                    Context.LAYOUT_INFLATER_SERVICE);
+
+                v = vi.inflate(R.layout.dashboard_icon, null);
+                v.setOnClickListener(mIcons[position].clickListener);
+                holder = new ViewHolder();
+                holder.text = (TextView) v.findViewById(R.id.dashboard_icon_text);
+                holder.icon = (ImageView) v.findViewById(R.id.dashboard_icon_img);
+                v.setTag(holder);
+            } else {
+                holder = (ViewHolder) v.getTag();
+            }
+
+            holder.icon.setImageResource(mIcons[position].imgId);
+            holder.text.setText(mIcons[position].text);
+
+            return v;
+        }
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.main);
 
-        Button encryptMessageButton = (Button) findViewById(R.id.btn_encryptMessage);
-        Button decryptMessageButton = (Button) findViewById(R.id.btn_decryptMessage);
-        Button encryptFileButton = (Button) findViewById(R.id.btn_encryptFile);
-        Button decryptFileButton = (Button) findViewById(R.id.btn_decryptFile);
+        setContentView(R.layout.dashboard);
 
-        encryptMessageButton.setOnClickListener(new OnClickListener() {
-            public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, EncryptActivity.class);
-                intent.setAction(Apg.Intent.ENCRYPT);
-                startActivity(intent);
-            }
-        });
+        GridView gridview = (GridView) findViewById(R.id.dashboard_grid);
+        gridview.setAdapter(new DashboardAdapter(this,
+            new LauncherIcon[] {
+                new LauncherIcon(R.drawable.key, "Encrypt",
+                    new OnClickListener() {
+                        public void onClick(View v) {
+                            Intent intent = new Intent(MainActivity.this, EncryptActivity.class);
+                            intent.setAction(Apg.Intent.ENCRYPT);
+                            startActivity(intent);
+                        }
+                    }),
+                new LauncherIcon(R.drawable.key, "Decrypt",
+                    new OnClickListener() {
+                        public void onClick(View v) {
+                            Intent intent = new Intent(MainActivity.this, DecryptActivity.class);
+                            intent.setAction(Apg.Intent.DECRYPT);
+                            startActivity(intent);
+                        }
+                    }),
+                new LauncherIcon(R.drawable.key, "Manage Keys",
+                    new OnClickListener() {
+                        public void onClick(View v) {
+                            startActivity(new Intent(MainActivity.this, PublicKeyListActivity.class));
+                        }
+                    }),
+                new LauncherIcon(R.drawable.key, "My Keys",
+                    new OnClickListener() {
+                        public void onClick(View v) {
+                            startActivity(new Intent(MainActivity.this, SecretKeyListActivity.class));
+                        }
+                    }),
+            }));
 
-        decryptMessageButton.setOnClickListener(new OnClickListener() {
-            public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, DecryptActivity.class);
-                intent.setAction(Apg.Intent.DECRYPT);
-                startActivity(intent);
-            }
-        });
-
-        encryptFileButton.setOnClickListener(new OnClickListener() {
-            public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, EncryptActivity.class);
-                intent.setAction(Apg.Intent.ENCRYPT_FILE);
-                startActivity(intent);
-            }
-        });
-
-        decryptFileButton.setOnClickListener(new OnClickListener() {
-            public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, DecryptActivity.class);
-                intent.setAction(Apg.Intent.DECRYPT_FILE);
-                startActivity(intent);
+        // Hack to disable GridView scrolling
+        gridview.setOnTouchListener(new OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                return event.getAction() == MotionEvent.ACTION_MOVE;
             }
         });
 
