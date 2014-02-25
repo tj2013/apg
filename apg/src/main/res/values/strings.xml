@@ -19,7 +19,9 @@
 
     <!-- title_lowerCase: capitalized words, no punctuation -->
     <string name="title_mailInbox">Mail Inbox</string>
-    <string name="title_managePublicKeys">Manage Public Keys</string>
+    <string name="title_manageKeys">Manage Keys</string>
+    <string name="title_manageOwnKeys">My Keys</string>
+    <string name="title_managePublicKeys">Manage Secret Keys</string>
     <string name="title_manageSecretKeys">Manage Secret Keys</string>
     <string name="title_selectRecipients">Select Recipients</string>
     <string name="title_selectSignature">Select Signature</string>

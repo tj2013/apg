@@ -56,14 +56,14 @@ import android.widget.Toast;
 public class MainActivity extends BaseActivity {
 
     static class LauncherIcon {
-        final String text;
+        final int textId;
         final int imgId;
         final OnClickListener clickListener;
 
-        public LauncherIcon(int imgId, String text, OnClickListener clickListener) {
+        public LauncherIcon(int imgId, int textId, OnClickListener clickListener) {
             super();
             this.imgId = imgId;
-            this.text = text;
+            this.textId = textId;
             this.clickListener = clickListener;
         }
     }
@@ -117,7 +117,7 @@ public class MainActivity extends BaseActivity {
             }
 
             holder.icon.setImageResource(mIcons[position].imgId);
-            holder.text.setText(mIcons[position].text);
+            holder.text.setText(mIcons[position].textId);
 
             return v;
         }
@@ -132,7 +132,7 @@ public class MainActivity extends BaseActivity {
         GridView gridview = (GridView) findViewById(R.id.dashboard_grid);
         gridview.setAdapter(new DashboardAdapter(this,
             new LauncherIcon[] {
-                new LauncherIcon(R.drawable.key, "Encrypt",
+                new LauncherIcon(R.drawable.key, R.string.title_encrypt,
                     new OnClickListener() {
                         public void onClick(View v) {
                             Intent intent = new Intent(MainActivity.this, EncryptActivity.class);
@@ -140,7 +140,7 @@ public class MainActivity extends BaseActivity {
                             startActivity(intent);
                         }
                     }),
-                new LauncherIcon(R.drawable.key, "Decrypt",
+                new LauncherIcon(R.drawable.key, R.string.title_decrypt,
                     new OnClickListener() {
                         public void onClick(View v) {
                             Intent intent = new Intent(MainActivity.this, DecryptActivity.class);
@@ -148,13 +148,13 @@ public class MainActivity extends BaseActivity {
                             startActivity(intent);
                         }
                     }),
-                new LauncherIcon(R.drawable.key, "Manage Keys",
+                new LauncherIcon(R.drawable.key, R.string.title_manageKeys,
                     new OnClickListener() {
                         public void onClick(View v) {
                             startActivity(new Intent(MainActivity.this, PublicKeyListActivity.class));
                         }
                     }),
-                new LauncherIcon(R.drawable.key, "My Keys",
+                new LauncherIcon(R.drawable.key, R.string.title_manageOwnKeys,
                     new OnClickListener() {
                         public void onClick(View v) {
                             startActivity(new Intent(MainActivity.this, SecretKeyListActivity.class));
@@ -268,17 +268,13 @@ public class MainActivity extends BaseActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        menu.add(0, Id.menu.option.manage_public_keys, 0, R.string.menu_managePublicKeys)
-                .setIcon(android.R.drawable.ic_menu_manage);
-        menu.add(0, Id.menu.option.manage_secret_keys, 1, R.string.menu_manageSecretKeys)
-                .setIcon(android.R.drawable.ic_menu_manage);
-        menu.add(2, Id.menu.option.preferences, 3, R.string.menu_preferences)
+        menu.add(0, Id.menu.option.preferences, 0, R.string.menu_preferences)
                 .setIcon(android.R.drawable.ic_menu_preferences);
-        menu.add(2, Id.menu.option.key_server, 4, R.string.menu_keyServer)
+        menu.add(0, Id.menu.option.key_server, 1, R.string.menu_keyServer)
                 .setIcon(android.R.drawable.ic_menu_search);
-        menu.add(3, Id.menu.option.about, 5, R.string.menu_about)
+        menu.add(1, Id.menu.option.about, 2, R.string.menu_about)
                 .setIcon(android.R.drawable.ic_menu_info_details);
-        menu.add(3, Id.menu.option.help, 6, R.string.menu_help)
+        menu.add(1, Id.menu.option.help, 3, R.string.menu_help)
                 .setIcon(android.R.drawable.ic_menu_help);
         return true;
     }
@@ -286,16 +282,6 @@ public class MainActivity extends BaseActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case Id.menu.option.manage_public_keys: {
-                startActivity(new Intent(this, PublicKeyListActivity.class));
-                return true;
-            }
-
-            case Id.menu.option.manage_secret_keys: {
-                startActivity(new Intent(this, SecretKeyListActivity.class));
-                return true;
-            }
-
             case Id.menu.option.help: {
                 showDialog(Id.dialog.help);
                 return true;
