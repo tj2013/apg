@@ -29,6 +29,8 @@ import org.thialfihar.android.apg.provider.Database;
 import org.thialfihar.android.apg.ui.widget.KeyEditor;
 import org.thialfihar.android.apg.ui.widget.SectionView;
 import org.thialfihar.android.apg.utils.IterableIterator;
+import org.thialfihar.android.apg.key.Key;
+import org.thialfihar.android.apg.key.KeyRing;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -48,7 +50,7 @@ import android.widget.Toast;
 
 public class EditKeyActivity extends BaseActivity implements OnClickListener {
 
-    private PGPSecretKeyRing mKeyRing = null;
+    private KeyRing mKeyRing = null;
 
     private SectionView mUserIds;
     private SectionView mKeys;
@@ -67,7 +69,7 @@ public class EditKeyActivity extends BaseActivity implements OnClickListener {
         setContentView(R.layout.edit_key);
 
         Vector<String> userIds = new Vector<String>();
-        Vector<PGPSecretKey> keys = new Vector<PGPSecretKey>();
+        Vector<Key> keys = new Vector<Key>();
 
         Intent intent = getIntent();
         long keyId = 0;
@@ -76,16 +78,16 @@ public class EditKeyActivity extends BaseActivity implements OnClickListener {
         }
 
         if (keyId != 0) {
-            PGPSecretKey masterKey = null;
+            Key masterKey = null;
             mKeyRing = Apg.getSecretKeyRing(keyId);
             if (mKeyRing != null) {
-                masterKey = Apg.getMasterKey(mKeyRing);
-                for (PGPSecretKey key : new IterableIterator<PGPSecretKey>(mKeyRing.getSecretKeys())) {
+                masterKey = mKeyRing.getMasterKey();
+                for (Key key : mKeyRing.getSecretKeys()) {
                     keys.add(key);
                 }
             }
             if (masterKey != null) {
-                for (String userId : new IterableIterator<String>(masterKey.getUserIDs())) {
+                for (String userId : masterKey.getUserIds()) {
                     userIds.add(userId);
                 }
             }
@@ -132,7 +134,7 @@ public class EditKeyActivity extends BaseActivity implements OnClickListener {
         if (mKeys.getEditors().getChildCount() == 0) {
             return 0;
         }
-        return ((KeyEditor) mKeys.getEditors().getChildAt(0)).getValue().getKeyID();
+        return ((KeyEditor) mKeys.getEditors().getChildAt(0)).getValue().getKeyId();
     }
 
     public boolean havePassPhrase() {

@@ -32,6 +32,8 @@ import org.bouncycastle2.openpgp.PGPSecretKeyRing;
 import org.thialfihar.android.apg.provider.KeyRings;
 import org.thialfihar.android.apg.provider.Keys;
 import org.thialfihar.android.apg.provider.UserIds;
+import org.thialfihar.android.apg.key.Key;
+import org.thialfihar.android.apg.key.KeyRing;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -195,12 +197,12 @@ public class KeyListActivity extends BaseActivity {
                 mSelectedItem = -1;
                 // TODO: better way to do this?
                 String userId = "<unknown>";
-                Object keyRing = Apg.getKeyRing(keyRingId);
+                KeyRing keyRing = Apg.getKeyRing(keyRingId);
                 if (keyRing != null) {
-                    if (keyRing instanceof PGPPublicKeyRing) {
-                        userId = Apg.getMainUserIdSafe(this, Apg.getMasterKey((PGPPublicKeyRing) keyRing));
+                    if (keyRing.isPublic()) {
+                        userId = Apg.getMainUserIdSafe(this, keyRing.getMasterKey());
                     } else {
-                        userId = Apg.getMainUserIdSafe(this, Apg.getMasterKey((PGPSecretKeyRing) keyRing));
+                        userId = Apg.getMainUserIdSafe(this, keyRing.getMasterKey());
                     }
                 }
 
@@ -620,7 +622,7 @@ public class KeyListActivity extends BaseActivity {
             c.close();
 
             if (masterKeyId != -1) {
-                children.insertElementAt(new KeyChild(Apg.getFingerPrint(fingerPrintId), true), 0);
+                children.insertElementAt(new KeyChild(Apg.getPublicKey(fingerPrintId).getFingerprint(), true), 0);
                 c = mDatabase.query(UserIds.TABLE_NAME,
                          new String[] {
                              UserIds.USER_ID, // 0
@@ -731,7 +733,7 @@ public class KeyListActivity extends BaseActivity {
                     String keyIdStr = Apg.getSmallFingerPrint(child.keyId);
                     keyId.setText(keyIdStr);
                     TextView keyDetails = (TextView) view.findViewById(R.id.keyDetails);
-                    String algorithmStr = Apg.getAlgorithmInfo(child.algorithm, child.keySize);
+                    String algorithmStr = Key.getAlgorithmInfo(child.algorithm, child.keySize);
                     keyDetails.setText("(" + algorithmStr + ")");
 
                     ImageView encryptIcon = (ImageView) view.findViewById(R.id.ic_encryptKey);

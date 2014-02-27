@@ -31,6 +31,9 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import org.thialfihar.android.apg.key.Key;
+import org.thialfihar.android.apg.key.KeyRing;
+
 public class AskForSecretKeyPassPhrase {
     public static interface PassPhraseCallbackInterface {
         void passPhraseCallback(long keyId, String passPhrase);
@@ -42,14 +45,14 @@ public class AskForSecretKeyPassPhrase {
 
         alert.setTitle(R.string.title_authentication);
 
-        final PGPSecretKey secretKey;
+        final Key secretKey;
         final Activity activity = context;
 
         if (secretKeyId == Id.key.symmetric || secretKeyId == Id.key.none) {
             secretKey = null;
             alert.setMessage(context.getString(R.string.passPhraseForSymmetricEncryption));
         } else {
-            secretKey = Apg.getMasterKey(Apg.getSecretKeyRing(secretKeyId));
+            secretKey = Apg.getSecretKeyRing(secretKeyId).getMasterKey();
             if (secretKey == null) {
                 alert.setTitle(R.string.title_keyNotFound);
                 alert.setMessage(context.getString(R.string.keyNotFound, secretKeyId));
@@ -83,8 +86,7 @@ public class AskForSecretKeyPassPhrase {
                         long keyId;
                         if (secretKey != null) {
                             try {
-                                PGPPrivateKey testKey = secretKey.extractPrivateKey(passPhrase.toCharArray(),
-                                                                                    new BouncyCastleProvider());
+                                PGPPrivateKey testKey = secretKey.extractPrivateKey(passPhrase);
                                 if (testKey == null) {
                                     Toast.makeText(activity,
                                                    R.string.error_couldNotExtractPrivateKey,
@@ -97,7 +99,7 @@ public class AskForSecretKeyPassPhrase {
                                                Toast.LENGTH_SHORT).show();
                                 return;
                             }
-                            keyId = secretKey.getKeyID();
+                            keyId = secretKey.getKeyId();
                         } else {
                             keyId = Id.key.symmetric;
                         }

@@ -13,6 +13,8 @@ import org.bouncycastle2.openpgp.PGPSecretKeyRing;
 import org.thialfihar.android.apg.Apg;
 import org.thialfihar.android.apg.Id;
 import org.thialfihar.android.apg.utils.IterableIterator;
+import org.thialfihar.android.apg.key.Key;
+import org.thialfihar.android.apg.key.KeyRing;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -163,7 +165,7 @@ public class Database extends SQLiteOpenHelper {
                             byte[] data = cursor.getBlob(0);
                             try {
                                 PGPPublicKeyRing keyRing = new PGPPublicKeyRing(data);
-                                saveKeyRing(keyRing);
+                                saveKeyRing(new KeyRing(keyRing));
                             } catch (IOException e) {
                                 Log.e("apg.db.upgrade", "key import failed: " + e);
                             } catch (GeneralException e) {
@@ -183,7 +185,7 @@ public class Database extends SQLiteOpenHelper {
                             byte[] data = cursor.getBlob(0);
                             try {
                                 PGPSecretKeyRing keyRing = new PGPSecretKeyRing(data);
-                                saveKeyRing(keyRing);
+                                saveKeyRing(new KeyRing(keyRing));
                             } catch (IOException e) {
                                 Log.e("apg.db.upgrade", "key import failed: " + e);
                             } catch (PGPException e) {
@@ -212,102 +214,95 @@ public class Database extends SQLiteOpenHelper {
         mDb = null;
     }
 
-    public int saveKeyRing(PGPPublicKeyRing keyRing) throws IOException, GeneralException {
+    public int saveKeyRing(KeyRing keyRing) throws IOException, GeneralException {
         mDb.beginTransaction();
         ContentValues values = new ContentValues();
-        PGPPublicKey masterKey = keyRing.getPublicKey();
-        long masterKeyId = masterKey.getKeyID();
-
-        values.put(KeyRings.MASTER_KEY_ID, masterKeyId);
-        values.put(KeyRings.TYPE, Id.database.type_public);
-        values.put(KeyRings.KEY_RING_DATA, keyRing.getEncoded());
-
-        long rowId = insertOrUpdateKeyRing(values);
+        Key masterKey = keyRing.getMasterKey();
+        long masterKeyId = masterKey.getKeyId();
         int returnValue = mStatus;
+        if (keyRing.isPublic()) {
+            values.put(KeyRings.MASTER_KEY_ID, masterKeyId);
+            values.put(KeyRings.TYPE, Id.database.type_public);
+            values.put(KeyRings.KEY_RING_DATA, keyRing.getEncoded());
 
-        if (rowId == -1) {
-            throw new GeneralException("saving public key ring " + masterKeyId + " failed");
-        }
+            long rowId = insertOrUpdateKeyRing(values);
 
-        Vector<Integer> seenIds = new Vector<Integer>();
-        int rank = 0;
-        for (PGPPublicKey key : new IterableIterator<PGPPublicKey>(keyRing.getPublicKeys())) {
-            seenIds.add(saveKey(rowId, key, rank));
-            ++rank;
-        }
-
-        String seenIdsStr = "";
-        for (Integer id : seenIds) {
-            if (seenIdsStr.length() > 0) {
-                seenIdsStr += ",";
+            if (rowId == -1) {
+                throw new GeneralException("saving public key ring " + masterKeyId + " failed");
             }
-            seenIdsStr += id;
+
+            Vector<Integer> seenIds = new Vector<Integer>();
+            int rank = 0;
+            for (Key key : keyRing.getPublicKeys()) {
+                seenIds.add(saveKey(rowId, key, rank));
+                ++rank;
+            }
+
+            String seenIdsStr = "";
+            for (Integer id : seenIds) {
+                if (seenIdsStr.length() > 0) {
+                    seenIdsStr += ",";
+                }
+                seenIdsStr += id;
+            }
+            mDb.delete(Keys.TABLE_NAME,
+                       Keys.KEY_RING_ID + " = ? AND " +
+                       Keys._ID + " NOT IN (" + seenIdsStr + ")",
+                       new String[] { "" + rowId });
+        } else {
+            values.put(KeyRings.MASTER_KEY_ID, masterKeyId);
+            values.put(KeyRings.TYPE, Id.database.type_secret);
+            values.put(KeyRings.KEY_RING_DATA, keyRing.getEncoded());
+
+            long rowId = insertOrUpdateKeyRing(values);
+
+            if (rowId == -1) {
+                throw new GeneralException("saving secret key ring " + masterKeyId + " failed");
+            }
+
+            Vector<Integer> seenIds = new Vector<Integer>();
+            int rank = 0;
+            for (Key key : keyRing.getSecretKeys()) {
+                seenIds.add(saveKey(rowId, key, rank));
+                ++rank;
+            }
+
+            String seenIdsStr = "";
+            for (Integer id : seenIds) {
+                if (seenIdsStr.length() > 0) {
+                    seenIdsStr += ",";
+                }
+                seenIdsStr += id;
+            }
+            mDb.delete(Keys.TABLE_NAME,
+                       Keys.KEY_RING_ID + " = ? AND " +
+                       Keys._ID + " NOT IN (" + seenIdsStr + ")",
+                       new String[] { "" + rowId });
         }
-        mDb.delete(Keys.TABLE_NAME,
-                   Keys.KEY_RING_ID + " = ? AND " +
-                   Keys._ID + " NOT IN (" + seenIdsStr + ")",
-                   new String[] { "" + rowId });
 
         mDb.setTransactionSuccessful();
         mDb.endTransaction();
         return returnValue;
     }
 
-    public int saveKeyRing(PGPSecretKeyRing keyRing) throws IOException, GeneralException {
-        mDb.beginTransaction();
-        ContentValues values = new ContentValues();
-        PGPSecretKey masterKey = keyRing.getSecretKey();
-        long masterKeyId = masterKey.getKeyID();
-
-        values.put(KeyRings.MASTER_KEY_ID, masterKeyId);
-        values.put(KeyRings.TYPE, Id.database.type_secret);
-        values.put(KeyRings.KEY_RING_DATA, keyRing.getEncoded());
-
-        long rowId = insertOrUpdateKeyRing(values);
-        int returnValue = mStatus;
-
-        if (rowId == -1) {
-            throw new GeneralException("saving secret key ring " + masterKeyId + " failed");
-        }
-
-        Vector<Integer> seenIds = new Vector<Integer>();
-        int rank = 0;
-        for (PGPSecretKey key : new IterableIterator<PGPSecretKey>(keyRing.getSecretKeys())) {
-            seenIds.add(saveKey(rowId, key, rank));
-            ++rank;
-        }
-
-        String seenIdsStr = "";
-        for (Integer id : seenIds) {
-            if (seenIdsStr.length() > 0) {
-                seenIdsStr += ",";
-            }
-            seenIdsStr += id;
-        }
-        mDb.delete(Keys.TABLE_NAME,
-                   Keys.KEY_RING_ID + " = ? AND " +
-                   Keys._ID + " NOT IN (" + seenIdsStr + ")",
-                   new String[] { "" + rowId });
-
-        mDb.setTransactionSuccessful();
-        mDb.endTransaction();
-        return returnValue;
-    }
-
-    private int saveKey(long keyRingId, PGPPublicKey key, int rank)
+    private int saveKey(long keyRingId, Key key, int rank)
             throws IOException, GeneralException {
         ContentValues values = new ContentValues();
 
-        values.put(Keys.KEY_ID, key.getKeyID());
-        values.put(Keys.TYPE, Id.database.type_public);
+        values.put(Keys.KEY_ID, key.getKeyId());
+        if (key.isPublic()) {
+            values.put(Keys.TYPE, Id.database.type_public);
+        } else {
+            values.put(Keys.TYPE, Id.database.type_secret);
+        }
         values.put(Keys.IS_MASTER_KEY, key.isMasterKey());
         values.put(Keys.ALGORITHM, key.getAlgorithm());
         values.put(Keys.KEY_SIZE, key.getBitStrength());
-        values.put(Keys.CAN_SIGN, Apg.isSigningKey(key));
-        values.put(Keys.CAN_ENCRYPT, Apg.isEncryptionKey(key));
+        values.put(Keys.CAN_SIGN, key.isSigningKey());
+        values.put(Keys.CAN_ENCRYPT, key.isEncryptionKey());
         values.put(Keys.IS_REVOKED, key.isRevoked());
-        values.put(Keys.CREATION, Apg.getCreationDate(key).getTime() / 1000);
-        Date expiryDate = Apg.getExpiryDate(key);
+        values.put(Keys.CREATION, key.getCreationDate().getTime() / 1000);
+        Date expiryDate = key.getExpiryDate();
         if (expiryDate != null) {
             values.put(Keys.EXPIRY, expiryDate.getTime() / 1000);
         }
@@ -318,61 +313,12 @@ public class Database extends SQLiteOpenHelper {
         long rowId = insertOrUpdateKey(values);
 
         if (rowId == -1) {
-            throw new GeneralException("saving public key " + key.getKeyID() + " failed");
+            throw new GeneralException("saving key " + key.getKeyId() + " failed");
         }
 
         Vector<Integer> seenIds = new Vector<Integer>();
         int userIdRank = 0;
-        for (String userId : new IterableIterator<String>(key.getUserIDs())) {
-            seenIds.add(saveUserId(rowId, userId, userIdRank));
-            ++userIdRank;
-        }
-
-        String seenIdsStr = "";
-        for (Integer id : seenIds) {
-            if (seenIdsStr.length() > 0) {
-                seenIdsStr += ",";
-            }
-            seenIdsStr += id;
-        }
-        mDb.delete(UserIds.TABLE_NAME,
-                   UserIds.KEY_ID + " = ? AND " +
-                   UserIds._ID + " NOT IN (" + seenIdsStr + ")",
-                   new String[] { "" + rowId });
-
-        return (int)rowId;
-    }
-
-    private int saveKey(long keyRingId, PGPSecretKey key, int rank)
-            throws IOException, GeneralException {
-        ContentValues values = new ContentValues();
-
-        values.put(Keys.KEY_ID, key.getPublicKey().getKeyID());
-        values.put(Keys.TYPE, Id.database.type_secret);
-        values.put(Keys.IS_MASTER_KEY, key.isMasterKey());
-        values.put(Keys.ALGORITHM, key.getPublicKey().getAlgorithm());
-        values.put(Keys.KEY_SIZE, key.getPublicKey().getBitStrength());
-        values.put(Keys.CAN_SIGN, Apg.isSigningKey(key));
-        values.put(Keys.CAN_ENCRYPT, Apg.isEncryptionKey(key));
-        values.put(Keys.IS_REVOKED, key.getPublicKey().isRevoked());
-        values.put(Keys.CREATION, Apg.getCreationDate(key).getTime() / 1000);
-        Date expiryDate = Apg.getExpiryDate(key);
-        if (expiryDate != null) {
-            values.put(Keys.EXPIRY, expiryDate.getTime() / 1000);
-        }
-        values.put(Keys.KEY_RING_ID, keyRingId);
-        values.put(Keys.KEY_DATA, key.getEncoded());
-        values.put(Keys.RANK, rank);
-
-        long rowId = insertOrUpdateKey(values);
-
-        if (rowId == -1) {
-            throw new GeneralException("saving secret key " + key.getPublicKey().getKeyID() + " failed");
-        }
-
-        Vector<Integer> seenIds = new Vector<Integer>();
-        int userIdRank = 0;
-        for (String userId : new IterableIterator<String>(key.getUserIDs())) {
+        for (String userId : key.getUserIds()) {
             seenIds.add(saveUserId(rowId, userId, userIdRank));
             ++userIdRank;
         }
@@ -482,7 +428,7 @@ public class Database extends SQLiteOpenHelper {
         return rowId;
     }
 
-    public Object getKeyRing(int keyRingId) {
+    public KeyRing getKeyRing(int keyRingId) {
         Cursor c = mDb.query(KeyRings.TABLE_NAME,
                              new String[] { KeyRings.KEY_RING_DATA, KeyRings.TYPE },
                              KeyRings._ID + " = ?",
@@ -491,15 +437,15 @@ public class Database extends SQLiteOpenHelper {
                              },
                              null, null, null);
         byte[] data = null;
-        Object keyRing = null;
+        KeyRing keyRing = null;
         if (c != null && c.moveToFirst()) {
             data = c.getBlob(0);
             if (data != null) {
                 try {
                     if (c.getInt(1) == Id.database.type_public) {
-                        keyRing = new PGPPublicKeyRing(data);
+                        keyRing = new KeyRing(new PGPPublicKeyRing(data));
                     } else {
-                        keyRing = new PGPSecretKeyRing(data);
+                        keyRing = new KeyRing(new PGPSecretKeyRing(data));
                     }
                 } catch (IOException e) {
                     // can't load it, then

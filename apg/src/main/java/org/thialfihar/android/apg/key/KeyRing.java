@@ -37,6 +37,7 @@ import java.security.SecureRandom;
 import java.security.Security;
 import java.security.SignatureException;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
@@ -111,19 +112,56 @@ public class KeyRing {
         return false;
     }
 
+    public Key getSecretKey(long keyId) {
+        if (isPublic()) {
+            return null;
+        }
+        return new Key(secretKeyRing.getSecretKey(keyId));
+    }
+
+    public Key getPublicKey(long keyId) {
+        return new Key(publicKeyRing.getPublicKey(keyId));
+    }
+
+    public byte[] getEncoded() throws IOException {
+        if (isPublic()) {
+            return publicKeyRing.getEncoded();
+        }
+        return secretKeyRing.getEncoded();
+    }
+
+    public Vector<Key> getPublicKeys() {
+        Vector<Key> keys = new Vector<Key>();
+        for (PGPPublicKey key : new IterableIterator<PGPPublicKey>(publicKeyRing.getPublicKeys())) {
+            keys.add(new Key(key));
+        }
+        return keys;
+    }
+
+    public Vector<Key> getSecretKeys() {
+        Vector<Key> keys = new Vector<Key>();
+        if (isPublic()) {
+            return keys;
+        }
+        for (PGPSecretKey key : new IterableIterator<PGPSecretKey>(secretKeyRing.getSecretKeys())) {
+            keys.add(new Key(key));
+        }
+        return keys;
+    }
+
     public Key getMasterKey() {
         if (isPublic()) {
-            for (PGPPublicKey key : new IterableIterator<PGPPublicKey>(publicKeyRing.getPublicKeys())) {
+            for (Key key : getPublicKeys()) {
                 if (key.isMasterKey()) {
-                    return Key(key);
+                    return key;
                 }
             }
 
             return null;
         } else {
-            for (PGPSecretKey key : new IterableIterator<PGPSecretKey>(secretKeyRing.getSecretKeys())) {
+            for (Key key : getSecretKeys()) {
                 if (key.isMasterKey()) {
-                    return Key(key);
+                    return key;
                 }
             }
 
@@ -133,13 +171,9 @@ public class KeyRing {
 
     public Vector<Key> getEncryptKeys() {
         Vector<Key> encryptKeys = new Vector<Key>();
-        if (publicKeyRing == null) {
-            return encryptKeys;
-        }
-
-        for (PGPPublicKey key : new IterableIterator<PGPPublicKey>(publicKeyRing.getPublicKeys())) {
-            if (isEncryptionKey(key)) {
-                encryptKeys.add(Key(key));
+        for (Key key : getPublicKeys()) {
+            if (key.isEncryptionKey()) {
+                encryptKeys.add(key);
             }
         }
 
@@ -148,13 +182,9 @@ public class KeyRing {
 
     public Vector<Key> getSigningKeys() {
         Vector<Key> signingKeys = new Vector<Key>();
-        if (secretKeyRing == null) {
-            return signingKeys;
-        }
-
-        for (PGPSecretKey key : new IterableIterator<PGPSecretKey>(secretKeyRing.getSecretKeys())) {
-            if (isSigningKey(key)) {
-                signingKeys.add(Key(key));
+        for (Key key : getSecretKeys()) {
+            if (key.isSigningKey()) {
+                signingKeys.add(key);
             }
         }
 
@@ -183,7 +213,7 @@ public class KeyRing {
 
     public Vector<Key> getUsableSigningKeys() {
         Vector<Key> usableKeys = new Vector<Key>();
-        Vector<Key> signingKeys = getSigningKeys(keyRing);
+        Vector<Key> signingKeys = getSigningKeys();
         Key masterKey = null;
         for (int i = 0; i < signingKeys.size(); ++i) {
             Key key = signingKeys.get(i);

@@ -16,6 +16,8 @@
 
 package org.thialfihar.android.apg;
 
+import org.thialfihar.android.apg.key.KeyRing;
+
 import org.bouncycastle2.openpgp.PGPPublicKeyRing;
 
 import android.content.Intent;
@@ -81,9 +83,9 @@ public class PublicKeyListActivity extends KeyListActivity {
                 mSelectedItem = groupPosition;
                 final int keyRingId = mListAdapter.getKeyRingId(groupPosition);
                 long keyId = 0;
-                Object keyRing = Apg.getKeyRing(keyRingId);
-                if (keyRing != null && keyRing instanceof PGPPublicKeyRing) {
-                    keyId = Apg.getMasterKey((PGPPublicKeyRing) keyRing).getKeyID();
+                KeyRing keyRing = Apg.getKeyRing(keyRingId);
+                if (keyRing != null && keyRing.isPublic()) {
+                    keyId = keyRing.getMasterKey().getKeyId();
                 }
                 if (keyId == 0) {
                     // this shouldn't happen

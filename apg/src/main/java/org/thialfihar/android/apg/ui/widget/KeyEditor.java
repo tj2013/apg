@@ -28,6 +28,7 @@ import org.thialfihar.android.apg.Apg;
 import org.thialfihar.android.apg.Id;
 import org.thialfihar.android.apg.R;
 import org.thialfihar.android.apg.utils.Choice;
+import org.thialfihar.android.apg.key.Key;
 
 import android.app.DatePickerDialog;
 import android.app.Dialog;
@@ -46,7 +47,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 public class KeyEditor extends LinearLayout implements Editor, OnClickListener {
-    private PGPSecretKey mKey;
+    private Key mKey;
 
     private EditorListener mEditorListener = null;
 
@@ -131,7 +132,7 @@ public class KeyEditor extends LinearLayout implements Editor, OnClickListener {
         super.onFinishInflate();
     }
 
-    public void setValue(PGPSecretKey key, boolean isMasterKey) {
+    public void setValue(Key key, boolean isMasterKey) {
         mKey = key;
 
         mIsMasterKey = isMasterKey;
@@ -139,13 +140,13 @@ public class KeyEditor extends LinearLayout implements Editor, OnClickListener {
             mDeleteButton.setVisibility(View.INVISIBLE);
         }
 
-        mAlgorithm.setText(Apg.getAlgorithmInfo(key));
-        String keyId1Str = Apg.getSmallFingerPrint(key.getKeyID());
-        String keyId2Str = Apg.getSmallFingerPrint(key.getKeyID() >> 32);
+        mAlgorithm.setText(key.getAlgorithmInfo());
+        String keyId1Str = Apg.getSmallFingerPrint(key.getKeyId());
+        String keyId2Str = Apg.getSmallFingerPrint(key.getKeyId() >> 32);
         mKeyId.setText(keyId1Str + " " + keyId2Str);
 
         Vector<Choice> choices = new Vector<Choice>();
-        boolean isElGamalKey = (key.getPublicKey().getAlgorithm() == PGPPublicKey.ELGAMAL_ENCRYPT);
+        boolean isElGamalKey = (key.getAlgorithm() == PGPPublicKey.ELGAMAL_ENCRYPT);
         if (!isElGamalKey) {
             choices.add(new Choice(Id.choice.usage.sign_only,
                                    getResources().getString(R.string.choice_signOnly)));
@@ -166,8 +167,8 @@ public class KeyEditor extends LinearLayout implements Editor, OnClickListener {
         mUsage.setAdapter(adapter);
 
         int selectId = 0;
-        if (Apg.isEncryptionKey(key)) {
-            if (Apg.isSigningKey(key)) {
+        if (key.isEncryptionKey()) {
+            if (key.isSigningKey()) {
                 selectId = Id.choice.usage.sign_and_encrypt;
             } else {
                 selectId = Id.choice.usage.encrypt_only;
@@ -184,19 +185,19 @@ public class KeyEditor extends LinearLayout implements Editor, OnClickListener {
         }
 
         GregorianCalendar cal = new GregorianCalendar();
-        cal.setTime(Apg.getCreationDate(key));
+        cal.setTime(key.getCreationDate());
         mCreationDate.setText(DateFormat.getDateInstance().format(cal.getTime()));
         cal = new GregorianCalendar();
-        Date date = Apg.getExpiryDate(key);
+        Date date = key.getExpiryDate();
         if (date == null) {
             setExpiryDate(null);
         } else {
-            cal.setTime(Apg.getExpiryDate(key));
+            cal.setTime(key.getExpiryDate());
             setExpiryDate(cal);
         }
     }
 
-    public PGPSecretKey getValue() {
+    public Key getValue() {
         return mKey;
     }
 

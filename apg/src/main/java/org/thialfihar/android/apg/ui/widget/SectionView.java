@@ -29,6 +29,7 @@ import org.thialfihar.android.apg.Id;
 import org.thialfihar.android.apg.R;
 import org.thialfihar.android.apg.ui.widget.Editor.EditorListener;
 import org.thialfihar.android.apg.utils.Choice;
+import org.thialfihar.android.apg.key.Key;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -59,7 +60,7 @@ public class SectionView extends LinearLayout implements OnClickListener, Editor
     private Choice mNewKeyAlgorithmChoice;
     private int mNewKeySize;
 
-    volatile private PGPSecretKey mNewKey;
+    volatile private Key mNewKey;
     private ProgressDialog mProgressDialog;
     private Thread mRunningThread = null;
 
@@ -264,13 +265,13 @@ public class SectionView extends LinearLayout implements OnClickListener, Editor
         this.updateEditorsVisible();
     }
 
-    public void setKeys(Vector<PGPSecretKey> list) {
+    public void setKeys(Vector<Key> list) {
         if (mType != Id.type.key) {
             return;
         }
 
         mEditors.removeAllViews();
-        for (PGPSecretKey key : list) {
+        for (Key key : list) {
             KeyEditor view =
                 (KeyEditor) mInflater.inflate(R.layout.edit_key_key_item, mEditors, false);
             view.setEditorListener(this);
@@ -295,11 +296,11 @@ public class SectionView extends LinearLayout implements OnClickListener, Editor
     public void run() {
         String error = null;
         try {
-            PGPSecretKey masterKey = null;
+            Key masterKey = null;
             String passPhrase;
             if (mEditors.getChildCount() > 0) {
                 masterKey = ((KeyEditor) mEditors.getChildAt(0)).getValue();
-                passPhrase = Apg.getCachedPassPhrase(masterKey.getKeyID());
+                passPhrase = Apg.getCachedPassPhrase(masterKey.getKeyId());
             } else {
                 passPhrase = "";
             }

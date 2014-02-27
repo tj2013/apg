@@ -91,6 +91,8 @@ import org.thialfihar.android.apg.ui.widget.SectionView;
 import org.thialfihar.android.apg.ui.widget.UserIdEditor;
 import org.thialfihar.android.apg.utils.IterableIterator;
 import org.thialfihar.android.apg.utils.PrngFixes;
+import org.thialfihar.android.apg.key.KeyRing;
+import org.thialfihar.android.apg.key.Key;
 
 import android.app.Activity;
 import android.content.Context;
@@ -245,15 +247,15 @@ public class Apg {
     public static String getCachedPassPhrase(long keyId) {
         long realId = keyId;
         if (realId != Id.key.symmetric) {
-            PGPSecretKeyRing keyRing = getSecretKeyRing(keyId);
+            KeyRing keyRing = getSecretKeyRing(keyId);
             if (keyRing == null) {
                 return null;
             }
-            PGPSecretKey masterKey = getMasterKey(keyRing);
+            Key masterKey = keyRing.getMasterKey();
             if (masterKey == null) {
                 return null;
             }
-            realId = masterKey.getKeyID();
+            realId = masterKey.getKeyId();
         }
         CachedPassPhrase cpp = mPassPhraseCache.get(realId);
         if (cpp == null) {
@@ -290,9 +292,9 @@ public class Apg {
         return delay;
     }
 
-    public static PGPSecretKey createKey(Context context,
-                                         int algorithmChoice, int keySize, String passPhrase,
-                                         PGPSecretKey masterKey)
+    public static Key createKey(Context context,
+                                int algorithmChoice, int keySize, String passPhrase,
+                                Key masterKey)
                   throws NoSuchAlgorithmException, PGPException, NoSuchProviderException,
                   GeneralException, InvalidAlgorithmParameterException {
 
@@ -361,9 +363,7 @@ public class Apg {
                 new PGPPublicKey(tmpKey.getAlgorithm(),
                                  tmpKey.getKey(new BouncyCastleProvider()),
                                  tmpKey.getCreationTime());
-            PGPPrivateKey masterPrivateKey =
-                masterKey.extractPrivateKey(passPhrase.toCharArray(),
-                                            new BouncyCastleProvider());
+            PGPPrivateKey masterPrivateKey = masterKey.extractPrivateKey(passPhrase);
 
             PGPKeyPair masterKeyPair = new PGPKeyPair(masterPublicKey, masterPrivateKey);
             PGPKeyRingGenerator ringGen =
@@ -380,7 +380,7 @@ public class Apg {
             secretKey = it.next();
         }
 
-        return secretKey;
+        return new Key(secretKey);
     }
 
     private static long getNumDaysBetween(GregorianCalendar first, GregorianCalendar second) {
@@ -415,7 +415,7 @@ public class Apg {
         }
 
         Vector<String> userIds = new Vector<String>();
-        Vector<PGPSecretKey> keys = new Vector<PGPSecretKey>();
+        Vector<Key> keys = new Vector<Key>();
 
         ViewGroup userIdEditors = userIdsView.getEditors();
         ViewGroup keyEditors = keysView.getEditors();
@@ -473,15 +473,13 @@ public class Apg {
 
         String mainUserId = userIds.get(0);
 
-        PGPSecretKey masterKey = keys.get(0);
+        Key masterKey = keys.get(0);
         PGPPublicKey tmpKey = masterKey.getPublicKey();
         PGPPublicKey masterPublicKey =
             new PGPPublicKey(tmpKey.getAlgorithm(),
                              tmpKey.getKey(new BouncyCastleProvider()),
                              tmpKey.getCreationTime());
-        PGPPrivateKey masterPrivateKey =
-            masterKey.extractPrivateKey(oldPassPhrase.toCharArray(),
-                                        new BouncyCastleProvider());
+        PGPPrivateKey masterPrivateKey = masterKey.extractPrivateKey(oldPassPhrase);
 
         progress.setProgress(R.string.progress_certifyingMasterKey, 20, 100);
         for (int i = 0; i < userIds.size(); ++i) {
@@ -518,7 +516,7 @@ public class Apg {
         // TODO: this doesn't work quite right yet
         if (keyEditor.getExpiryDate() != null) {
             GregorianCalendar creationDate = new GregorianCalendar();
-            creationDate.setTime(getCreationDate(masterKey));
+            creationDate.setTime(masterKey.getCreationDate());
             GregorianCalendar expiryDate = keyEditor.getExpiryDate();
             long numDays = getNumDaysBetween(creationDate, expiryDate);
             if (numDays <= 0) {
@@ -538,12 +536,10 @@ public class Apg {
         progress.setProgress(R.string.progress_addingSubKeys, 40, 100);
         for (int i = 1; i < keys.size(); ++i) {
             progress.setProgress(40 + 50 * (i - 1)/ (keys.size() - 1), 100);
-            PGPSecretKey subKey = keys.get(i);
+            Key subKey = keys.get(i);
             keyEditor = (KeyEditor) keyEditors.getChildAt(i);
             PGPPublicKey subPublicKey = subKey.getPublicKey();
-            PGPPrivateKey subPrivateKey =
-                    subKey.extractPrivateKey(oldPassPhrase.toCharArray(),
-                                             new BouncyCastleProvider());
+            PGPPrivateKey subPrivateKey = subKey.extractPrivateKey(oldPassPhrase);
             PGPKeyPair subKeyPair =
                 new PGPKeyPair(subPublicKey.getAlgorithm(),
                                subPublicKey.getKey(new BouncyCastleProvider()),
@@ -570,7 +566,7 @@ public class Apg {
             // TODO: this doesn't work quite right yet
             if (keyEditor.getExpiryDate() != null) {
                 GregorianCalendar creationDate = new GregorianCalendar();
-                creationDate.setTime(getCreationDate(masterKey));
+                creationDate.setTime(masterKey.getCreationDate());
                 GregorianCalendar expiryDate = keyEditor.getExpiryDate();
                 long numDays = getNumDaysBetween(creationDate, expiryDate);
                 if (numDays <= 0) {
@@ -587,8 +583,8 @@ public class Apg {
         PGPPublicKeyRing publicKeyRing = keyGen.generatePublicKeyRing();
 
         progress.setProgress(R.string.progress_savingKeyRing, 90, 100);
-        mDatabase.saveKeyRing(secretKeyRing);
-        mDatabase.saveKeyRing(publicKeyRing);
+        mDatabase.saveKeyRing(new KeyRing(secretKeyRing));
+        mDatabase.saveKeyRing(new KeyRing(publicKeyRing));
 
         progress.setProgress(R.string.progress_done, 100, 100);
     }
@@ -650,11 +646,11 @@ public class Apg {
                                 // all good if this fails, we likely didn't use the right password
                             }
                             if (save) {
-                                retValue = mDatabase.saveKeyRing(secretKeyRing);
+                                retValue = mDatabase.saveKeyRing(new KeyRing(secretKeyRing));
                             }
                         } else if (type == Id.type.public_key && obj instanceof PGPPublicKeyRing) {
                             publicKeyRing = (PGPPublicKeyRing) obj;
-                            retValue = mDatabase.saveKeyRing(publicKeyRing);
+                            retValue = mDatabase.saveKeyRing(new KeyRing(publicKeyRing));
                         }
                     } catch (IOException e) {
                         retValue = Id.return_value.error;
@@ -733,72 +729,36 @@ public class Apg {
         return returnData;
     }
 
-    public static PGPPublicKey getEncryptPublicKey(long masterKeyId) {
-        PGPPublicKeyRing keyRing = getPublicKeyRing(masterKeyId);
+    public static Key getEncryptKey(long masterKeyId) {
+        KeyRing keyRing = getPublicKeyRing(masterKeyId);
         if (keyRing == null) {
             return null;
         }
-        Vector<PGPPublicKey> encryptKeys = getUsableEncryptKeys(keyRing);
+        Vector<Key> encryptKeys = keyRing.getUsableEncryptKeys();
         if (encryptKeys.size() == 0) {
             return null;
         }
         return encryptKeys.get(0);
     }
 
-    public static PGPSecretKey getSigningKey(long masterKeyId) {
-        PGPSecretKeyRing keyRing = getSecretKeyRing(masterKeyId);
+    public static Key getSigningKey(long masterKeyId) {
+        KeyRing keyRing = getSecretKeyRing(masterKeyId);
         if (keyRing == null) {
             return null;
         }
-        Vector<PGPSecretKey> signingKeys = getUsableSigningKeys(keyRing);
+        Vector<Key> signingKeys = keyRing.getUsableSigningKeys();
         if (signingKeys.size() == 0) {
             return null;
         }
         return signingKeys.get(0);
     }
 
-    public static String getMainUserIdSafe(Context context, PGPPublicKey key) {
-        String userId = getMainUserId(key);
+    public static String getMainUserIdSafe(Context context, Key key) {
+        String userId = key.getMainUserId();
         if (userId == null) {
             userId = context.getResources().getString(R.string.unknownUserId);
         }
         return userId;
-    }
-
-    public static String getMainUserIdSafe(Context context, PGPSecretKey key) {
-        String userId = getMainUserId(key);
-        if (userId == null) {
-            userId = context.getResources().getString(R.string.unknownUserId);
-        }
-        return userId;
-    }
-
-    public static String getFingerPrint(long keyId) {
-        PGPPublicKey key = Apg.getPublicKey(keyId);
-        if (key == null) {
-            PGPSecretKey secretKey = Apg.getSecretKey(keyId);
-            if (secretKey == null) {
-                return "";
-            }
-            key = secretKey.getPublicKey();
-        }
-
-        String fingerPrint = "";
-        byte fp[] = key.getFingerprint();
-        for (int i = 0; i < fp.length; ++i) {
-            if (i != 0 && i % 10 == 0) {
-                fingerPrint += "  ";
-            } else if (i != 0 && i % 2 == 0) {
-                fingerPrint += " ";
-            }
-            String chunk = Integer.toHexString((fp[i] + 256) % 256).toUpperCase();
-            while (chunk.length() < 2) {
-                chunk = "0" + chunk;
-            }
-            fingerPrint += chunk;
-        }
-
-        return fingerPrint;
     }
 
     public static String getSmallFingerPrint(long keyId) {
@@ -824,17 +784,18 @@ public class Apg {
         mDatabase.deleteKeyRing(keyRingId);
     }
 
-    public static Object getKeyRing(int keyRingId) {
+    public static KeyRing getKeyRing(int keyRingId) {
         return mDatabase.getKeyRing(keyRingId);
     }
 
-    public static PGPSecretKeyRing getSecretKeyRing(long keyId) {
+    public static KeyRing getSecretKeyRing(long keyId) {
+        // TODO: this belongs in Database somewhere
         byte[] data = mDatabase.getKeyRingDataFromKeyId(Id.database.type_secret, keyId);
         if (data == null) {
             return null;
         }
         try {
-            return new PGPSecretKeyRing(data);
+            return new KeyRing(new PGPSecretKeyRing(data));
         } catch (IOException e) {
             // no good way to handle this, return null
             // TODO: some info?
@@ -845,13 +806,13 @@ public class Apg {
         return null;
     }
 
-    public static PGPPublicKeyRing getPublicKeyRing(long keyId) {
+    public static KeyRing getPublicKeyRing(long keyId) {
         byte[] data = mDatabase.getKeyRingDataFromKeyId(Id.database.type_public, keyId);
         if (data == null) {
             return null;
         }
         try {
-            return new PGPPublicKeyRing(data);
+            return new KeyRing(new PGPPublicKeyRing(data));
         } catch (IOException e) {
             // no good way to handle this, return null
             // TODO: some info?
@@ -859,16 +820,16 @@ public class Apg {
         return null;
     }
 
-    public static PGPSecretKey getSecretKey(long keyId) {
-        PGPSecretKeyRing keyRing = getSecretKeyRing(keyId);
+    public static Key getSecretKey(long keyId) {
+        KeyRing keyRing = getSecretKeyRing(keyId);
         if (keyRing == null) {
             return null;
         }
         return keyRing.getSecretKey(keyId);
     }
 
-    public static PGPPublicKey getPublicKey(long keyId) {
-        PGPPublicKeyRing keyRing = getPublicKeyRing(keyId);
+    public static Key getPublicKey(long keyId) {
+        KeyRing keyRing = getPublicKeyRing(keyId);
         if (keyRing == null) {
             return null;
         }
@@ -957,8 +918,8 @@ public class Apg {
         } else {
             out = outStream;
         }
-        PGPSecretKey signingKey = null;
-        PGPSecretKeyRing signingKeyRing = null;
+        Key signingKey = null;
+        KeyRing signingKeyRing = null;
         PGPPrivateKey signaturePrivateKey = null;
 
         if (encryptionKeyIds.length == 0 && passPhrase == null) {
@@ -967,7 +928,7 @@ public class Apg {
 
         if (signatureKeyId != 0) {
             signingKeyRing = getSecretKeyRing(signatureKeyId);
-            signingKey = getSigningKey(signatureKeyId);
+            signingKey = signingKeyRing.getUsableSigningKeys().get(0);
             if (signingKey == null) {
                 throw new GeneralException(context.getString(R.string.error_signatureFailed));
             }
@@ -976,8 +937,7 @@ public class Apg {
                 throw new GeneralException(context.getString(R.string.error_noSignaturePassPhrase));
             }
             progress.setProgress(R.string.progress_extractingSignatureKey, 0, 100);
-            signaturePrivateKey = signingKey.extractPrivateKey(signaturePassPhrase.toCharArray(),
-                                                               new BouncyCastleProvider());
+            signaturePrivateKey = signingKey.extractPrivateKey(signaturePassPhrase);
             if (signaturePrivateKey == null) {
                 throw new GeneralException(context.getString(R.string.error_couldNotExtractPrivateKey));
             }
@@ -993,9 +953,9 @@ public class Apg {
             cPk.addMethod(passPhrase.toCharArray());
         }
         for (int i = 0; i < encryptionKeyIds.length; ++i) {
-            PGPPublicKey key = getEncryptPublicKey(encryptionKeyIds[i]);
+            Key key = getEncryptKey(encryptionKeyIds[i]);
             if (key != null) {
-                cPk.addMethod(key);
+                cPk.addMethod(key.getPublicKey());
             }
         }
         encryptOut = cPk.open(out, new byte[1 << 16]);
@@ -1007,18 +967,18 @@ public class Apg {
             progress.setProgress(R.string.progress_preparingSignature, 10, 100);
             if (forceV3Signature) {
                 signatureV3Generator =
-                    new PGPV3SignatureGenerator(signingKey.getPublicKey().getAlgorithm(),
+                    new PGPV3SignatureGenerator(signingKey.getAlgorithm(),
                                                 hashAlgorithm,
                                                 new BouncyCastleProvider());
                 signatureV3Generator.initSign(PGPSignature.BINARY_DOCUMENT, signaturePrivateKey);
             } else {
                 signatureGenerator =
-                        new PGPSignatureGenerator(signingKey.getPublicKey().getAlgorithm(),
+                        new PGPSignatureGenerator(signingKey.getAlgorithm(),
                                                   hashAlgorithm,
                                                   new BouncyCastleProvider());
                 signatureGenerator.initSign(PGPSignature.BINARY_DOCUMENT, signaturePrivateKey);
 
-                String userId = getMainUserId(getMasterKey(signingKeyRing));
+                String userId = signingKeyRing.getMasterKey().getMainUserId();
                 PGPSignatureSubpacketGenerator spGen = new PGPSignatureSubpacketGenerator();
                 spGen.setSignerUserID(false, userId);
                 signatureGenerator.setHashedSubpackets(spGen.generate());
@@ -1099,8 +1059,8 @@ public class Apg {
         ArmoredOutputStream armorOut = new ArmoredOutputStream(outStream);
         armorOut.setHeader("Version", getFullVersion(context));
 
-        PGPSecretKey signingKey = null;
-        PGPSecretKeyRing signingKeyRing = null;
+        Key signingKey = null;
+        KeyRing signingKeyRing = null;
         PGPPrivateKey signaturePrivateKey = null;
 
         if (signatureKeyId == 0) {
@@ -1116,9 +1076,7 @@ public class Apg {
         if (signaturePassPhrase == null) {
             throw new GeneralException(context.getString(R.string.error_noSignaturePassPhrase));
         }
-        signaturePrivateKey =
-                signingKey.extractPrivateKey(signaturePassPhrase.toCharArray(),
-                                             new BouncyCastleProvider());
+        signaturePrivateKey = signingKey.extractPrivateKey(signaturePassPhrase);
         if (signaturePrivateKey == null) {
             throw new GeneralException(context.getString(R.string.error_couldNotExtractPrivateKey));
         }
@@ -1131,19 +1089,19 @@ public class Apg {
 
         if (forceV3Signature) {
             signatureV3Generator =
-                new PGPV3SignatureGenerator(signingKey.getPublicKey().getAlgorithm(),
+                new PGPV3SignatureGenerator(signingKey.getAlgorithm(),
                                             hashAlgorithm,
                                             new BouncyCastleProvider());
             signatureV3Generator.initSign(PGPSignature.CANONICAL_TEXT_DOCUMENT, signaturePrivateKey);
         } else {
             signatureGenerator =
-                    new PGPSignatureGenerator(signingKey.getPublicKey().getAlgorithm(),
+                    new PGPSignatureGenerator(signingKey.getAlgorithm(),
                                               hashAlgorithm,
                                               new BouncyCastleProvider());
             signatureGenerator.initSign(PGPSignature.CANONICAL_TEXT_DOCUMENT, signaturePrivateKey);
 
             PGPSignatureSubpacketGenerator spGen = new PGPSignatureSubpacketGenerator();
-            String userId = getMainUserId(getMasterKey(signingKeyRing));
+            String userId = signingKeyRing.getMasterKey().getMainUserId();
             spGen.setSignerUserID(false, userId);
             signatureGenerator.setHashedSubpackets(spGen.generate());
         }
@@ -1215,8 +1173,8 @@ public class Apg {
             out = outStream;
         }
 
-        PGPSecretKey signingKey = null;
-        PGPSecretKeyRing signingKeyRing = null;
+        Key signingKey = null;
+        KeyRing signingKeyRing = null;
         PGPPrivateKey signaturePrivateKey = null;
 
         if (signatureKeyId == 0) {
@@ -1232,9 +1190,7 @@ public class Apg {
         if (signaturePassPhrase == null) {
             throw new GeneralException(context.getString(R.string.error_noSignaturePassPhrase));
         }
-        signaturePrivateKey =
-                signingKey.extractPrivateKey(signaturePassPhrase.toCharArray(),
-                                             new BouncyCastleProvider());
+        signaturePrivateKey = signingKey.extractPrivateKey(signaturePassPhrase);
         if (signaturePrivateKey == null) {
             throw new GeneralException(context.getString(R.string.error_couldNotExtractPrivateKey));
         }
@@ -1264,7 +1220,7 @@ public class Apg {
             signatureGenerator.initSign(type, signaturePrivateKey);
 
             PGPSignatureSubpacketGenerator spGen = new PGPSignatureSubpacketGenerator();
-            String userId = getMainUserId(getMasterKey(signingKeyRing));
+            String userId = signingKeyRing.getMasterKey().getMainUserId();
             spGen.setSignerUserID(false, userId);
             signatureGenerator.setHashedSubpackets(spGen.generate());
         }
@@ -1335,7 +1291,7 @@ public class Apg {
 
         // TODO: currently we always only look at the first known key
         // find the secret key
-        PGPSecretKey secretKey = null;
+        Key secretKey = null;
         Iterator<?> it = enc.getEncryptedDataObjects();
         boolean gotAsymmetricEncryption = false;
         while (it.hasNext()) {
@@ -1358,7 +1314,7 @@ public class Apg {
             return Id.key.none;
         }
 
-        return secretKey.getKeyID();
+        return secretKey.getKeyId();
     }
 
     public static boolean hasSymmetricEncryption(Context context, InputData data)
@@ -1448,7 +1404,7 @@ public class Apg {
         } else {
             progress.setProgress(R.string.progress_findingKey, currentProgress, 100);
             PGPPublicKeyEncryptedData pbe = null;
-            PGPSecretKey secretKey = null;
+            Key secretKey = null;
             Iterator<?> it = enc.getEncryptedDataObjects();
             // find secret key
             while (it.hasNext()) {
@@ -1471,8 +1427,7 @@ public class Apg {
             progress.setProgress(R.string.progress_extractingKey, currentProgress, 100);
             PGPPrivateKey privateKey = null;
             try {
-                privateKey = secretKey.extractPrivateKey(passPhrase.toCharArray(),
-                                                         new BouncyCastleProvider());
+                privateKey = secretKey.extractPrivateKey(passPhrase);
             } catch (PGPException e) {
                 throw new PGPException(context.getString(R.string.error_wrongPassPhrase));
             }
@@ -1489,7 +1444,7 @@ public class Apg {
         PGPObjectFactory plainFact = new PGPObjectFactory(clear);
         Object dataChunk = plainFact.nextObject();
         PGPOnePassSignature signature = null;
-        PGPPublicKey signatureKey = null;
+        Key signatureKey = null;
         int signatureIndex = -1;
 
         if (dataChunk instanceof PGPCompressedData) {
@@ -1517,9 +1472,9 @@ public class Apg {
                     signatureIndex = i;
                     signatureKeyId = signature.getKeyID();
                     String userId = null;
-                    PGPPublicKeyRing sigKeyRing = getPublicKeyRing(signatureKeyId);
+                    KeyRing sigKeyRing = getPublicKeyRing(signatureKeyId);
                     if (sigKeyRing != null) {
-                        userId = getMainUserId(getMasterKey(sigKeyRing));
+                        userId = sigKeyRing.getMasterKey().getMainUserId();
                     }
                     returnData.putString(EXTRA_SIGNATURE_USER_ID, userId);
                     break;
@@ -1529,7 +1484,7 @@ public class Apg {
             returnData.putLong(EXTRA_SIGNATURE_KEY_ID, signatureKeyId);
 
             if (signature != null) {
-                signature.initVerify(signatureKey, new BouncyCastleProvider());
+                signature.initVerify(signatureKey.getPublicKey(), new BouncyCastleProvider());
             } else {
                 returnData.putBoolean(EXTRA_SIGNATURE_UNKNOWN, true);
             }
@@ -1649,7 +1604,7 @@ public class Apg {
         }
         PGPSignature signature = null;
         long signatureKeyId = 0;
-        PGPPublicKey signatureKey = null;
+        Key signatureKey = null;
         for (int i = 0; i < sigList.size(); ++i) {
             signature = sigList.get(i);
             signatureKey = getPublicKey(signature.getKeyID());
@@ -1674,9 +1629,9 @@ public class Apg {
             } else {
                 signatureKeyId = signature.getKeyID();
                 String userId = null;
-                PGPPublicKeyRing sigKeyRing = getPublicKeyRing(signatureKeyId);
+                KeyRing sigKeyRing = getPublicKeyRing(signatureKeyId);
                 if (sigKeyRing != null) {
-                    userId = getMainUserId(getMasterKey(sigKeyRing));
+                    userId = sigKeyRing.getMasterKey().getMainUserId();
                 }
                 returnData.putString(EXTRA_SIGNATURE_USER_ID, userId);
                 break;
@@ -1691,7 +1646,7 @@ public class Apg {
             return returnData;
         }
 
-        signature.initVerify(signatureKey, new BouncyCastleProvider());
+        signature.initVerify(signatureKey.getPublicKey(), new BouncyCastleProvider());
 
         InputStream sigIn = new BufferedInputStream(new ByteArrayInputStream(clearText));
 

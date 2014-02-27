@@ -33,6 +33,8 @@ import org.bouncycastle2.openpgp.PGPSecretKey;
 import org.bouncycastle2.openpgp.PGPSecretKeyRing;
 import org.thialfihar.android.apg.provider.DataProvider;
 import org.thialfihar.android.apg.utils.Choice;
+import org.thialfihar.android.apg.key.Key;
+import org.thialfihar.android.apg.key.KeyRing;
 
 import android.app.Dialog;
 import android.content.ActivityNotFoundException;
@@ -302,14 +304,14 @@ public class EncryptActivity extends BaseActivity {
             long signatureKeyId = extras.getLong(Apg.EXTRA_SIGNATURE_KEY_ID);
             long encryptionKeyIds[] = extras.getLongArray(Apg.EXTRA_ENCRYPTION_KEY_IDS);
             if (signatureKeyId != 0) {
-                PGPSecretKeyRing keyRing = Apg.getSecretKeyRing(signatureKeyId);
-                PGPSecretKey masterKey = null;
+                KeyRing keyRing = Apg.getSecretKeyRing(signatureKeyId);
+                Key masterKey = null;
                 if (keyRing != null) {
-                    masterKey = Apg.getMasterKey(keyRing);
+                    masterKey = keyRing.getMasterKey();
                     if (masterKey != null) {
-                        Vector<PGPSecretKey> signKeys = Apg.getUsableSigningKeys(keyRing);
+                        Vector<Key> signKeys = keyRing.getUsableSigningKeys();
                         if (signKeys.size() > 0) {
-                            setSecretKeyId(masterKey.getKeyID());
+                            setSecretKeyId(masterKey.getKeyId());
                         }
                     }
                 }
@@ -318,20 +320,20 @@ public class EncryptActivity extends BaseActivity {
             if (encryptionKeyIds != null) {
                 Vector<Long> goodIds = new Vector<Long>();
                 for (int i = 0; i < encryptionKeyIds.length; ++i) {
-                    PGPPublicKeyRing keyRing = Apg.getPublicKeyRing(encryptionKeyIds[i]);
-                    PGPPublicKey masterKey = null;
+                    KeyRing keyRing = Apg.getPublicKeyRing(encryptionKeyIds[i]);
+                    Key masterKey = null;
                     if (keyRing == null) {
                         continue;
                     }
-                    masterKey = Apg.getMasterKey(keyRing);
+                    masterKey = keyRing.getMasterKey();
                     if (masterKey == null) {
                         continue;
                     }
-                    Vector<PGPPublicKey> encryptKeys = Apg.getUsableEncryptKeys(keyRing);
+                    Vector<Key> encryptKeys = keyRing.getUsableEncryptKeys();
                     if (encryptKeys.size() == 0) {
                         continue;
                     }
-                    goodIds.add(masterKey.getKeyID());
+                    goodIds.add(masterKey.getKeyId());
                 }
                 if (goodIds.size() > 0) {
                     mEncryptionKeyIds = new long[goodIds.size()];
@@ -691,7 +693,7 @@ public class EncryptActivity extends BaseActivity {
 
             out.close();
             if (mEncryptTarget != Id.target.file) {
-            	
+
             	if(out instanceof ByteArrayOutputStream) {
             		if (useAsciiArmour) {
                     	String extraData = new String(((ByteArrayOutputStream)out).toByteArray());
@@ -757,9 +759,9 @@ public class EncryptActivity extends BaseActivity {
         } else {
             String uid = getResources().getString(R.string.unknownUserId);
             String uidExtra = "";
-            PGPSecretKeyRing keyRing = Apg.getSecretKeyRing(getSecretKeyId());
+            KeyRing keyRing = Apg.getSecretKeyRing(getSecretKeyId());
             if (keyRing != null) {
-                PGPSecretKey key = Apg.getMasterKey(keyRing);
+                Key key = keyRing.getMasterKey();
                 if (key != null) {
                     String userId = Apg.getMainUserIdSafe(this, key);
                     String chunks[] = userId.split(" <", 2);

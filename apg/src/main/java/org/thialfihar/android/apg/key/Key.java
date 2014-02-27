@@ -105,6 +105,14 @@ public class Key {
         this.publicKey = secretKey.getPublicKey();
     }
 
+    public PGPPublicKey getPublicKey() {
+        return publicKey;
+    }
+
+    public PGPSecretKey getSecretKey() {
+        return secretKey;
+    }
+
     public boolean isPublic() {
         if (secretKey == null) {
             return true;
@@ -119,6 +127,10 @@ public class Key {
         return publicKey.isMasterKey();
     }
 
+    public long getKeyId() {
+       return publicKey.getKeyID();
+    }
+
     public Date getCreationDate() {
         return publicKey.getCreationTime();
     }
@@ -131,7 +143,7 @@ public class Key {
         }
         Calendar calendar = GregorianCalendar.getInstance();
         calendar.setTime(creationDate);
-        calendar.add(Calendar.DATE, key.getValidDays());
+        calendar.add(Calendar.DATE, publicKey.getValidDays());
         Date expiryDate = calendar.getTime();
 
         return expiryDate;
@@ -148,8 +160,16 @@ public class Key {
         return true;
     }
 
+    public boolean isRevoked() {
+        return publicKey.isRevoked();
+    }
+
+    public IterableIterator<String> getUserIds() {
+        return new IterableIterator<String>(publicKey.getUserIDs());
+    }
+
     public String getMainUserId() {
-        for (String userId : new IterableIterator<String>(publicKey.getUserIDs())) {
+        for (String userId : getUserIds()) {
             return userId;
         }
         return null;
@@ -225,9 +245,21 @@ public class Key {
         return false;
     }
 
+    public int getAlgorithm() {
+        return publicKey.getAlgorithm();
+    }
+
+    public int getBitStrength() {
+        return publicKey.getBitStrength();
+    }
+
     public String getAlgorithmInfo() {
-        int algorithm = publicKey.getAlgorithm();
-        int keySize = publicKey.getBitStrength());
+        int algorithm = getAlgorithm();
+        int keySize = getBitStrength();
+        return Key.getAlgorithmInfo(algorithm, keySize);
+    }
+
+    static public String getAlgorithmInfo(int algorithm, int keySize) {
         String algorithmStr = null;
 
         switch (algorithm) {
@@ -276,4 +308,18 @@ public class Key {
         return fingerprint;
     }
 
+    public byte[] getEncoded() throws IOException {
+        if (isPublic()) {
+            return publicKey.getEncoded();
+        } else {
+            return secretKey.getEncoded();
+        }
+    }
+
+    public PGPPrivateKey extractPrivateKey(String passPhrase) throws PGPException {
+        if (isPublic()) {
+            return null;
+        }
+        return secretKey.extractPrivateKey(passPhrase.toCharArray(), new BouncyCastleProvider());
+    }
 }
