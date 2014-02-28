@@ -14,32 +14,18 @@
  * limitations under the License.
  */
 
-package org.thialfihar.android.apg.utils;
+package org.thialfihar.android.apg.util;
 
-public class Choice {
-    private String mName;
-    private int mId;
+public class Utils {
 
-    public Choice() {
-        mId = -1;
-        mName = "";
-    }
-
-    public Choice(int id, String name) {
-        mId = id;
-        mName = name;
-    }
-
-    public int getId() {
-        return mId;
-    }
-
-    public String getName() {
-        return mName;
-    }
-
-    @Override
-    public String toString() {
-        return mName;
+    public static String toHexString(long keyId, int length) {
+        String s = Long.toHexString(keyId).toUpperCase();
+        while (s.length() < length) {
+            s = "0" + s;
+        }
+        if (s.length() > length) {
+            s = s.substring(0, length);
+        }
+        return s;
     }
 }

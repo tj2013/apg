@@ -25,7 +25,7 @@ import org.bouncycastle2.openpgp.PGPSecretKey;
 import org.bouncycastle2.openpgp.PGPSignature;
 import org.bouncycastle2.openpgp.PGPSignatureSubpacketVector;
 
-import org.thialfihar.android.apg.utils.IterableIterator;
+import org.thialfihar.android.apg.util.IterableIterator;
 
 import java.io.IOException;
 import java.util.Calendar;

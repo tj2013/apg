@@ -28,7 +28,7 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import org.thialfihar.android.apg.utils.Choice;
+import org.thialfihar.android.apg.util.Choice;
 
 import java.io.ByteArrayInputStream;
 import java.io.FileNotFoundException;

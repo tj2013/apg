@@ -44,6 +44,7 @@ import org.thialfihar.android.apg.KeyServer.InsufficientQuery;
 import org.thialfihar.android.apg.KeyServer.KeyInfo;
 import org.thialfihar.android.apg.KeyServer.QueryException;
 import org.thialfihar.android.apg.KeyServer.TooManyResponses;
+import org.thialfihar.android.apg.util.Utils;
 
 import java.util.List;
 import java.util.Vector;
@@ -104,7 +105,7 @@ public class KeyServerQueryActivity extends BaseActivity {
             Apg.Intent.LOOK_UP_KEY_ID_AND_RETURN.equals(intent.getAction())) {
             long keyId = intent.getLongExtra(Apg.EXTRA_KEY_ID, 0);
             if (keyId != 0) {
-                String query = "0x" + Apg.keyToHex(keyId);
+                String query = "0x" + Utils.toHexString(keyId, 8);
                 mQuery.setText(query);
                 search(query);
             }
@@ -266,7 +267,7 @@ public class KeyServerQueryActivity extends BaseActivity {
                 mainUserId.setText(userId);
             }
 
-            keyId.setText(Apg.getSmallFingerPrint(keyInfo.keyId));
+            keyId.setText(Utils.toHexString(keyInfo.keyId, 8));
 
             if (mainUserIdRest.getText().length() == 0) {
                 mainUserIdRest.setVisibility(View.GONE);

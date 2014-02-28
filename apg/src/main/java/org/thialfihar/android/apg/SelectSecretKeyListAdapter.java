@@ -31,6 +31,7 @@ import android.widget.TextView;
 import org.thialfihar.android.apg.provider.KeyRings;
 import org.thialfihar.android.apg.provider.Keys;
 import org.thialfihar.android.apg.provider.UserIds;
+import org.thialfihar.android.apg.util.Utils;
 
 import java.util.Date;
 
@@ -158,7 +159,7 @@ public class SelectSecretKeyListAdapter extends BaseAdapter {
         }
 
         long masterKeyId = mCursor.getLong(1); // MASTER_KEY_ID
-        keyId.setText(Apg.getSmallFingerPrint(masterKeyId));
+        keyId.setText(Utils.toHexString(masterKeyId, 8));
 
         if (mainUserIdRest.getText().length() == 0) {
             mainUserIdRest.setVisibility(View.GONE);

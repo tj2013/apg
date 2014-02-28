@@ -48,6 +48,7 @@ import org.thialfihar.android.apg.key.KeyRing;
 import org.thialfihar.android.apg.provider.KeyRings;
 import org.thialfihar.android.apg.provider.Keys;
 import org.thialfihar.android.apg.provider.UserIds;
+import org.thialfihar.android.apg.util.Utils;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -729,7 +730,7 @@ public class KeyListActivity extends BaseActivity {
                     }
 
                     TextView keyId = (TextView) view.findViewById(R.id.keyId);
-                    String keyIdStr = Apg.getSmallFingerPrint(child.keyId);
+                    String keyIdStr = Utils.toHexString(child.keyId, 8);
                     keyId.setText(keyIdStr);
                     TextView keyDetails = (TextView) view.findViewById(R.id.keyDetails);
                     String algorithmStr = Key.getAlgorithmInfo(child.algorithm, child.keySize);

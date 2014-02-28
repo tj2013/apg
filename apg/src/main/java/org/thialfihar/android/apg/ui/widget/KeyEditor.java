@@ -34,11 +34,11 @@ import android.widget.TextView;
 
 import org.bouncycastle2.openpgp.PGPPublicKey;
 
-import org.thialfihar.android.apg.Apg;
 import org.thialfihar.android.apg.Id;
 import org.thialfihar.android.apg.R;
 import org.thialfihar.android.apg.key.Key;
-import org.thialfihar.android.apg.utils.Choice;
+import org.thialfihar.android.apg.util.Choice;
+import org.thialfihar.android.apg.util.Utils;
 
 import java.text.DateFormat;
 import java.util.Calendar;
@@ -141,9 +141,8 @@ public class KeyEditor extends LinearLayout implements Editor, OnClickListener {
         }
 
         mAlgorithm.setText(key.getAlgorithmInfo());
-        String keyId1Str = Apg.getSmallFingerPrint(key.getKeyId());
-        String keyId2Str = Apg.getSmallFingerPrint(key.getKeyId() >> 32);
-        mKeyId.setText(keyId1Str + " " + keyId2Str);
+        String keyIdStr = Utils.toHexString(key.getKeyId(), 16);
+        mKeyId.setText(keyIdStr);
 
         Vector<Choice> choices = new Vector<Choice>();
         boolean isElGamalKey = (key.getAlgorithm() == PGPPublicKey.ELGAMAL_ENCRYPT);

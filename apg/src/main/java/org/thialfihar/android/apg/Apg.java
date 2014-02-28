@@ -74,20 +74,18 @@ import org.thialfihar.android.apg.provider.UserIds;
 import org.thialfihar.android.apg.ui.widget.KeyEditor;
 import org.thialfihar.android.apg.ui.widget.SectionView;
 import org.thialfihar.android.apg.ui.widget.UserIdEditor;
-import org.thialfihar.android.apg.utils.PrngFixes;
+import org.thialfihar.android.apg.util.PrngFixes;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.EOFException;
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.RandomAccessFile;
 import java.math.BigInteger;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.KeyPairGenerator;
@@ -756,25 +754,6 @@ public class Apg {
             userId = context.getResources().getString(R.string.unknownUserId);
         }
         return userId;
-    }
-
-    public static String getSmallFingerPrint(long keyId) {
-        String fingerPrint = Long.toHexString(keyId & 0xffffffffL).toUpperCase();
-        while (fingerPrint.length() < 8) {
-            fingerPrint = "0" + fingerPrint;
-        }
-        return fingerPrint;
-    }
-
-    public static String keyToHex(long keyId) {
-        return getSmallFingerPrint(keyId >> 32) + getSmallFingerPrint(keyId);
-    }
-
-    public static long keyFromHex(String data) {
-        int len = data.length();
-        String s2 = data.substring(len - 8);
-        String s1 = data.substring(0, len - 8);
-        return (Long.parseLong(s1, 16) << 32) | Long.parseLong(s2, 16);
     }
 
     public static void deleteKey(int keyRingId) {

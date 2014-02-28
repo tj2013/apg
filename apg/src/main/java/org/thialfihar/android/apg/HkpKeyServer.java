@@ -18,6 +18,8 @@ package org.thialfihar.android.apg;
 
 import android.text.Html;
 
+import org.thialfihar.android.apg.util.Utils;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -63,6 +65,10 @@ public class HkpKeyServer extends KeyServer {
             Pattern.CASE_INSENSITIVE);
     public static final Pattern USER_ID_LINE =
         Pattern.compile("^   +(.+)$", Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
+
+    public static long keyIdFromHex(String data) {
+        return Long.parseLong(data, 16);
+    }
 
     public HkpKeyServer(String host) {
         mHost = host;
@@ -161,8 +167,8 @@ public class HkpKeyServer extends KeyServer {
             KeyInfo info = new KeyInfo();
             info.size = Integer.parseInt(matcher.group(1));
             info.algorithm = matcher.group(2);
-            info.keyId = Apg.keyFromHex(matcher.group(3));
-            info.fingerPrint = Apg.getSmallFingerPrint(info.keyId);
+            info.keyId = keyIdFromHex(matcher.group(3));
+            info.fingerPrint = Utils.toHexString(info.keyId, 8);
             String chunks[] = matcher.group(4).split("-");
             info.date = new GregorianCalendar(Integer.parseInt(chunks[0]),
                                               Integer.parseInt(chunks[1]),
@@ -192,7 +198,7 @@ public class HkpKeyServer extends KeyServer {
     @Override
     String get(long keyId)
             throws QueryException {
-        String request = "/pks/lookup?op=get&search=0x" + Apg.keyToHex(keyId);
+        String request = "/pks/lookup?op=get&search=0x" + Utils.toHexString(keyId, 8);
 
         String data = null;
         try {

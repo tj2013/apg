@@ -42,7 +42,7 @@ import org.bouncycastle2.openpgp.PGPException;
 import org.thialfihar.android.apg.key.Key;
 import org.thialfihar.android.apg.key.KeyRing;
 import org.thialfihar.android.apg.provider.DataProvider;
-import org.thialfihar.android.apg.utils.Choice;
+import org.thialfihar.android.apg.util.Choice;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;

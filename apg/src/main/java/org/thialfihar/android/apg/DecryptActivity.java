@@ -43,6 +43,7 @@ import org.bouncycastle2.openpgp.PGPException;
 
 import org.thialfihar.android.apg.key.KeyRing;
 import org.thialfihar.android.apg.provider.DataProvider;
+import org.thialfihar.android.apg.util.Utils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -617,7 +618,7 @@ public class DecryptActivity extends BaseActivity {
         if (data.getBoolean(Apg.EXTRA_SIGNATURE)) {
             String userId = data.getString(Apg.EXTRA_SIGNATURE_USER_ID);
             mSignatureKeyId = data.getLong(Apg.EXTRA_SIGNATURE_KEY_ID);
-            mUserIdRest.setText("id: " + Apg.getSmallFingerPrint(mSignatureKeyId));
+            mUserIdRest.setText("id: " + Utils.toHexString(mSignatureKeyId, 8));
             if (userId == null) {
                 userId = getResources().getString(R.string.unknownUserId);
             }
@@ -723,7 +724,7 @@ public class DecryptActivity extends BaseActivity {
                 alert.setIcon(android.R.drawable.ic_dialog_alert);
                 alert.setTitle(R.string.title_unknownSignatureKey);
                 alert.setMessage(getString(R.string.lookupUnknownKey,
-                                           Apg.getSmallFingerPrint(mUnknownSignatureKeyId)));
+                                           Utils.toHexString(mUnknownSignatureKeyId, 8)));
 
                 alert.setPositiveButton(android.R.string.ok,
                                         new DialogInterface.OnClickListener() {

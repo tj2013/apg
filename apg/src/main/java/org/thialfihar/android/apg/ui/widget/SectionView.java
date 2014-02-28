@@ -42,7 +42,7 @@ import org.thialfihar.android.apg.Id;
 import org.thialfihar.android.apg.R;
 import org.thialfihar.android.apg.key.Key;
 import org.thialfihar.android.apg.ui.widget.Editor.EditorListener;
-import org.thialfihar.android.apg.utils.Choice;
+import org.thialfihar.android.apg.util.Choice;
 
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidParameterException;

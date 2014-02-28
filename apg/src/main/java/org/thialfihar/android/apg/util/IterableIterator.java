@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.thialfihar.android.apg.utils;
+package org.thialfihar.android.apg.util;
 
 import java.util.Iterator;
 
