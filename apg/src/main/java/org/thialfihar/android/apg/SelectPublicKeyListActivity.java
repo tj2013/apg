@@ -16,8 +16,6 @@
 
 package org.thialfihar.android.apg;
 
-import java.util.Vector;
-
 import android.app.SearchManager;
 import android.content.Intent;
 import android.os.Bundle;
@@ -29,6 +27,8 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import java.util.Vector;
 
 public class SelectPublicKeyListActivity extends BaseActivity {
     protected ListView mList;

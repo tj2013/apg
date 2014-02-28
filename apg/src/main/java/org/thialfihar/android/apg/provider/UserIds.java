@@ -21,11 +21,11 @@ import android.provider.BaseColumns;
 public class UserIds implements BaseColumns {
     public static final String TABLE_NAME = "user_ids";
 
-    public static final String _ID_type = "INTEGER PRIMARY KEY";
+    public static final String _ID_TYPE = "INTEGER PRIMARY KEY";
     public static final String KEY_ID = "c_key_id";
-    public static final String KEY_ID_type = "INTEGER";
+    public static final String KEY_ID_TYPE = "INTEGER";
     public static final String USER_ID = "c_user_id";
-    public static final String USER_ID_type = "TEXT";
+    public static final String USER_ID_TYPE = "TEXT";
     public static final String RANK = "c_rank";
-    public static final String RANK_type = "INTEGER";
+    public static final String RANK_TYPE = "INTEGER";
 }

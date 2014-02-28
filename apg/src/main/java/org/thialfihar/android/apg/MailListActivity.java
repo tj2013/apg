@@ -16,9 +16,6 @@
 
 package org.thialfihar.android.apg;
 
-import java.util.Vector;
-import java.util.regex.Matcher;
-
 import android.app.ListActivity;
 import android.content.Context;
 import android.content.Intent;
@@ -35,6 +32,9 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.TextView;
+
+import java.util.Vector;
+import java.util.regex.Matcher;
 
 public class MailListActivity extends ListActivity {
     LayoutInflater mInflater = null;

@@ -1,12 +1,20 @@
+/*
+ * Copyright (C) 2010 Thialfihar <thi@thialfihar.org>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.thialfihar.android.apg;
-
-import java.util.List;
-import java.util.Vector;
-
-import org.thialfihar.android.apg.KeyServer.InsufficientQuery;
-import org.thialfihar.android.apg.KeyServer.KeyInfo;
-import org.thialfihar.android.apg.KeyServer.QueryException;
-import org.thialfihar.android.apg.KeyServer.TooManyResponses;
 
 import android.app.Activity;
 import android.app.Dialog;
@@ -31,6 +39,14 @@ import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import org.thialfihar.android.apg.KeyServer.InsufficientQuery;
+import org.thialfihar.android.apg.KeyServer.KeyInfo;
+import org.thialfihar.android.apg.KeyServer.QueryException;
+import org.thialfihar.android.apg.KeyServer.TooManyResponses;
+
+import java.util.List;
+import java.util.Vector;
 
 public class KeyServerQueryActivity extends BaseActivity {
     private ListView mList;
@@ -111,10 +127,10 @@ public class KeyServerQueryActivity extends BaseActivity {
     }
 
     @Override
-	protected Dialog onCreateDialog(int id) {
+    protected Dialog onCreateDialog(int id) {
         ProgressDialog progress = (ProgressDialog) super.onCreateDialog(id);
         progress.setMessage(this.getString(R.string.progress_queryingServer,
-                                           (String)mKeyServer.getSelectedItem()));
+                                           (String) mKeyServer.getSelectedItem()));
         return progress;
     }
 
@@ -125,7 +141,7 @@ public class KeyServerQueryActivity extends BaseActivity {
         Message msg = new Message();
 
         try {
-            HkpKeyServer server = new HkpKeyServer((String)mKeyServer.getSelectedItem());
+            HkpKeyServer server = new HkpKeyServer((String) mKeyServer.getSelectedItem());
             if (mQueryType == Id.query.search) {
                 mSearchResult = server.search(mQueryString);
             } else if (mQueryType == Id.query.get) {
@@ -164,7 +180,9 @@ public class KeyServerQueryActivity extends BaseActivity {
 
         if (mQueryType == Id.query.search) {
             if (mSearchResult != null) {
-                Toast.makeText(this, getString(R.string.keysFound, mSearchResult.size()), Toast.LENGTH_SHORT).show();
+                Toast.makeText(this,
+                               getString(R.string.keysFound, mSearchResult.size()),
+                               Toast.LENGTH_SHORT).show();
                 mAdapter.setKeys(mSearchResult);
             }
         } else if (mQueryType == Id.query.get) {
@@ -279,7 +297,8 @@ public class KeyServerQueryActivity extends BaseActivity {
                         sep.setBackgroundResource(android.R.drawable.divider_horizontal_dark);
                         ll.addView(sep);
                     }
-                    TextView uidView = (TextView) mInflater.inflate(R.layout.key_server_query_result_user_id, null);
+                    TextView uidView =
+                        (TextView) mInflater.inflate(R.layout.key_server_query_result_user_id, null);
                     uidView.setText(uid);
                     ll.addView(uidView);
                     second = false;

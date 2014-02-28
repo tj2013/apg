@@ -16,14 +16,6 @@
 
 package org.thialfihar.android.apg;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Vector;
-
-import org.bouncycastle2.bcpg.HashAlgorithmTags;
-import org.bouncycastle2.openpgp.PGPEncryptedData;
-import org.thialfihar.android.apg.ui.widget.IntegerListPreference;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
@@ -31,6 +23,14 @@ import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceScreen;
+
+import org.bouncycastle2.bcpg.HashAlgorithmTags;
+import org.bouncycastle2.openpgp.PGPEncryptedData;
+import org.thialfihar.android.apg.ui.widget.IntegerListPreference;
+
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Vector;
 
 public class PreferencesActivity extends PreferenceActivity {
     private ListPreference mLanguage = null;
@@ -53,14 +53,14 @@ public class PreferencesActivity extends PreferenceActivity {
         addPreferencesFromResource(R.xml.apg_preferences);
 
         mLanguage = (ListPreference) findPreference(Constants.pref.language);
-        Vector<CharSequence> entryVector = new Vector<CharSequence>(Arrays.asList(mLanguage.getEntries()));
-        Vector<CharSequence> entryValueVector = new Vector<CharSequence>(Arrays.asList(mLanguage.getEntryValues()));
+        Vector<CharSequence> entryVector =
+            new Vector<CharSequence>(Arrays.asList(mLanguage.getEntries()));
+        Vector<CharSequence> entryValueVector =
+            new Vector<CharSequence>(Arrays.asList(mLanguage.getEntryValues()));
         String supportedLanguages[] = getResources().getStringArray(R.array.supported_languages);
         HashSet<String> supportedLanguageSet = new HashSet<String>(Arrays.asList(supportedLanguages));
-        for (int i = entryVector.size() - 1; i > -1; --i)
-        {
-            if (!supportedLanguageSet.contains(entryValueVector.get(i)))
-            {
+        for (int i = entryVector.size() - 1; i > -1; --i) {
+            if (!supportedLanguageSet.contains(entryValueVector.get(i))) {
                 entryVector.remove(i);
                 entryValueVector.remove(i);
             }
@@ -96,7 +96,8 @@ public class PreferencesActivity extends PreferenceActivity {
             }
         });
 
-        mEncryptionAlgorithm = (IntegerListPreference) findPreference(Constants.pref.default_encryption_algorithm);
+        mEncryptionAlgorithm =
+            (IntegerListPreference) findPreference(Constants.pref.default_encryption_algorithm);
         int valueIds[] = {
                 PGPEncryptedData.AES_128, PGPEncryptedData.AES_192, PGPEncryptedData.AES_256,
                 PGPEncryptedData.BLOWFISH, PGPEncryptedData.TWOFISH, PGPEncryptedData.CAST5,
@@ -156,7 +157,8 @@ public class PreferencesActivity extends PreferenceActivity {
             }
         });
 
-        mMessageCompression = (IntegerListPreference) findPreference(Constants.pref.default_message_compression);
+        mMessageCompression =
+            (IntegerListPreference) findPreference(Constants.pref.default_message_compression);
         valueIds = new int[] {
                 Id.choice.compression.none,
                 Id.choice.compression.zip,
@@ -206,26 +208,24 @@ public class PreferencesActivity extends PreferenceActivity {
 
         mAsciiArmour = (CheckBoxPreference) findPreference(Constants.pref.default_ascii_armour);
         mAsciiArmour.setChecked(mPreferences.getDefaultAsciiArmour());
-        mAsciiArmour.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener()
-        {
-            public boolean onPreferenceChange(Preference preference, Object newValue)
-            {
-                mAsciiArmour.setChecked((Boolean)newValue);
-                mPreferences.setDefaultAsciiArmour((Boolean)newValue);
+        mAsciiArmour.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+            public boolean onPreferenceChange(Preference preference, Object newValue) {
+                mAsciiArmour.setChecked((Boolean) newValue);
+                mPreferences.setDefaultAsciiArmour((Boolean) newValue);
                 return false;
             }
         });
 
-        mForceV3Signatures = (CheckBoxPreference) findPreference(Constants.pref.force_v3_signatures);
+        mForceV3Signatures =
+            (CheckBoxPreference) findPreference(Constants.pref.force_v3_signatures);
         mForceV3Signatures.setChecked(mPreferences.getForceV3Signatures());
-        mForceV3Signatures.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener()
-        {
-            public boolean onPreferenceChange(Preference preference, Object newValue)
-            {
-                mForceV3Signatures.setChecked((Boolean)newValue);
-                mPreferences.setForceV3Signatures((Boolean)newValue);
-                return false;
-            }
+        mForceV3Signatures.setOnPreferenceChangeListener(
+            new Preference.OnPreferenceChangeListener() {
+                public boolean onPreferenceChange(Preference preference, Object newValue) {
+                    mForceV3Signatures.setChecked((Boolean) newValue);
+                    mPreferences.setForceV3Signatures((Boolean) newValue);
+                    return false;
+                }
         });
 
         mKeyServerPreference = (PreferenceScreen) findPreference(Constants.pref.key_servers);
@@ -251,7 +251,8 @@ public class PreferencesActivity extends PreferenceActivity {
                 }
                 String servers[] = data.getStringArrayExtra(Apg.EXTRA_KEY_SERVERS);
                 mPreferences.setKeyServers(servers);
-                mKeyServerPreference.setSummary(getResources().getString(R.string.nKeyServers, servers.length));
+                mKeyServerPreference.setSummary(
+                    getResources().getString(R.string.nKeyServers, servers.length));
                 break;
             }
 

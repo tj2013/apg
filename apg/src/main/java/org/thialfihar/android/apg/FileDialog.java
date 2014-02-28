@@ -31,6 +31,7 @@ import android.widget.ImageButton;
 import android.widget.Toast;
 
 public class FileDialog {
+    // TODO: this whole class shouldn't be static
     private static EditText mFilename;
     private static ImageButton mBrowse;
     private static CheckBox mCheckBox;

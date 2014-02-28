@@ -16,20 +16,6 @@
 
 package org.thialfihar.android.apg.ui.widget;
 
-import java.text.DateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.Vector;
-
-import org.bouncycastle2.openpgp.PGPPublicKey;
-import org.bouncycastle2.openpgp.PGPSecretKey;
-import org.thialfihar.android.apg.Apg;
-import org.thialfihar.android.apg.Id;
-import org.thialfihar.android.apg.R;
-import org.thialfihar.android.apg.utils.Choice;
-import org.thialfihar.android.apg.key.Key;
-
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.content.Context;
@@ -45,6 +31,20 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
+
+import org.bouncycastle2.openpgp.PGPPublicKey;
+
+import org.thialfihar.android.apg.Apg;
+import org.thialfihar.android.apg.Id;
+import org.thialfihar.android.apg.R;
+import org.thialfihar.android.apg.key.Key;
+import org.thialfihar.android.apg.utils.Choice;
+
+import java.text.DateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.Vector;
 
 public class KeyEditor extends LinearLayout implements Editor, OnClickListener {
     private Key mKey;
@@ -202,7 +202,7 @@ public class KeyEditor extends LinearLayout implements Editor, OnClickListener {
     }
 
     public void onClick(View v) {
-        final ViewGroup parent = (ViewGroup)getParent();
+        final ViewGroup parent = (ViewGroup) getParent();
         if (v == mDeleteButton) {
             parent.removeView(this);
             if (mEditorListener != null) {

@@ -9,3 +9,4 @@ bouncycastle
 apg.sublime-*
 apg/build
 .gradle
+Makefile

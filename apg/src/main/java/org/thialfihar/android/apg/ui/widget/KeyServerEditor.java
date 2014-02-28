@@ -16,8 +16,6 @@
 
 package org.thialfihar.android.apg.ui.widget;
 
-import org.thialfihar.android.apg.R;
-
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.View;
@@ -26,6 +24,8 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import org.thialfihar.android.apg.R;
 
 public class KeyServerEditor extends LinearLayout implements Editor, OnClickListener {
     private EditorListener mEditorListener = null;
@@ -63,7 +63,7 @@ public class KeyServerEditor extends LinearLayout implements Editor, OnClickList
     }
 
     public void onClick(View v) {
-        final ViewGroup parent = (ViewGroup)getParent();
+        final ViewGroup parent = (ViewGroup) getParent();
         if (v == mDeleteButton) {
             parent.removeView(this);
             if (mEditorListener != null) {

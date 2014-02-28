@@ -16,21 +16,6 @@
 
 package org.thialfihar.android.apg.ui.widget;
 
-import java.security.InvalidAlgorithmParameterException;
-import java.security.InvalidParameterException;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.util.Vector;
-
-import org.bouncycastle2.openpgp.PGPException;
-import org.bouncycastle2.openpgp.PGPSecretKey;
-import org.thialfihar.android.apg.Apg;
-import org.thialfihar.android.apg.Id;
-import org.thialfihar.android.apg.R;
-import org.thialfihar.android.apg.ui.widget.Editor.EditorListener;
-import org.thialfihar.android.apg.utils.Choice;
-import org.thialfihar.android.apg.key.Key;
-
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -50,6 +35,21 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.bouncycastle2.openpgp.PGPException;
+
+import org.thialfihar.android.apg.Apg;
+import org.thialfihar.android.apg.Id;
+import org.thialfihar.android.apg.R;
+import org.thialfihar.android.apg.key.Key;
+import org.thialfihar.android.apg.ui.widget.Editor.EditorListener;
+import org.thialfihar.android.apg.utils.Choice;
+
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidParameterException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.util.Vector;
+
 public class SectionView extends LinearLayout implements OnClickListener, EditorListener, Runnable {
     private LayoutInflater mInflater;
     private View mAdd;
@@ -60,7 +60,7 @@ public class SectionView extends LinearLayout implements OnClickListener, Editor
     private Choice mNewKeyAlgorithmChoice;
     private int mNewKeySize;
 
-    volatile private Key mNewKey;
+    private volatile Key mNewKey;
     private ProgressDialog mProgressDialog;
     private Thread mRunningThread = null;
 

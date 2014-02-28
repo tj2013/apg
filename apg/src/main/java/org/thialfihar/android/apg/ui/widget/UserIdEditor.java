@@ -16,11 +16,6 @@
 
 package org.thialfihar.android.apg.ui.widget;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import org.thialfihar.android.apg.R;
-
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.View;
@@ -30,6 +25,11 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
+
+import org.thialfihar.android.apg.R;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class UserIdEditor extends LinearLayout implements Editor, OnClickListener {
     private EditorListener mEditorListener = null;
@@ -155,7 +155,7 @@ public class UserIdEditor extends LinearLayout implements Editor, OnClickListene
     }
 
     public void onClick(View v) {
-        final ViewGroup parent = (ViewGroup)getParent();
+        final ViewGroup parent = (ViewGroup) getParent();
         if (v == mDeleteButton) {
             boolean wasMainUserId = mIsMainUserId.isChecked();
             parent.removeView(this);

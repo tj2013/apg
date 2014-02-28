@@ -16,34 +16,17 @@
 
 package org.thialfihar.android.apg;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.EOFException;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.RandomAccessFile;
-import java.math.BigInteger;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.KeyPairGenerator;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.SecureRandom;
-import java.security.Security;
-import java.security.SignatureException;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Vector;
-import java.util.regex.Pattern;
+import android.app.Activity;
+import android.content.Context;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager.NameNotFoundException;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
+import android.os.Bundle;
+import android.os.Environment;
+import android.os.Message;
+import android.view.ViewGroup;
 
 import org.bouncycastle2.bcpg.ArmoredInputStream;
 import org.bouncycastle2.bcpg.ArmoredOutputStream;
@@ -78,9 +61,11 @@ import org.bouncycastle2.openpgp.PGPSignature;
 import org.bouncycastle2.openpgp.PGPSignatureGenerator;
 import org.bouncycastle2.openpgp.PGPSignatureList;
 import org.bouncycastle2.openpgp.PGPSignatureSubpacketGenerator;
-import org.bouncycastle2.openpgp.PGPSignatureSubpacketVector;
 import org.bouncycastle2.openpgp.PGPUtil;
 import org.bouncycastle2.openpgp.PGPV3SignatureGenerator;
+
+import org.thialfihar.android.apg.key.Key;
+import org.thialfihar.android.apg.key.KeyRing;
 import org.thialfihar.android.apg.provider.DataProvider;
 import org.thialfihar.android.apg.provider.Database;
 import org.thialfihar.android.apg.provider.KeyRings;
@@ -89,22 +74,36 @@ import org.thialfihar.android.apg.provider.UserIds;
 import org.thialfihar.android.apg.ui.widget.KeyEditor;
 import org.thialfihar.android.apg.ui.widget.SectionView;
 import org.thialfihar.android.apg.ui.widget.UserIdEditor;
-import org.thialfihar.android.apg.utils.IterableIterator;
 import org.thialfihar.android.apg.utils.PrngFixes;
-import org.thialfihar.android.apg.key.KeyRing;
-import org.thialfihar.android.apg.key.Key;
 
-import android.app.Activity;
-import android.content.Context;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager.NameNotFoundException;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-import android.net.Uri;
-import android.os.Bundle;
-import android.os.Environment;
-import android.os.Message;
-import android.view.ViewGroup;
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.EOFException;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.RandomAccessFile;
+import java.math.BigInteger;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.KeyPairGenerator;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.SecureRandom;
+import java.security.Security;
+import java.security.SignatureException;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Vector;
+import java.util.regex.Pattern;
 
 public class Apg {
     private static final String mApgPackageName = "org.thialfihar.android.apg";
@@ -167,8 +166,6 @@ public class Apg {
     public static final Uri CONTENT_URI_PUBLIC_KEY_RING_BY_EMAILS =
             Uri.parse("content://" + AUTHORITY + "/key_rings/public/emails/");
 
-    private static String VERSION = null;
-
     private static final int[] PREFERRED_SYMMETRIC_ALGORITHMS =
             new int[] {
                     SymmetricKeyAlgorithmTags.AES_256,
@@ -187,23 +184,22 @@ public class Apg {
                     CompressionAlgorithmTags.BZIP2,
                     CompressionAlgorithmTags.ZIP };
 
-    public static Pattern PGP_MESSAGE =
-            Pattern.compile(".*?(-----BEGIN PGP MESSAGE-----.*?-----END PGP MESSAGE-----).*",
-                            Pattern.DOTALL);
+    public static final Pattern PGP_MESSAGE =
+        Pattern.compile(".*?(-----BEGIN PGP MESSAGE-----.*?-----END PGP MESSAGE-----).*",
+                        Pattern.DOTALL);
 
-    public static Pattern PGP_SIGNED_MESSAGE =
-            Pattern.compile(".*?(-----BEGIN PGP SIGNED MESSAGE-----.*?-----BEGIN PGP SIGNATURE-----.*?-----END PGP SIGNATURE-----).*",
-                            Pattern.DOTALL);
+    public static final Pattern PGP_SIGNED_MESSAGE =
+        Pattern.compile(".*?(-----BEGIN PGP SIGNED MESSAGE-----.*?-----BEGIN PGP SIGNATURE-----.*?-----END PGP SIGNATURE-----).*",
+                        Pattern.DOTALL);
 
-    public static Pattern PGP_PUBLIC_KEY =
-            Pattern.compile(".*?(-----BEGIN PGP PUBLIC KEY BLOCK-----.*?-----END PGP PUBLIC KEY BLOCK-----).*",
-                            Pattern.DOTALL);
+    public static final Pattern PGP_PUBLIC_KEY =
+        Pattern.compile(".*?(-----BEGIN PGP PUBLIC KEY BLOCK-----.*?-----END PGP PUBLIC KEY BLOCK-----).*",
+                        Pattern.DOTALL);
 
-    private static HashMap<Long, CachedPassPhrase> mPassPhraseCache =
-            new HashMap<Long, CachedPassPhrase>();
-    private static String mEditPassPhrase = null;
+    private static HashMap<Long, CachedPassPhrase> sPassPhraseCache = new HashMap<Long, CachedPassPhrase>();
+    private static String sEditPassPhrase = null;
 
-    private static Database mDatabase = null;
+    private static Database sDatabase = null;
 
     public static class GeneralException extends Exception {
         static final long serialVersionUID = 0xf812773342L;
@@ -222,26 +218,26 @@ public class Apg {
     }
 
     public static void initialize(Context context) {
-        if (mDatabase == null) {
-            mDatabase = new Database(context);
+        if (sDatabase == null) {
+            sDatabase = new Database(context);
         }
         PrngFixes.apply();
     }
 
     public static Database getDatabase() {
-        return mDatabase;
+        return sDatabase;
     }
 
     public static void setEditPassPhrase(String passPhrase) {
-        mEditPassPhrase = passPhrase;
+        sEditPassPhrase = passPhrase;
     }
 
     public static String getEditPassPhrase() {
-        return mEditPassPhrase;
+        return sEditPassPhrase;
     }
 
     public static void setCachedPassPhrase(long keyId, String passPhrase) {
-        mPassPhraseCache.put(keyId, new CachedPassPhrase(new Date().getTime(), passPhrase));
+        sPassPhraseCache.put(keyId, new CachedPassPhrase(new Date().getTime(), passPhrase));
     }
 
     public static String getCachedPassPhrase(long keyId) {
@@ -257,7 +253,7 @@ public class Apg {
             }
             realId = masterKey.getKeyId();
         }
-        CachedPassPhrase cpp = mPassPhraseCache.get(realId);
+        CachedPassPhrase cpp = sPassPhraseCache.get(realId);
         if (cpp == null) {
             return null;
         }
@@ -271,7 +267,7 @@ public class Apg {
         long realTtl = ttl * 1000;
         long now = new Date().getTime();
         Vector<Long> oldKeys = new Vector<Long>();
-        for (Map.Entry<Long, CachedPassPhrase> pair : mPassPhraseCache.entrySet()) {
+        for (Map.Entry<Long, CachedPassPhrase> pair : sPassPhraseCache.entrySet()) {
             long lived = now - pair.getValue().timestamp;
             if (lived >= realTtl) {
                 oldKeys.add(pair.getKey());
@@ -280,13 +276,13 @@ public class Apg {
                 // check delay
                 long nextCheck = realTtl - lived + 1000;
                 if (nextCheck < delay) {
-                    delay = (int)nextCheck;
+                    delay = (int) nextCheck;
                 }
             }
         }
 
         for (long keyId : oldKeys) {
-            mPassPhraseCache.remove(keyId);
+            sPassPhraseCache.remove(keyId);
         }
 
         return delay;
@@ -387,7 +383,7 @@ public class Apg {
         GregorianCalendar tmp = new GregorianCalendar();
         tmp.setTime(first.getTime());
         long numDays = (second.getTimeInMillis() - first.getTimeInMillis()) / 1000 / 86400;
-        tmp.add(Calendar.DAY_OF_MONTH, (int)numDays);
+        tmp.add(Calendar.DAY_OF_MONTH, (int) numDays);
         while (tmp.before(second)) {
             tmp.add(Calendar.DAY_OF_MONTH, 1);
             ++numDays;
@@ -422,7 +418,7 @@ public class Apg {
 
         boolean gotMainUserId = false;
         for (int i = 0; i < userIdEditors.getChildCount(); ++i) {
-            UserIdEditor editor = (UserIdEditor)userIdEditors.getChildAt(i);
+            UserIdEditor editor = (UserIdEditor) userIdEditors.getChildAt(i);
             String userId = null;
             try {
                 userId = editor.getValue();
@@ -459,7 +455,7 @@ public class Apg {
         }
 
         for (int i = 0; i < keyEditors.getChildCount(); ++i) {
-            KeyEditor editor = (KeyEditor)keyEditors.getChildAt(i);
+            KeyEditor editor = (KeyEditor) keyEditors.getChildAt(i);
             keys.add(editor.getValue());
         }
 
@@ -535,7 +531,7 @@ public class Apg {
 
         progress.setProgress(R.string.progress_addingSubKeys, 40, 100);
         for (int i = 1; i < keys.size(); ++i) {
-            progress.setProgress(40 + 50 * (i - 1)/ (keys.size() - 1), 100);
+            progress.setProgress(40 + 50 * (i - 1) / (keys.size() - 1), 100);
             Key subKey = keys.get(i);
             keyEditor = (KeyEditor) keyEditors.getChildAt(i);
             PGPPublicKey subPublicKey = subKey.getPublicKey();
@@ -583,8 +579,8 @@ public class Apg {
         PGPPublicKeyRing publicKeyRing = keyGen.generatePublicKeyRing();
 
         progress.setProgress(R.string.progress_savingKeyRing, 90, 100);
-        mDatabase.saveKeyRing(new KeyRing(secretKeyRing));
-        mDatabase.saveKeyRing(new KeyRing(publicKeyRing));
+        sDatabase.saveKeyRing(new KeyRing(secretKeyRing));
+        sDatabase.saveKeyRing(new KeyRing(publicKeyRing));
 
         progress.setProgress(R.string.progress_done, 100, 100);
     }
@@ -635,7 +631,8 @@ public class Apg {
                             boolean save = true;
                             try {
                                 PGPPrivateKey testKey = secretKeyRing.getSecretKey()
-                                        .extractPrivateKey(new char[] {}, new BouncyCastleProvider());
+                                    .extractPrivateKey(new char[] {},
+                                                       new BouncyCastleProvider());
                                 if (testKey == null) {
                                     // this is bad, something is very wrong... likely a
                                     // --export-secret-subkeys export
@@ -646,11 +643,11 @@ public class Apg {
                                 // all good if this fails, we likely didn't use the right password
                             }
                             if (save) {
-                                retValue = mDatabase.saveKeyRing(new KeyRing(secretKeyRing));
+                                retValue = sDatabase.saveKeyRing(new KeyRing(secretKeyRing));
                             }
                         } else if (type == Id.type.public_key && obj instanceof PGPPublicKeyRing) {
                             publicKeyRing = (PGPPublicKeyRing) obj;
-                            retValue = mDatabase.saveKeyRing(new KeyRing(publicKeyRing));
+                            retValue = sDatabase.saveKeyRing(new KeyRing(publicKeyRing));
                         }
                     } catch (IOException e) {
                         retValue = Id.return_value.error;
@@ -669,7 +666,7 @@ public class Apg {
                     } else if (retValue == Id.return_value.bad) {
                         ++badKeys;
                     }
-                    progress.setProgress((int)(100 * progressIn.position() / data.getSize()), 100);
+                    progress.setProgress((int) (100 * progressIn.position() / data.getSize()), 100);
                     obj = objectFactory.nextObject();
                 }
             }
@@ -706,7 +703,7 @@ public class Apg {
         int numKeys = 0;
         for (int i = 0; i < keyRingIds.size(); ++i) {
             progress.setProgress(i * 100 / keyRingIds.size(), 100);
-            Object obj = mDatabase.getKeyRing(keyRingIds.get(i));
+            Object obj = sDatabase.getKeyRing(keyRingIds.get(i));
             PGPPublicKeyRing publicKeyRing;
             PGPSecretKeyRing secretKeyRing;
 
@@ -781,16 +778,16 @@ public class Apg {
     }
 
     public static void deleteKey(int keyRingId) {
-        mDatabase.deleteKeyRing(keyRingId);
+        sDatabase.deleteKeyRing(keyRingId);
     }
 
     public static KeyRing getKeyRing(int keyRingId) {
-        return mDatabase.getKeyRing(keyRingId);
+        return sDatabase.getKeyRing(keyRingId);
     }
 
     public static KeyRing getSecretKeyRing(long keyId) {
         // TODO: this belongs in Database somewhere
-        byte[] data = mDatabase.getKeyRingDataFromKeyId(Id.database.type_secret, keyId);
+        byte[] data = sDatabase.getKeyRingDataFromKeyId(Id.database.type_secret, keyId);
         if (data == null) {
             return null;
         }
@@ -807,7 +804,7 @@ public class Apg {
     }
 
     public static KeyRing getPublicKeyRing(long keyId) {
-        byte[] data = mDatabase.getKeyRingDataFromKeyId(Id.database.type_public, keyId);
+        byte[] data = sDatabase.getKeyRingDataFromKeyId(Id.database.type_public, keyId);
         if (data == null) {
             return null;
         }
@@ -837,7 +834,7 @@ public class Apg {
     }
 
     public static Vector<Integer> getKeyRingIds(int type) {
-        SQLiteDatabase db = mDatabase.db();
+        SQLiteDatabase db = sDatabase.db();
         Vector<Integer> keyIds = new Vector<Integer>();
         Cursor c = db.query(KeyRings.TABLE_NAME,
                             new String[] { KeyRings._ID },
@@ -857,7 +854,7 @@ public class Apg {
     }
 
     public static String getMainUserId(long keyId, int type) {
-        SQLiteDatabase db = mDatabase.db();
+        SQLiteDatabase db = sDatabase.db();
         Cursor c = db.query(Keys.TABLE_NAME + " INNER JOIN " + KeyRings.TABLE_NAME + " ON (" +
                             KeyRings.TABLE_NAME + "." + KeyRings._ID + " = " +
                             Keys.TABLE_NAME + "." + Keys.KEY_RING_ID + ") " +
@@ -1523,12 +1520,13 @@ public class Apg {
                     }
                 }
                 // unknown size, but try to at least have a moving, slowing down progress bar
-                currentProgress = startProgress + (endProgress - startProgress) * done / (done + 100000);
+                currentProgress =
+                    startProgress + (endProgress - startProgress) * done / (done + 100000);
                 if (data.getSize() - startPos == 0) {
                     currentProgress = endProgress;
                 } else {
-                    currentProgress = (int)(startProgress + (endProgress - startProgress) *
-                                        (data.getStreamPosition() - startPos) / (data.getSize() - startPos));
+                    currentProgress = (int) (startProgress + (endProgress - startProgress) *
+                            (data.getStreamPosition() - startPos) / (data.getSize() - startPos));
                 }
                 progress.setProgress(currentProgress, 100);
             }
@@ -1658,8 +1656,8 @@ public class Apg {
             do {
                 lookAhead = readInputLine(lineOut, lookAhead, sigIn);
 
-                signature.update((byte)'\r');
-                signature.update((byte)'\n');
+                signature.update((byte) '\r');
+                signature.update((byte) '\n');
 
                 processLine(signature, lineOut.toByteArray());
             }
@@ -1838,7 +1836,7 @@ public class Apg {
         byte[] nlBytes = new byte[nl.length()];
 
         for (int i = 0; i != nlBytes.length; i++) {
-            nlBytes[i] = (byte)nl.charAt(i);
+            nlBytes[i] = (byte) nl.charAt(i);
         }
 
         return nlBytes;
@@ -1859,13 +1857,9 @@ public class Apg {
     }
 
     public static String getVersion(Context context) {
-        if (VERSION != null) {
-            return VERSION;
-        }
         try {
             PackageInfo pi = context.getPackageManager().getPackageInfo(mApgPackageName, 0);
-            VERSION = pi.versionName;
-            return VERSION;
+            return pi.versionName;
         } catch (NameNotFoundException e) {
             // unpossible!
             return "0.0.0";
@@ -1891,11 +1885,11 @@ public class Apg {
         for (int i = 0; i < length; ++i) {
             int v = (bytes[i] + 256) % 64;
             if (v < 10) {
-                result += (char)('0' + v);
+                result += (char) ('0' + v);
             } else if (v < 36) {
-                result += (char)('A' + v - 10);
+                result += (char) ('A' + v - 10);
             } else if (v < 62) {
-                result += (char)('a' + v - 36);
+                result += (char) ('a' + v - 36);
             } else if (v == 62) {
                 result += '_';
             } else if (v == 63) {
@@ -1926,7 +1920,7 @@ public class Apg {
         int pos = 0;
         String msg = context.getString(R.string.progress_deletingSecurely, file.getName());
         while (pos < length) {
-            progress.setProgress(msg, (int)(100 * pos / length), 100);
+            progress.setProgress(msg, (int) (100 * pos / length), 100);
             random.nextBytes(data);
             raf.write(data);
             pos += data.length;

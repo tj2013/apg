@@ -16,10 +16,6 @@
 
 package org.thialfihar.android.apg;
 
-import org.thialfihar.android.apg.key.KeyRing;
-
-import org.bouncycastle2.openpgp.PGPPublicKeyRing;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.ContextMenu;
@@ -29,6 +25,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ExpandableListView;
 import android.widget.ExpandableListView.ExpandableListContextMenuInfo;
+
+import org.thialfihar.android.apg.key.KeyRing;
 
 public class PublicKeyListActivity extends KeyListActivity {
     @Override

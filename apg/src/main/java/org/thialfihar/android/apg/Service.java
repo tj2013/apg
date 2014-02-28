@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2010 Thialfihar <thi@thialfihar.org>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.thialfihar.android.apg;
 
 import android.content.Intent;
@@ -32,19 +48,18 @@ public class Service extends android.app.Service {
         }
     };
 
-    static private boolean mIsRunning = false;
+    private static boolean sIsRunning = false;
 
     @Override
     public void onCreate() {
         super.onCreate();
-
-        mIsRunning = true;
+        sIsRunning = true;
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        mIsRunning = false;
+        sIsRunning = false;
     }
 
     @Override
@@ -61,8 +76,8 @@ public class Service extends android.app.Service {
         mCacheHandler.postDelayed(mCacheTask, 1000);
     }
 
-    static public boolean isRunning() {
-        return mIsRunning;
+    public static boolean isRunning() {
+        return sIsRunning;
     }
 
     public class LocalBinder extends Binder {

@@ -16,12 +16,6 @@
 
 package org.thialfihar.android.apg;
 
-import java.util.Vector;
-
-import org.thialfihar.android.apg.ui.widget.Editor;
-import org.thialfihar.android.apg.ui.widget.Editor.EditorListener;
-import org.thialfihar.android.apg.ui.widget.KeyServerEditor;
-
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -32,6 +26,12 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+
+import org.thialfihar.android.apg.ui.widget.Editor;
+import org.thialfihar.android.apg.ui.widget.Editor.EditorListener;
+import org.thialfihar.android.apg.ui.widget.KeyServerEditor;
+
+import java.util.Vector;
 
 public class KeyServerPreferenceActivity extends BaseActivity
         implements OnClickListener, EditorListener {
@@ -61,7 +61,8 @@ public class KeyServerPreferenceActivity extends BaseActivity
         String servers[] = intent.getStringArrayExtra(Apg.EXTRA_KEY_SERVERS);
         if (servers != null) {
             for (int i = 0; i < servers.length; ++i) {
-                KeyServerEditor view = (KeyServerEditor) mInflater.inflate(R.layout.key_server_editor, mEditors, false);
+                KeyServerEditor view =
+                    (KeyServerEditor) mInflater.inflate(R.layout.key_server_editor, mEditors, false);
                 view.setEditorListener(this);
                 view.setValue(servers[i]);
                 mEditors.addView(view);
@@ -88,7 +89,8 @@ public class KeyServerPreferenceActivity extends BaseActivity
     }
 
     public void onClick(View v) {
-        KeyServerEditor view = (KeyServerEditor) mInflater.inflate(R.layout.key_server_editor, mEditors, false);
+        KeyServerEditor view =
+            (KeyServerEditor) mInflater.inflate(R.layout.key_server_editor, mEditors, false);
         view.setEditorListener(this);
         mEditors.addView(view);
     }

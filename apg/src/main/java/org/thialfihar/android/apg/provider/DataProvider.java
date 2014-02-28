@@ -16,12 +16,6 @@
 
 package org.thialfihar.android.apg.provider;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.util.HashMap;
-
-import org.thialfihar.android.apg.Id;
-
 import android.content.ContentProvider;
 import android.content.ContentValues;
 import android.content.UriMatcher;
@@ -31,6 +25,12 @@ import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.os.ParcelFileDescriptor;
 import android.text.TextUtils;
+
+import org.thialfihar.android.apg.Id;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.HashMap;
 
 public class DataProvider extends ContentProvider {
     public static final String AUTHORITY = "org.thialfihar.android.apg.provider";
@@ -169,9 +169,7 @@ public class DataProvider extends ContentProvider {
                 qb.appendWhere(" AND " +
                                KeyRings.TABLE_NAME + "." + KeyRings.MASTER_KEY_ID + " = ");
                 qb.appendWhereEscapeString(uri.getPathSegments().get(2));
-
-                // break omitted intentionally
-            }
+            } // fall through
 
             case PUBLIC_KEY_RING:
             case SECRET_KEY_RING: {
@@ -290,7 +288,6 @@ public class DataProvider extends ContentProvider {
             orderBy = sortOrder;
         }
 
-        //System.out.println(qb.buildQuery(projection, selection, selectionArgs, null, null, sortOrder, null).replace("WHERE", "WHERE\n"));
         Cursor c = qb.query(mDb.db(), projection, selection, selectionArgs, null, null, orderBy);
 
         // Tell the cursor what uri to watch, so it knows when its source data changes

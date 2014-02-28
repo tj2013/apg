@@ -1,20 +1,20 @@
+/*
+ * Copyright (C) 2010 Thialfihar <thi@thialfihar.org>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.thialfihar.android.apg.provider;
-
-import java.io.IOException;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Vector;
-
-import org.bouncycastle2.openpgp.PGPException;
-import org.bouncycastle2.openpgp.PGPPublicKey;
-import org.bouncycastle2.openpgp.PGPPublicKeyRing;
-import org.bouncycastle2.openpgp.PGPSecretKey;
-import org.bouncycastle2.openpgp.PGPSecretKeyRing;
-import org.thialfihar.android.apg.Apg;
-import org.thialfihar.android.apg.Id;
-import org.thialfihar.android.apg.utils.IterableIterator;
-import org.thialfihar.android.apg.key.Key;
-import org.thialfihar.android.apg.key.KeyRing;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -22,6 +22,19 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
+
+import org.bouncycastle2.openpgp.PGPException;
+import org.bouncycastle2.openpgp.PGPPublicKeyRing;
+import org.bouncycastle2.openpgp.PGPSecretKeyRing;
+
+import org.thialfihar.android.apg.Id;
+import org.thialfihar.android.apg.key.Key;
+import org.thialfihar.android.apg.key.KeyRing;
+
+import java.io.IOException;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Vector;
 
 public class Database extends SQLiteOpenHelper {
     public static class GeneralException extends Exception {
@@ -90,33 +103,33 @@ public class Database extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE " + KeyRings.TABLE_NAME + " (" +
-                   KeyRings._ID + " " + KeyRings._ID_type + "," +
-                   KeyRings.MASTER_KEY_ID + " " + KeyRings.MASTER_KEY_ID_type + ", " +
-                   KeyRings.TYPE + " " + KeyRings.TYPE_type + ", " +
-                   KeyRings.WHO_ID + " " + KeyRings.WHO_ID_type + ", " +
-                   KeyRings.KEY_RING_DATA + " " + KeyRings.KEY_RING_DATA_type + ");");
+                   KeyRings._ID + " " + KeyRings._ID_TYPE + "," +
+                   KeyRings.MASTER_KEY_ID + " " + KeyRings.MASTER_KEY_ID_TYPE + ", " +
+                   KeyRings.TYPE + " " + KeyRings.TYPE_TYPE + ", " +
+                   KeyRings.WHO_ID + " " + KeyRings.WHO_ID_TYPE + ", " +
+                   KeyRings.KEY_RING_DATA + " " + KeyRings.KEY_RING_DATA_TYPE + ");");
 
         db.execSQL("CREATE TABLE " + Keys.TABLE_NAME + " (" +
-                   Keys._ID + " " + Keys._ID_type + "," +
-                   Keys.KEY_ID + " " + Keys.KEY_ID_type + ", " +
-                   Keys.TYPE + " " + Keys.TYPE_type + ", " +
-                   Keys.IS_MASTER_KEY + " " + Keys.IS_MASTER_KEY_type + ", " +
-                   Keys.ALGORITHM + " " + Keys.ALGORITHM_type + ", " +
-                   Keys.KEY_SIZE + " " + Keys.KEY_SIZE_type + ", " +
-                   Keys.CAN_SIGN + " " + Keys.CAN_SIGN_type + ", " +
-                   Keys.CAN_ENCRYPT + " " + Keys.CAN_ENCRYPT_type + ", " +
-                   Keys.IS_REVOKED + " " + Keys.IS_REVOKED_type + ", " +
-                   Keys.CREATION + " " + Keys.CREATION_type + ", " +
-                   Keys.EXPIRY + " " + Keys.EXPIRY_type + ", " +
-                   Keys.KEY_RING_ID + " " + Keys.KEY_RING_ID_type + ", " +
-                   Keys.KEY_DATA + " " + Keys.KEY_DATA_type +
-                   Keys.RANK + " " + Keys.RANK_type + ");");
+                   Keys._ID + " " + Keys._ID_TYPE + "," +
+                   Keys.KEY_ID + " " + Keys.KEY_ID_TYPE + ", " +
+                   Keys.TYPE + " " + Keys.TYPE_TYPE + ", " +
+                   Keys.IS_MASTER_KEY + " " + Keys.IS_MASTER_KEY_TYPE + ", " +
+                   Keys.ALGORITHM + " " + Keys.ALGORITHM_TYPE + ", " +
+                   Keys.KEY_SIZE + " " + Keys.KEY_SIZE_TYPE + ", " +
+                   Keys.CAN_SIGN + " " + Keys.CAN_SIGN_TYPE + ", " +
+                   Keys.CAN_ENCRYPT + " " + Keys.CAN_ENCRYPT_TYPE + ", " +
+                   Keys.IS_REVOKED + " " + Keys.IS_REVOKED_TYPE + ", " +
+                   Keys.CREATION + " " + Keys.CREATION_TYPE + ", " +
+                   Keys.EXPIRY + " " + Keys.EXPIRY_TYPE + ", " +
+                   Keys.KEY_RING_ID + " " + Keys.KEY_RING_ID_TYPE + ", " +
+                   Keys.KEY_DATA + " " + Keys.KEY_DATA_TYPE +
+                   Keys.RANK + " " + Keys.RANK_TYPE + ");");
 
         db.execSQL("CREATE TABLE " + UserIds.TABLE_NAME + " (" +
-                   UserIds._ID + " " + UserIds._ID_type + "," +
-                   UserIds.KEY_ID + " " + UserIds.KEY_ID_type + "," +
-                   UserIds.USER_ID + " " + UserIds.USER_ID_type + "," +
-                   UserIds.RANK + " " + UserIds.RANK_type + ");");
+                   UserIds._ID + " " + UserIds._ID_TYPE + "," +
+                   UserIds.KEY_ID + " " + UserIds.KEY_ID_TYPE + "," +
+                   UserIds.USER_ID + " " + UserIds.USER_ID_TYPE + "," +
+                   UserIds.RANK + " " + UserIds.RANK_TYPE + ");");
     }
 
     @Override
@@ -130,33 +143,33 @@ public class Database extends SQLiteOpenHelper {
                     db.execSQL("DROP TABLE IF EXISTS " + UserIds.TABLE_NAME + ";");
 
                     db.execSQL("CREATE TABLE " + KeyRings.TABLE_NAME + " (" +
-                               KeyRings._ID + " " + KeyRings._ID_type + "," +
-                               KeyRings.MASTER_KEY_ID + " " + KeyRings.MASTER_KEY_ID_type + ", " +
-                               KeyRings.TYPE + " " + KeyRings.TYPE_type + ", " +
-                               KeyRings.WHO_ID + " " + KeyRings.WHO_ID_type + ", " +
-                               KeyRings.KEY_RING_DATA + " " + KeyRings.KEY_RING_DATA_type + ");");
+                               KeyRings._ID + " " + KeyRings._ID_TYPE + "," +
+                               KeyRings.MASTER_KEY_ID + " " + KeyRings.MASTER_KEY_ID_TYPE + ", " +
+                               KeyRings.TYPE + " " + KeyRings.TYPE_TYPE + ", " +
+                               KeyRings.WHO_ID + " " + KeyRings.WHO_ID_TYPE + ", " +
+                               KeyRings.KEY_RING_DATA + " " + KeyRings.KEY_RING_DATA_TYPE + ");");
 
                     db.execSQL("CREATE TABLE " + Keys.TABLE_NAME + " (" +
-                               Keys._ID + " " + Keys._ID_type + "," +
-                               Keys.KEY_ID + " " + Keys.KEY_ID_type + ", " +
-                               Keys.TYPE + " " + Keys.TYPE_type + ", " +
-                               Keys.IS_MASTER_KEY + " " + Keys.IS_MASTER_KEY_type + ", " +
-                               Keys.ALGORITHM + " " + Keys.ALGORITHM_type + ", " +
-                               Keys.KEY_SIZE + " " + Keys.KEY_SIZE_type + ", " +
-                               Keys.CAN_SIGN + " " + Keys.CAN_SIGN_type + ", " +
-                               Keys.CAN_ENCRYPT + " " + Keys.CAN_ENCRYPT_type + ", " +
-                               Keys.IS_REVOKED + " " + Keys.IS_REVOKED_type + ", " +
-                               Keys.CREATION + " " + Keys.CREATION_type + ", " +
-                               Keys.EXPIRY + " " + Keys.EXPIRY_type + ", " +
-                               Keys.KEY_RING_ID + " " + Keys.KEY_RING_ID_type + ", " +
-                               Keys.KEY_DATA + " " + Keys.KEY_DATA_type +
-                               Keys.RANK + " " + Keys.RANK_type + ");");
+                               Keys._ID + " " + Keys._ID_TYPE + "," +
+                               Keys.KEY_ID + " " + Keys.KEY_ID_TYPE + ", " +
+                               Keys.TYPE + " " + Keys.TYPE_TYPE + ", " +
+                               Keys.IS_MASTER_KEY + " " + Keys.IS_MASTER_KEY_TYPE + ", " +
+                               Keys.ALGORITHM + " " + Keys.ALGORITHM_TYPE + ", " +
+                               Keys.KEY_SIZE + " " + Keys.KEY_SIZE_TYPE + ", " +
+                               Keys.CAN_SIGN + " " + Keys.CAN_SIGN_TYPE + ", " +
+                               Keys.CAN_ENCRYPT + " " + Keys.CAN_ENCRYPT_TYPE + ", " +
+                               Keys.IS_REVOKED + " " + Keys.IS_REVOKED_TYPE + ", " +
+                               Keys.CREATION + " " + Keys.CREATION_TYPE + ", " +
+                               Keys.EXPIRY + " " + Keys.EXPIRY_TYPE + ", " +
+                               Keys.KEY_RING_ID + " " + Keys.KEY_RING_ID_TYPE + ", " +
+                               Keys.KEY_DATA + " " + Keys.KEY_DATA_TYPE +
+                               Keys.RANK + " " + Keys.RANK_TYPE + ");");
 
                     db.execSQL("CREATE TABLE " + UserIds.TABLE_NAME + " (" +
-                               UserIds._ID + " " + UserIds._ID_type + "," +
-                               UserIds.KEY_ID + " " + UserIds.KEY_ID_type + "," +
-                               UserIds.USER_ID + " " + UserIds.USER_ID_type + "," +
-                               UserIds.RANK + " " + UserIds.RANK_type + ");");
+                               UserIds._ID + " " + UserIds._ID_TYPE + "," +
+                               UserIds.KEY_ID + " " + UserIds.KEY_ID_TYPE + "," +
+                               UserIds.USER_ID + " " + UserIds.USER_ID_TYPE + "," +
+                               UserIds.RANK + " " + UserIds.RANK_TYPE + ");");
 
                     Cursor cursor = db.query("public_keys", new String[] { "c_key_data" },
                                              null, null, null, null, null);
@@ -335,7 +348,7 @@ public class Database extends SQLiteOpenHelper {
                    UserIds._ID + " NOT IN (" + seenIdsStr + ")",
                    new String[] { "" + rowId });
 
-        return (int)rowId;
+        return (int) rowId;
     }
 
     private int saveUserId(long keyId, String userId, int rank) throws GeneralException {
@@ -351,7 +364,7 @@ public class Database extends SQLiteOpenHelper {
             throw new GeneralException("saving user id " + userId + " failed");
         }
 
-        return (int)rowId;
+        return (int) rowId;
     }
 
     private long insertOrUpdateKeyRing(ContentValues values) {

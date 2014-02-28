@@ -16,23 +16,6 @@
 
 package org.thialfihar.android.apg;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.security.Security;
-import java.security.SignatureException;
-import java.util.regex.Matcher;
-
-import org.bouncycastle2.jce.provider.BouncyCastleProvider;
-import org.bouncycastle2.openpgp.PGPException;
-import org.bouncycastle2.openpgp.PGPPublicKeyRing;
-import org.thialfihar.android.apg.provider.DataProvider;
-import org.thialfihar.android.apg.key.Key;
-import org.thialfihar.android.apg.key.KeyRing;
-
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.ActivityNotFoundException;
@@ -54,6 +37,22 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewFlipper;
+
+import org.bouncycastle2.jce.provider.BouncyCastleProvider;
+import org.bouncycastle2.openpgp.PGPException;
+
+import org.thialfihar.android.apg.key.KeyRing;
+import org.thialfihar.android.apg.provider.DataProvider;
+
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.security.Security;
+import java.security.SignatureException;
+import java.util.regex.Matcher;
 
 public class DecryptActivity extends BaseActivity {
     private long mSignatureKeyId = 0;
@@ -723,7 +722,8 @@ public class DecryptActivity extends BaseActivity {
 
                 alert.setIcon(android.R.drawable.ic_dialog_alert);
                 alert.setTitle(R.string.title_unknownSignatureKey);
-                alert.setMessage(getString(R.string.lookupUnknownKey, Apg.getSmallFingerPrint(mUnknownSignatureKeyId)));
+                alert.setMessage(getString(R.string.lookupUnknownKey,
+                                           Apg.getSmallFingerPrint(mUnknownSignatureKeyId)));
 
                 alert.setPositiveButton(android.R.string.ok,
                                         new DialogInterface.OnClickListener() {

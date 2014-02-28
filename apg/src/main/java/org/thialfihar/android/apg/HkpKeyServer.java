@@ -1,4 +1,22 @@
+/*
+ * Copyright (C) 2010 Thialfihar <thi@thialfihar.org>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.thialfihar.android.apg;
+
+import android.text.Html;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -15,8 +33,6 @@ import java.util.List;
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import android.text.Html;
 
 public class HkpKeyServer extends KeyServer {
     private static class HttpError extends Exception {
@@ -41,13 +57,12 @@ public class HkpKeyServer extends KeyServer {
     private String mHost;
     private short mPort = 11371;
 
-    // example:
-    // pub  2048R/<a href="/pks/lookup?op=get&search=0x887DF4BE9F5C9090">9F5C9090</a> 2009-08-17 <a href="/pks/lookup?op=vindex&search=0x887DF4BE9F5C9090">Jörg Runge &lt;joerg@joergrunge.de&gt;</a>
-    public static Pattern PUB_KEY_LINE =
-            Pattern.compile("pub +([0-9]+)([a-z]+)/.*?0x([0-9a-z]+).*? +([0-9-]+) +(.+)[\n\r]+((?:    +.+[\n\r]+)*)",
-                            Pattern.CASE_INSENSITIVE);
-    public static Pattern USER_ID_LINE =
-            Pattern.compile("^   +(.+)$", Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
+    public static final Pattern PUB_KEY_LINE =
+        Pattern.compile(
+            "pub +([0-9]+)([a-z]+)/.*?0x([0-9a-z]+).*? +([0-9-]+) +(.+)[\n\r]+((?:    +.+[\n\r]+)*)",
+            Pattern.CASE_INSENSITIVE);
+    public static final Pattern USER_ID_LINE =
+        Pattern.compile("^   +(.+)$", Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
 
     public HkpKeyServer(String host) {
         mHost = host;
@@ -58,8 +73,7 @@ public class HkpKeyServer extends KeyServer {
         mPort = port;
     }
 
-    static private String readAll(InputStream in, String encoding)
-            throws IOException {
+    private static String readAll(InputStream in, String encoding) throws IOException {
         ByteArrayOutputStream raw = new ByteArrayOutputStream();
 
         byte buffer[] = new byte[1 << 16];
@@ -93,8 +107,7 @@ public class HkpKeyServer extends KeyServer {
                 int response = conn.getResponseCode();
                 if (response >= 200 && response < 300) {
                     return readAll(conn.getInputStream(), conn.getContentEncoding());
-                }
-                else {
+                } else {
                     String data = readAll(conn.getErrorStream(), conn.getContentEncoding());
                     throw new HttpError(response, data);
                 }

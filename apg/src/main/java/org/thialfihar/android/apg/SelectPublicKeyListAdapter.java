@@ -16,12 +16,6 @@
 
 package org.thialfihar.android.apg;
 
-import java.util.Date;
-
-import org.thialfihar.android.apg.provider.KeyRings;
-import org.thialfihar.android.apg.provider.Keys;
-import org.thialfihar.android.apg.provider.UserIds;
-
 import android.app.Activity;
 import android.content.Context;
 import android.database.Cursor;
@@ -35,6 +29,12 @@ import android.widget.BaseAdapter;
 import android.widget.CheckBox;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import org.thialfihar.android.apg.provider.KeyRings;
+import org.thialfihar.android.apg.provider.Keys;
+import org.thialfihar.android.apg.provider.UserIds;
+
+import java.util.Date;
 
 public class SelectPublicKeyListAdapter extends BaseAdapter {
     protected LayoutInflater mInflater;

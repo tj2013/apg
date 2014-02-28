@@ -16,10 +16,6 @@
 
 package org.thialfihar.android.apg;
 
-import org.bouncycastle2.jce.provider.BouncyCastleProvider;
-import org.bouncycastle2.openpgp.PGPException;
-import org.bouncycastle2.openpgp.PGPPrivateKey;
-import org.bouncycastle2.openpgp.PGPSecretKey;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -31,8 +27,10 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import org.bouncycastle2.openpgp.PGPException;
+import org.bouncycastle2.openpgp.PGPPrivateKey;
+
 import org.thialfihar.android.apg.key.Key;
-import org.thialfihar.android.apg.key.KeyRing;
 
 public class AskForSecretKeyPassPhrase {
     public static interface PassPhraseCallbackInterface {

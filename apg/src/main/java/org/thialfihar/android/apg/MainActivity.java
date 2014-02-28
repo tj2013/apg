@@ -16,23 +16,14 @@
 
 package org.thialfihar.android.apg;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.database.Cursor;
-import android.database.SQLException;
-import android.net.Uri;
 import android.os.Bundle;
 import android.text.util.Linkify;
 import android.text.util.Linkify.TransformFilter;
-import android.view.ContextMenu;
-import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -41,28 +32,24 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
-import android.widget.Button;
-import android.widget.CursorAdapter;
-import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class MainActivity extends BaseActivity {
 
     static class LauncherIcon {
-        final int textId;
-        final int imgId;
-        final OnClickListener clickListener;
+        public final int textId;
+        public final int imageId;
+        public final OnClickListener clickListener;
 
-        public LauncherIcon(int imgId, int textId, OnClickListener clickListener) {
+        public LauncherIcon(int imageId, int textId, OnClickListener clickListener) {
             super();
-            this.imgId = imgId;
+            this.imageId = imageId;
             this.textId = textId;
             this.clickListener = clickListener;
         }
@@ -116,7 +103,7 @@ public class MainActivity extends BaseActivity {
                 holder = (ViewHolder) v.getTag();
             }
 
-            holder.icon.setImageResource(mIcons[position].imgId);
+            holder.icon.setImageResource(mIcons[position].imageId);
             holder.text.setText(mIcons[position].textId);
 
             return v;

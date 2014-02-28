@@ -16,11 +16,6 @@
 
 package org.thialfihar.android.apg;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.Locale;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -39,6 +34,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.Locale;
 
 public class BaseActivity extends Activity
                           implements Runnable, ProgressDialogUpdater,
@@ -257,7 +257,8 @@ public class BaseActivity extends Activity
                                        Bundle data = new Bundle();
                                        data.putInt(Constants.extras.status, Id.message.delete_done);
                                        try {
-                                           Apg.deleteFileSecurely(BaseActivity.this, file, BaseActivity.this);
+                                           Apg.deleteFileSecurely(BaseActivity.this,
+                                                                  file, BaseActivity.this);
                                        } catch (FileNotFoundException e) {
                                            data.putString(Apg.EXTRA_ERROR,
                                                           BaseActivity.this.getString(
@@ -438,20 +439,16 @@ public class BaseActivity extends Activity
         return mDeleteFile;
     }
 
-    public static void setLanguage(Context context, String language)
-    {
+    public static void setLanguage(Context context, String language) {
         Locale locale;
-        if (language == null || language.equals(""))
-        {
+        if (language == null || language.equals("")) {
             locale = Locale.getDefault();
-        }
-        else
-        {
+        } else {
             locale = new Locale(language);
         }
         Configuration config = new Configuration();
         config.locale = locale;
         context.getResources().updateConfiguration(config,
-                context.getResources().getDisplayMetrics());
+                                                   context.getResources().getDisplayMetrics());
     }
 }
