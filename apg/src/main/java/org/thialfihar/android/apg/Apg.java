@@ -1888,23 +1888,5 @@ public class Apg {
         return size;
     }
 
-    static void deleteFileSecurely(Context context, File file, ProgressDialogUpdater progress)
-            throws FileNotFoundException, IOException {
-        long length = file.length();
-        SecureRandom random = new SecureRandom();
-        RandomAccessFile raf = new RandomAccessFile(file, "rws");
-        raf.seek(0);
-        raf.getFilePointer();
-        byte[] data = new byte[1 << 16];
-        int pos = 0;
-        String msg = context.getString(R.string.progress_deletingSecurely, file.getName());
-        while (pos < length) {
-            progress.setProgress(msg, (int) (100 * pos / length), 100);
-            random.nextBytes(data);
-            raf.write(data);
-            pos += data.length;
-        }
-        raf.close();
-        file.delete();
-    }
+
 }

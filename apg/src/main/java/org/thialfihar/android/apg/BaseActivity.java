@@ -38,6 +38,8 @@ import android.widget.Toast;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.RandomAccessFile;
+import java.security.SecureRandom;
 import java.util.Locale;
 
 public class BaseActivity extends Activity
@@ -257,8 +259,7 @@ public class BaseActivity extends Activity
                                        Bundle data = new Bundle();
                                        data.putInt(Constants.extras.status, Id.message.delete_done);
                                        try {
-                                           Apg.deleteFileSecurely(BaseActivity.this,
-                                                                  file, BaseActivity.this);
+                                           deleteFileSecurely(file);
                                        } catch (FileNotFoundException e) {
                                            data.putString(Apg.EXTRA_ERROR,
                                                           BaseActivity.this.getString(
@@ -450,5 +451,24 @@ public class BaseActivity extends Activity
         config.locale = locale;
         context.getResources().updateConfiguration(config,
                                                    context.getResources().getDisplayMetrics());
+    }
+
+    void deleteFileSecurely(File file) throws FileNotFoundException, IOException {
+        long length = file.length();
+        SecureRandom random = new SecureRandom();
+        RandomAccessFile raf = new RandomAccessFile(file, "rws");
+        raf.seek(0);
+        raf.getFilePointer();
+        byte[] data = new byte[1 << 16];
+        int pos = 0;
+        String msg = getString(R.string.progress_deletingSecurely, file.getName());
+        while (pos < length) {
+            setProgress(msg, (int) (100 * pos / length), 100);
+            random.nextBytes(data);
+            raf.write(data);
+            pos += data.length;
+        }
+        raf.close();
+        file.delete();
     }
 }
