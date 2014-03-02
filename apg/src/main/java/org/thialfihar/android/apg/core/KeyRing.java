@@ -161,4 +161,19 @@ public class KeyRing {
         }
         return usableKeys;
     }
+
+
+    public Key getSigningKey() {
+        for (Key key : getUsableSigningKeys()) {
+            return key;
+        }
+        return null;
+    }
+
+    public Key getEncryptKey() {
+        for (Key key : getUsableEncryptKeys()) {
+            return key;
+        }
+        return null;
+    }
 }

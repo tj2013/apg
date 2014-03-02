@@ -16,6 +16,10 @@
 
 package org.thialfihar.android.apg.util;
 
+import android.content.Context;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager.NameNotFoundException;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.SecureRandom;
@@ -92,5 +96,33 @@ public class Utils {
             size += n;
         }
         return size;
+    }
+
+    public static boolean isReleaseVersion(Context context) {
+        try {
+            PackageInfo pi = context.getPackageManager().getPackageInfo(Constants.PACKAGE_NAME, 0);
+            if (pi.versionCode % 100 == 99) {
+                return true;
+            } else {
+                return false;
+            }
+        } catch (NameNotFoundException e) {
+            // unpossible!
+            return false;
+        }
+    }
+
+    public static String getVersion(Context context) {
+        try {
+            PackageInfo pi = context.getPackageManager().getPackageInfo(Constants.PACKAGE_NAME, 0);
+            return pi.versionName;
+        } catch (NameNotFoundException e) {
+            // unpossible!
+            return "0.0.0";
+        }
+    }
+
+    public static String getFullVersion(Context context) {
+        return "APG v" + getVersion(context);
     }
 }

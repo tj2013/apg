@@ -21,6 +21,7 @@ import android.net.Uri;
 import android.os.Environment;
 
 import org.thialfihar.android.apg.Apg.GeneralException;
+import org.thialfihar.android.apg.util.InputData;
 import org.thialfihar.android.apg.util.Utils;
 
 import java.io.ByteArrayInputStream;

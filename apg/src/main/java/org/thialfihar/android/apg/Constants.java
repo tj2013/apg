@@ -18,7 +18,14 @@ package org.thialfihar.android.apg;
 
 import android.os.Environment;
 
+import org.bouncycastle2.jce.provider.BouncyCastleProvider;
+
 public final class Constants {
+    public static final boolean DEBUG = true;
+    public static final String BOUNCY_CASTLE_PROVIDER_NAME = BouncyCastleProvider.PROVIDER_NAME;
+    public static final String TAG = "APG";
+    public static final String PACKAGE_NAME = "org.thialfihar.android.apg";
+
     public static final class path {
         public static final String app_dir = Environment.getExternalStorageDirectory() + "/APG";
     }

@@ -36,6 +36,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import org.thialfihar.android.apg.core.Progressable;
+import org.thialfihar.android.apg.util.Utils;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -178,7 +179,7 @@ public class BaseActivity extends Activity
             case Id.dialog.about: {
                 AlertDialog.Builder alert = new AlertDialog.Builder(this);
 
-                alert.setTitle("About " + Apg.getFullVersion(this));
+                alert.setTitle("About " + Utils.getFullVersion(this));
 
                 LayoutInflater inflater =
                         (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);

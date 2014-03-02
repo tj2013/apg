@@ -18,8 +18,6 @@ package org.thialfihar.android.apg;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager.NameNotFoundException;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
@@ -75,6 +73,8 @@ import org.thialfihar.android.apg.provider.UserIds;
 import org.thialfihar.android.apg.ui.widget.KeyEditor;
 import org.thialfihar.android.apg.ui.widget.SectionView;
 import org.thialfihar.android.apg.ui.widget.UserIdEditor;
+import org.thialfihar.android.apg.util.InputData;
+import org.thialfihar.android.apg.util.PositionAwareInputStream;
 import org.thialfihar.android.apg.util.PrngFixes;
 import org.thialfihar.android.apg.util.Utils;
 
@@ -104,8 +104,6 @@ import java.util.Vector;
 import java.util.regex.Pattern;
 
 public class Apg {
-    private static final String mApgPackageName = "org.thialfihar.android.apg";
-
     public static class Intent {
         public static final String DECRYPT = "org.thialfihar.android.apg.intent.DECRYPT";
         public static final String ENCRYPT = "org.thialfihar.android.apg.intent.ENCRYPT";
@@ -241,7 +239,7 @@ public class Apg {
     public static String getCachedPassPhrase(long keyId) {
         long realId = keyId;
         if (realId != Id.key.symmetric) {
-            KeyRing keyRing = getSecretKeyRing(keyId);
+            KeyRing keyRing = sDatabase.getSecretKeyRing(keyId);
             if (keyRing == null) {
                 return null;
             }
@@ -706,8 +704,9 @@ public class Apg {
         return returnData;
     }
 
+    // TODO: this surely belongs in KeyRing
     public static Key getEncryptKey(long masterKeyId) {
-        KeyRing keyRing = getPublicKeyRing(masterKeyId);
+        KeyRing keyRing = sDatabase.getPublicKeyRing(masterKeyId);
         if (keyRing == null) {
             return null;
         }
@@ -718,8 +717,9 @@ public class Apg {
         return encryptKeys.get(0);
     }
 
+    // TODO: this surely belongs in KeyRing
     public static Key getSigningKey(long masterKeyId) {
-        KeyRing keyRing = getSecretKeyRing(masterKeyId);
+        KeyRing keyRing = sDatabase.getSecretKeyRing(masterKeyId);
         if (keyRing == null) {
             return null;
         }
@@ -747,51 +747,19 @@ public class Apg {
     }
 
     public static KeyRing getSecretKeyRing(long keyId) {
-        // TODO: this belongs in Database somewhere
-        byte[] data = sDatabase.getKeyRingDataFromKeyId(Id.database.type_secret, keyId);
-        if (data == null) {
-            return null;
-        }
-        try {
-            return new KeyRing(new PGPSecretKeyRing(data));
-        } catch (IOException e) {
-            // no good way to handle this, return null
-            // TODO: some info?
-        } catch (PGPException e) {
-            // no good way to handle this, return null
-            // TODO: some info?
-        }
-        return null;
+        return sDatabase.getSecretKeyRing(keyId);
     }
 
     public static KeyRing getPublicKeyRing(long keyId) {
-        byte[] data = sDatabase.getKeyRingDataFromKeyId(Id.database.type_public, keyId);
-        if (data == null) {
-            return null;
-        }
-        try {
-            return new KeyRing(new PGPPublicKeyRing(data));
-        } catch (IOException e) {
-            // no good way to handle this, return null
-            // TODO: some info?
-        }
-        return null;
+        return sDatabase.getPublicKeyRing(keyId);
     }
 
     public static Key getSecretKey(long keyId) {
-        KeyRing keyRing = getSecretKeyRing(keyId);
-        if (keyRing == null) {
-            return null;
-        }
-        return keyRing.getSecretKey(keyId);
+        return sDatabase.getSecretKey(keyId);
     }
 
     public static Key getPublicKey(long keyId) {
-        KeyRing keyRing = getPublicKeyRing(keyId);
-        if (keyRing == null) {
-            return null;
-        }
-        return keyRing.getPublicKey(keyId);
+        return sDatabase.getPublicKey(keyId);
     }
 
     public static Vector<Integer> getKeyRingIds(int type) {
@@ -871,7 +839,7 @@ public class Apg {
         OutputStream encryptOut = null;
         if (armored) {
             armorOut = new ArmoredOutputStream(outStream);
-            armorOut.setHeader("Version", getFullVersion(context));
+            armorOut.setHeader("Version", Utils.getFullVersion(context));
             out = armorOut;
         } else {
             out = outStream;
@@ -885,7 +853,7 @@ public class Apg {
         }
 
         if (signatureKeyId != 0) {
-            signingKeyRing = getSecretKeyRing(signatureKeyId);
+            signingKeyRing = sDatabase.getSecretKeyRing(signatureKeyId);
             signingKey = signingKeyRing.getUsableSigningKeys().get(0);
             if (signingKey == null) {
                 throw new GeneralException(context.getString(R.string.error_signatureFailed));
@@ -1015,7 +983,7 @@ public class Apg {
         Security.addProvider(new BouncyCastleProvider());
 
         ArmoredOutputStream armorOut = new ArmoredOutputStream(outStream);
-        armorOut.setHeader("Version", getFullVersion(context));
+        armorOut.setHeader("Version", Utils.getFullVersion(context));
 
         Key signingKey = null;
         KeyRing signingKeyRing = null;
@@ -1025,7 +993,7 @@ public class Apg {
             throw new GeneralException(context.getString(R.string.error_noSignatureKey));
         }
 
-        signingKeyRing = getSecretKeyRing(signatureKeyId);
+        signingKeyRing = sDatabase.getSecretKeyRing(signatureKeyId);
         signingKey = getSigningKey(signatureKeyId);
         if (signingKey == null) {
             throw new GeneralException(context.getString(R.string.error_signatureFailed));
@@ -1125,7 +1093,7 @@ public class Apg {
         OutputStream out = null;
         if (armored) {
             armorOut = new ArmoredOutputStream(outStream);
-            armorOut.setHeader("Version", getFullVersion(context));
+            armorOut.setHeader("Version", Utils.getFullVersion(context));
             out = armorOut;
         } else {
             out = outStream;
@@ -1139,7 +1107,7 @@ public class Apg {
             throw new GeneralException(context.getString(R.string.error_noSignatureKey));
         }
 
-        signingKeyRing = getSecretKeyRing(signatureKeyId);
+        signingKeyRing = sDatabase.getSecretKeyRing(signatureKeyId);
         signingKey = getSigningKey(signatureKeyId);
         if (signingKey == null) {
             throw new GeneralException(context.getString(R.string.error_signatureFailed));
@@ -1257,7 +1225,7 @@ public class Apg {
             if (obj instanceof PGPPublicKeyEncryptedData) {
                 gotAsymmetricEncryption = true;
                 PGPPublicKeyEncryptedData pbe = (PGPPublicKeyEncryptedData) obj;
-                secretKey = getSecretKey(pbe.getKeyID());
+                secretKey = sDatabase.getSecretKey(pbe.getKeyID());
                 if (secretKey != null) {
                     break;
                 }
@@ -1369,7 +1337,7 @@ public class Apg {
                 Object obj = it.next();
                 if (obj instanceof PGPPublicKeyEncryptedData) {
                     PGPPublicKeyEncryptedData encData = (PGPPublicKeyEncryptedData) obj;
-                    secretKey = getSecretKey(encData.getKeyID());
+                    secretKey = sDatabase.getSecretKey(encData.getKeyID());
                     if (secretKey != null) {
                         pbe = encData;
                         break;
@@ -1420,7 +1388,7 @@ public class Apg {
             PGPOnePassSignatureList sigList = (PGPOnePassSignatureList) dataChunk;
             for (int i = 0; i < sigList.size(); ++i) {
                 signature = sigList.get(i);
-                signatureKey = getPublicKey(signature.getKeyID());
+                signatureKey = sDatabase.getPublicKey(signature.getKeyID());
                 if (signatureKeyId == 0) {
                     signatureKeyId = signature.getKeyID();
                 }
@@ -1430,7 +1398,7 @@ public class Apg {
                     signatureIndex = i;
                     signatureKeyId = signature.getKeyID();
                     String userId = null;
-                    KeyRing sigKeyRing = getPublicKeyRing(signatureKeyId);
+                    KeyRing sigKeyRing = sDatabase.getPublicKeyRing(signatureKeyId);
                     if (sigKeyRing != null) {
                         userId = sigKeyRing.getMasterKey().getMainUserId();
                     }
@@ -1566,7 +1534,7 @@ public class Apg {
         Key signatureKey = null;
         for (int i = 0; i < sigList.size(); ++i) {
             signature = sigList.get(i);
-            signatureKey = getPublicKey(signature.getKeyID());
+            signatureKey = sDatabase.getPublicKey(signature.getKeyID());
             if (signatureKeyId == 0) {
                 signatureKeyId = signature.getKeyID();
             }
@@ -1580,7 +1548,7 @@ public class Apg {
                 // pause here
                 context.getRunningThread().pause();
                 // see whether the key was found in the meantime
-                signatureKey = getPublicKey(signature.getKeyID());
+                signatureKey = sDatabase.getPublicKey(signature.getKeyID());
             }
 
             if (signatureKey == null) {
@@ -1588,7 +1556,7 @@ public class Apg {
             } else {
                 signatureKeyId = signature.getKeyID();
                 String userId = null;
-                KeyRing sigKeyRing = getPublicKeyRing(signatureKeyId);
+                KeyRing sigKeyRing = sDatabase.getPublicKeyRing(signatureKeyId);
                 if (sigKeyRing != null) {
                     userId = sigKeyRing.getMasterKey().getMainUserId();
                 }
@@ -1803,31 +1771,5 @@ public class Apg {
         return nlBytes;
     }
 
-    public static boolean isReleaseVersion(Context context) {
-        try {
-            PackageInfo pi = context.getPackageManager().getPackageInfo(mApgPackageName, 0);
-            if (pi.versionCode % 100 == 99) {
-                return true;
-            } else {
-                return false;
-            }
-        } catch (NameNotFoundException e) {
-            // unpossible!
-            return false;
-        }
-    }
 
-    public static String getVersion(Context context) {
-        try {
-            PackageInfo pi = context.getPackageManager().getPackageInfo(mApgPackageName, 0);
-            return pi.versionName;
-        } catch (NameNotFoundException e) {
-            // unpossible!
-            return "0.0.0";
-        }
-    }
-
-    public static String getFullVersion(Context context) {
-        return "APG v" + getVersion(context);
-    }
 }

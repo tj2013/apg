@@ -17,13 +17,14 @@
 package org.thialfihar.android.apg.core;
 
 import org.bouncycastle2.bcpg.sig.KeyFlags;
-import org.bouncycastle2.jce.provider.BouncyCastleProvider;
 import org.bouncycastle2.openpgp.PGPException;
 import org.bouncycastle2.openpgp.PGPPrivateKey;
 import org.bouncycastle2.openpgp.PGPPublicKey;
 import org.bouncycastle2.openpgp.PGPSecretKey;
 import org.bouncycastle2.openpgp.PGPSignature;
 import org.bouncycastle2.openpgp.PGPSignatureSubpacketVector;
+import org.bouncycastle2.openpgp.operator.PBESecretKeyDecryptor;
+import org.bouncycastle2.openpgp.operator.jcajce.JcePBESecretKeyDecryptorBuilder;
 
 import org.thialfihar.android.apg.util.IterableIterator;
 
@@ -260,6 +261,16 @@ public class Key {
         if (isPublic()) {
             return null;
         }
-        return mSecretKey.extractPrivateKey(passPhrase.toCharArray(), new BouncyCastleProvider());
+        PBESecretKeyDecryptor keyDecryptor =
+            new JcePBESecretKeyDecryptorBuilder().setProvider(
+                Constants.BOUNCY_CASTLE_PROVIDER_NAME).build(passPhrase.toCharArray());
+        return extractPrivateKey(keyDecryptor);
+    }
+
+    public PGPPrivateKey extractPrivateKey(PBESecretKeyDecryptor keyDecryptor) throws PGPException {
+        if (isPublic()) {
+            return null;
+        }
+        return mSecretKey.extractPrivateKey(keyDecryptor);
     }
 }

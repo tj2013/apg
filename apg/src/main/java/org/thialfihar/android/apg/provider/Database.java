@@ -29,6 +29,7 @@ import org.bouncycastle2.openpgp.PGPSecretKeyRing;
 
 import org.thialfihar.android.apg.Id;
 import org.thialfihar.android.apg.core.Key;
+import org.thialfihar.android.apg.core.KeyProvider;
 import org.thialfihar.android.apg.core.KeyRing;
 
 import java.io.IOException;
@@ -36,7 +37,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Vector;
 
-public class Database extends SQLiteOpenHelper {
+public class Database extends SQLiteOpenHelper implements KeyProvider {
     public static class GeneralException extends Exception {
         static final long serialVersionUID = 0xf812773343L;
 
@@ -557,4 +558,52 @@ public class Database extends SQLiteOpenHelper {
     public SQLiteDatabase db() {
         return mDb;
     }
+
+    public KeyRing getSecretKeyRing(long keyId) {
+        byte[] data = getKeyRingDataFromKeyId(Id.database.type_secret, keyId);
+        if (data == null) {
+            return null;
+        }
+        try {
+            return new KeyRing(new PGPSecretKeyRing(data));
+        } catch (IOException e) {
+            // no good way to handle this, return null
+            // TODO: some info?
+        } catch (PGPException e) {
+            // no good way to handle this, return null
+            // TODO: some info?
+        }
+        return null;
+    }
+
+    public KeyRing getPublicKeyRing(long keyId) {
+        byte[] data = getKeyRingDataFromKeyId(Id.database.type_public, keyId);
+        if (data == null) {
+            return null;
+        }
+        try {
+            return new KeyRing(new PGPPublicKeyRing(data));
+        } catch (IOException e) {
+            // no good way to handle this, return null
+            // TODO: some info?
+        }
+        return null;
+    }
+
+    public Key getSecretKey(long keyId) {
+        KeyRing keyRing = getSecretKeyRing(keyId);
+        if (keyRing == null) {
+            return null;
+        }
+        return keyRing.getSecretKey(keyId);
+    }
+
+    public Key getPublicKey(long keyId) {
+        KeyRing keyRing = getPublicKeyRing(keyId);
+        if (keyRing == null) {
+            return null;
+        }
+        return keyRing.getPublicKey(keyId);
+    }
+
 }
