@@ -25,7 +25,7 @@
         android:label="@string/app_name">
 
         <activity
-            android:name=".MainActivity"
+            android:name="ui.MainActivity"
             android:label="@string/app_name"
             android:configChanges="keyboardHidden|keyboard">
 
@@ -37,7 +37,7 @@
         </activity>
 
         <activity
-            android:name=".PublicKeyListActivity"
+            android:name="ui.PublicKeyListActivity"
             android:label="@string/title_managePublicKeys"
             android:configChanges="keyboardHidden|orientation|keyboard"
             android:launchMode="singleTop">
@@ -53,7 +53,7 @@
         </activity>
 
         <activity
-            android:name=".SecretKeyListActivity"
+            android:name="ui.SecretKeyListActivity"
             android:label="@string/title_manageSecretKeys"
             android:configChanges="keyboardHidden|orientation|keyboard"
             android:launchMode="singleTop">
@@ -69,12 +69,12 @@
         </activity>
 
         <activity
-            android:name=".EditKeyActivity"
+            android:name="ui.EditKeyActivity"
             android:label="@string/title_editKey"
             android:configChanges="keyboardHidden|orientation|keyboard"/>
 
         <activity
-            android:name=".SelectPublicKeyListActivity"
+            android:name="ui.SelectPublicKeyListActivity"
             android:label="@string/title_selectRecipients"
             android:configChanges="keyboardHidden|orientation|keyboard"
             android:launchMode="singleTop">
@@ -95,7 +95,7 @@
         </activity>
 
         <activity
-            android:name=".SelectSecretKeyListActivity"
+            android:name="ui.SelectSecretKeyListActivity"
             android:label="@string/title_selectSignature"
             android:configChanges="keyboardHidden|orientation|keyboard"
             android:launchMode="singleTop">
@@ -116,7 +116,7 @@
         </activity>
 
         <activity
-            android:name=".EncryptActivity"
+            android:name="ui.EncryptActivity"
             android:label="@string/title_encrypt"
             android:configChanges="keyboardHidden|orientation|keyboard">
 
@@ -132,7 +132,7 @@
         </activity>
 
         <activity
-            android:name=".DecryptActivity"
+            android:name="ui.DecryptActivity"
             android:label="@string/title_decrypt"
             android:configChanges="keyboardHidden|orientation|keyboard">
 
@@ -147,7 +147,7 @@
         </activity>
 
         <activity
-            android:name=".GeneralActivity"
+            android:name="ui.GeneralActivity"
             android:label="@string/app_name"
             android:configChanges="keyboardHidden|orientation|keyboard"
             android:theme="@android:style/Theme.Dialog">
@@ -175,26 +175,32 @@
         </activity>
 
         <activity
-            android:name=".MailListActivity"
+            android:name="ui/MailListActivity"
             android:label="@string/title_mailInbox"
             android:configChanges="keyboardHidden|orientation|keyboard"/>
 
         <activity
-            android:name=".KeyServerQueryActivity"
+            android:name="ui.KeyServerQueryActivity"
             android:label="@string/title_keyServerQuery"
             android:configChanges="keyboardHidden|orientation|keyboard"/>
 
         <activity
-            android:name=".PreferencesActivity"
+            android:name="ui.PreferencesActivity"
             android:label="@string/title_preferences"
             android:configChanges="keyboardHidden|orientation|keyboard"/>
 
         <activity
-            android:name=".KeyServerPreferenceActivity"
+            android:name="ui.KeyServerPreferenceActivity"
             android:label="@string/title_keyServerPreference"
             android:configChanges="keyboardHidden|orientation|keyboard"/>
 
-        <service android:name=".Service" />
+        <service
+            android:name="service.PassphraseCacheService"
+            android:exported="false"
+            android:process=":passphrase_cache"/>
+        <!-- service
+            android:name="service.IntentService"
+            android:exported="false"/ -->
 
         <provider
             android:readPermission="org.thialfihar.android.apg.permission.READ_KEY_DETAILS"
