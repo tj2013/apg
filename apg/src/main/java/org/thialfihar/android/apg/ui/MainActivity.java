@@ -172,7 +172,7 @@ public class MainActivity extends BaseActivity {
             case Id.dialog.change_log: {
                 AlertDialog.Builder alert = new AlertDialog.Builder(this);
 
-                alert.setTitle("Changes " + Apg.getFullVersion(this));
+                alert.setTitle("Changes " + Utils.getFullVersion(this));
                 LayoutInflater inflater =
                     (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                 View layout = inflater.inflate(R.layout.info, null);

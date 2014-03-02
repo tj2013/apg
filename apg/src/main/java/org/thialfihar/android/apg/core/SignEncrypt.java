@@ -27,7 +27,6 @@ import org.bouncycastle2.openpgp.PGPException;
 import org.bouncycastle2.openpgp.PGPLiteralData;
 import org.bouncycastle2.openpgp.PGPLiteralDataGenerator;
 import org.bouncycastle2.openpgp.PGPPrivateKey;
-import org.bouncycastle2.openpgp.PGPPublicKey;
 import org.bouncycastle2.openpgp.PGPSignature;
 import org.bouncycastle2.openpgp.PGPSignatureGenerator;
 import org.bouncycastle2.openpgp.PGPSignatureSubpacketGenerator;
@@ -43,7 +42,6 @@ import org.thialfihar.android.apg.R;
 import org.thialfihar.android.apg.core.exception.PgpGeneralException;
 import org.thialfihar.android.apg.util.InputData;
 import org.thialfihar.android.apg.util.Log;
-import org.thialfihar.android.apg.util.Utils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -63,6 +61,7 @@ public class SignEncrypt {
     private InputData mInputData;
     private OutputStream mOutputStream;
     private KeyProvider mKeyProvider;
+    private String mVersion;
 
     private Progressable mProgress;
     private boolean mEnableAsciiArmorOutput;
@@ -81,6 +80,7 @@ public class SignEncrypt {
         this.mInputData = builder.inputData;
         this.mOutputStream = builder.outputStream;
         this.mKeyProvider = builder.keyProvider;
+        this.mVersion = builder.version;
 
         this.mProgress = builder.progress;
         this.mEnableAsciiArmorOutput = builder.enableAsciiArmorOutput;
@@ -100,6 +100,7 @@ public class SignEncrypt {
         public InputData inputData;
         public OutputStream outputStream;
         public KeyProvider keyProvider;
+        public String version;
 
         // optional
         public Progressable progress = null;
@@ -114,11 +115,12 @@ public class SignEncrypt {
         public String signaturePassphrase = null;
 
         public Builder(Context context, InputData inputData, OutputStream outputStream,
-                       KeyProvider keyProvider) {
+                       KeyProvider keyProvider, String version) {
             this.context = context;
             this.inputData = inputData;
             this.outputStream = outputStream;
             this.keyProvider = keyProvider;
+            this.version = version;
         }
 
         public Builder setProgress(Progressable progress) {
@@ -222,7 +224,7 @@ public class SignEncrypt {
         OutputStream out;
         if (mEnableAsciiArmorOutput) {
             armorOut = new ArmoredOutputStream(mOutputStream);
-            armorOut.setHeader("Version", Utils.getFullVersion(mContext));
+            armorOut.setHeader("Version", mVersion);
             out = armorOut;
         } else {
             out = mOutputStream;
@@ -274,12 +276,19 @@ public class SignEncrypt {
             } else {
                 // Asymmetric encryption
                 for (long id : mEncryptionKeyIds) {
-                    PGPPublicKey key = PgpKeyHelper.getEncryptPublicKey(mContext, id);
-                    if (key != null) {
-                        JcePublicKeyKeyEncryptionMethodGenerator pubKeyEncryptionGenerator =
-                                new JcePublicKeyKeyEncryptionMethodGenerator(key);
-                        cPk.addMethod(pubKeyEncryptionGenerator);
+                    KeyRing keyRing = mKeyProvider.getPublicKeyRing(id);
+                    if (keyRing == null) {
+                        // TODO: this should likely be an error
+                        continue;
                     }
+                    Key key = keyRing.getEncryptKey();
+                    if (key == null) {
+                        // TODO: probably also an error
+                        continue;
+                    }
+                    JcePublicKeyKeyEncryptionMethodGenerator pubKeyEncryptionGenerator =
+                            new JcePublicKeyKeyEncryptionMethodGenerator(key);
+                    cPk.addMethod(pubKeyEncryptionGenerator);
                 }
             }
         }
@@ -450,7 +459,7 @@ public class SignEncrypt {
         if (mEnableAsciiArmorOutput) {
             // Ascii Armor (Radix-64)
             ArmoredOutputStream armorOut = new ArmoredOutputStream(mOutputStream);
-            armorOut.setHeader("Version", Utils.getFullVersion(mContext));
+            armorOut.setHeader("Version", mVersion);
             out = armorOut;
         } else {
             out = mOutputStream;
