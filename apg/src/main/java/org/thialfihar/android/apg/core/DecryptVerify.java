@@ -76,7 +76,7 @@ public class DecryptVerify {
     private KeyProvider mKeyProvider;
 
     private Progressable mProgress;
-    private boolean mAsssumeSymmetric;
+    private boolean mAssumeSymmetric;
     private String mPassphrase;
 
     private DecryptVerify(Builder builder) {

@@ -287,7 +287,7 @@ public class SignEncrypt {
                         continue;
                     }
                     JcePublicKeyKeyEncryptionMethodGenerator pubKeyEncryptionGenerator =
-                            new JcePublicKeyKeyEncryptionMethodGenerator(key);
+                            new JcePublicKeyKeyEncryptionMethodGenerator(key.getPublicKey());
                     cPk.addMethod(pubKeyEncryptionGenerator);
                 }
             }
@@ -466,16 +466,22 @@ public class SignEncrypt {
         }
 
         if (mSignatureKeyId == 0) {
+            // TODO: this sort of error should be caught by the Builder pattern and should never
+            // need a translateable string
             throw new PgpGeneralException(mContext.getString(R.string.error_no_signature_key));
         }
 
         KeyRing signingKeyRing = mKeyProvider.getSecretKeyRing(mSignatureKeyId);
         Key signingKey = signingKeyRing.getSigningKey();
         if (signingKey == null) {
+            // TODO: this sort of error should be caught by the Builder pattern and should never
+            // need a translateable string
             throw new PgpGeneralException(mContext.getString(R.string.error_signature_failed));
         }
 
         if (mSignaturePassphrase == null) {
+            // TODO: this sort of error should be caught by the Builder pattern and should never
+            // need a translateable string
             throw new PgpGeneralException(mContext.getString(R.string.error_no_signature_passphrase));
         }
 
@@ -495,7 +501,7 @@ public class SignEncrypt {
 
         // content signer based on signing key algorithm and chosen hash algorithm
         JcaPGPContentSignerBuilder contentSignerBuilder =
-            new JcaPGPContentSignerBuilder(signingKey.getSecretKey(),
+            new JcaPGPContentSignerBuilder(
                 signingKey.getPublicKey().getAlgorithm(), mSignatureHashAlgorithm)
                 .setProvider(Constants.BOUNCY_CASTLE_PROVIDER_NAME);
 
