@@ -21,6 +21,7 @@ import android.net.Uri;
 import android.os.Environment;
 
 import org.thialfihar.android.apg.Apg.GeneralException;
+import org.thialfihar.android.apg.util.Utils;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -95,7 +96,7 @@ public class DataSource {
                 in = context.getContentResolver().openInputStream(mContentUri);
                 if (withSize) {
                     InputStream tmp = context.getContentResolver().openInputStream(mContentUri);
-                    size = Apg.getLengthOfStream(tmp);
+                    size = Utils.getLengthOfStream(tmp);
                     tmp.close();
                 }
             }

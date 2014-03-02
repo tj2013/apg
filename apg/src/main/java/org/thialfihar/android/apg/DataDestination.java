@@ -20,6 +20,7 @@ import android.content.Context;
 import android.os.Environment;
 
 import org.thialfihar.android.apg.Apg.GeneralException;
+import org.thialfihar.android.apg.util.Utils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
@@ -57,7 +58,7 @@ public class DataDestination {
             case Id.mode.stream: {
                 try {
                     while (true) {
-                        mStreamFilename = Apg.generateRandomString(32);
+                        mStreamFilename = Utils.generateRandomString(32);
                         if (mStreamFilename == null) {
                             throw new Apg.GeneralException("couldn't generate random file name");
                         }

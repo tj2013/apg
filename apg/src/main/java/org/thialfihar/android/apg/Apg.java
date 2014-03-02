@@ -75,6 +75,7 @@ import org.thialfihar.android.apg.ui.widget.KeyEditor;
 import org.thialfihar.android.apg.ui.widget.SectionView;
 import org.thialfihar.android.apg.ui.widget.UserIdEditor;
 import org.thialfihar.android.apg.util.PrngFixes;
+import org.thialfihar.android.apg.util.Utils;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
@@ -94,9 +95,7 @@ import java.security.NoSuchProviderException;
 import java.security.SecureRandom;
 import java.security.Security;
 import java.security.SignatureException;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -377,18 +376,6 @@ public class Apg {
         return new Key(secretKey);
     }
 
-    private static long getNumDaysBetween(GregorianCalendar first, GregorianCalendar second) {
-        GregorianCalendar tmp = new GregorianCalendar();
-        tmp.setTime(first.getTime());
-        long numDays = (second.getTimeInMillis() - first.getTimeInMillis()) / 1000 / 86400;
-        tmp.add(Calendar.DAY_OF_MONTH, (int) numDays);
-        while (tmp.before(second)) {
-            tmp.add(Calendar.DAY_OF_MONTH, 1);
-            ++numDays;
-        }
-        return numDays;
-    }
-
     public static void buildSecretKey(Activity context,
                                       SectionView userIdsView, SectionView keysView,
                                       String oldPassPhrase, String newPassPhrase,
@@ -509,10 +496,7 @@ public class Apg {
 
         // TODO: this doesn't work quite right yet
         if (keyEditor.getExpiryDate() != null) {
-            GregorianCalendar creationDate = new GregorianCalendar();
-            creationDate.setTime(masterKey.getCreationDate());
-            GregorianCalendar expiryDate = keyEditor.getExpiryDate();
-            long numDays = getNumDaysBetween(creationDate, expiryDate);
+            long numDays = Utils.getNumDaysBetween(masterKey.getCreationDate(), keyEditor.getExpiryDate());
             if (numDays <= 0) {
                 throw new GeneralException(context.getString(R.string.error_expiryMustComeAfterCreation));
             }
@@ -559,10 +543,7 @@ public class Apg {
 
             // TODO: this doesn't work quite right yet
             if (keyEditor.getExpiryDate() != null) {
-                GregorianCalendar creationDate = new GregorianCalendar();
-                creationDate.setTime(masterKey.getCreationDate());
-                GregorianCalendar expiryDate = keyEditor.getExpiryDate();
-                long numDays = getNumDaysBetween(creationDate, expiryDate);
+                long numDays = Utils.getNumDaysBetween(masterKey.getCreationDate(), keyEditor.getExpiryDate());
                 if (numDays <= 0) {
                     throw new GeneralException(context.getString(R.string.error_expiryMustComeAfterCreation));
                 }
@@ -1848,45 +1829,4 @@ public class Apg {
     public static String getFullVersion(Context context) {
         return "APG v" + getVersion(context);
     }
-
-    public static String generateRandomString(int length) {
-        SecureRandom random = new SecureRandom();
-        /*
-        try {
-            random = SecureRandom.getInstance("SHA1PRNG", new BouncyCastleProvider());
-        } catch (NoSuchAlgorithmException e) {
-            // TODO: need to handle this case somehow
-            return null;
-        }*/
-        byte bytes[] = new byte[length];
-        random.nextBytes(bytes);
-        String result = "";
-        for (int i = 0; i < length; ++i) {
-            int v = (bytes[i] + 256) % 64;
-            if (v < 10) {
-                result += (char) ('0' + v);
-            } else if (v < 36) {
-                result += (char) ('A' + v - 10);
-            } else if (v < 62) {
-                result += (char) ('a' + v - 36);
-            } else if (v == 62) {
-                result += '_';
-            } else if (v == 63) {
-                result += '.';
-            }
-        }
-        return result;
-    }
-
-    static long getLengthOfStream(InputStream in) throws IOException {
-        long size = 0;
-        long n = 0;
-        byte dummy[] = new byte[0x10000];
-        while ((n = in.read(dummy)) > 0) {
-            size += n;
-        }
-        return size;
-    }
-
-
 }
