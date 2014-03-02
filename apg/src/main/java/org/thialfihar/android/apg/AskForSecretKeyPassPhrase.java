@@ -30,7 +30,7 @@ import android.widget.Toast;
 import org.bouncycastle2.openpgp.PGPException;
 import org.bouncycastle2.openpgp.PGPPrivateKey;
 
-import org.thialfihar.android.apg.key.Key;
+import org.thialfihar.android.apg.core.Key;
 
 public class AskForSecretKeyPassPhrase {
     public static interface PassPhraseCallbackInterface {

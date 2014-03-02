@@ -28,8 +28,8 @@ import org.bouncycastle2.openpgp.PGPPublicKeyRing;
 import org.bouncycastle2.openpgp.PGPSecretKeyRing;
 
 import org.thialfihar.android.apg.Id;
-import org.thialfihar.android.apg.key.Key;
-import org.thialfihar.android.apg.key.KeyRing;
+import org.thialfihar.android.apg.core.Key;
+import org.thialfihar.android.apg.core.KeyRing;
 
 import java.io.IOException;
 import java.util.Date;

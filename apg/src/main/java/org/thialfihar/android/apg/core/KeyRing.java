@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.thialfihar.android.apg.key;
+package org.thialfihar.android.apg.core;
 
 import org.bouncycastle2.openpgp.PGPPublicKey;
 import org.bouncycastle2.openpgp.PGPPublicKeyRing;

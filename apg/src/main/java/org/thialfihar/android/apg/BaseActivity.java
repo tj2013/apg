@@ -35,6 +35,8 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.thialfihar.android.apg.core.Progressable;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -43,7 +45,7 @@ import java.security.SecureRandom;
 import java.util.Locale;
 
 public class BaseActivity extends Activity
-                          implements Runnable, ProgressDialogUpdater,
+                          implements Runnable, Progressable,
                           AskForSecretKeyPassPhrase.PassPhraseCallbackInterface {
 
     private ProgressDialog mProgressDialog = null;

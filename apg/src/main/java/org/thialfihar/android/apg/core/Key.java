@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.thialfihar.android.apg.key;
+package org.thialfihar.android.apg.core;
 
 import org.bouncycastle2.bcpg.sig.KeyFlags;
 import org.bouncycastle2.jce.provider.BouncyCastleProvider;

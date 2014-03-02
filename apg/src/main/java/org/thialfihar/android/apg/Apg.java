@@ -64,8 +64,9 @@ import org.bouncycastle2.openpgp.PGPSignatureSubpacketGenerator;
 import org.bouncycastle2.openpgp.PGPUtil;
 import org.bouncycastle2.openpgp.PGPV3SignatureGenerator;
 
-import org.thialfihar.android.apg.key.Key;
-import org.thialfihar.android.apg.key.KeyRing;
+import org.thialfihar.android.apg.core.Key;
+import org.thialfihar.android.apg.core.KeyRing;
+import org.thialfihar.android.apg.core.Progressable;
 import org.thialfihar.android.apg.provider.DataProvider;
 import org.thialfihar.android.apg.provider.Database;
 import org.thialfihar.android.apg.provider.KeyRings;
@@ -379,7 +380,7 @@ public class Apg {
     public static void buildSecretKey(Activity context,
                                       SectionView userIdsView, SectionView keysView,
                                       String oldPassPhrase, String newPassPhrase,
-                                      ProgressDialogUpdater progress)
+                                      Progressable progress)
             throws Apg.GeneralException, NoSuchProviderException, PGPException,
             NoSuchAlgorithmException, SignatureException, IOException, Database.GeneralException {
 
@@ -566,7 +567,7 @@ public class Apg {
 
     public static Bundle importKeyRings(Activity context, int type,
                                         InputData data,
-                                        ProgressDialogUpdater progress)
+                                        Progressable progress)
             throws GeneralException, FileNotFoundException, PGPException, IOException {
         Bundle returnData = new Bundle();
 
@@ -664,7 +665,7 @@ public class Apg {
 
     public static Bundle exportKeyRings(Activity context, Vector<Integer> keyRingIds,
                                         OutputStream outStream,
-                                        ProgressDialogUpdater progress)
+                                        Progressable progress)
             throws GeneralException, FileNotFoundException, PGPException, IOException {
         Bundle returnData = new Bundle();
 
@@ -853,7 +854,7 @@ public class Apg {
                                boolean armored,
                                long encryptionKeyIds[], long signatureKeyId,
                                String signaturePassPhrase,
-                               ProgressDialogUpdater progress,
+                               Progressable progress,
                                int symmetricAlgorithm, int hashAlgorithm, int compression,
                                boolean forceV3Signature,
                                String passPhrase)
@@ -1008,7 +1009,7 @@ public class Apg {
                                 long signatureKeyId, String signaturePassPhrase,
                                 int hashAlgorithm,
                                 boolean forceV3Signature,
-                                ProgressDialogUpdater progress)
+                                Progressable progress)
             throws GeneralException, PGPException, IOException, NoSuchAlgorithmException,
             SignatureException {
         Security.addProvider(new BouncyCastleProvider());
@@ -1115,7 +1116,7 @@ public class Apg {
                                          long signatureKeyId, String signaturePassPhrase,
                                          int hashAlgorithm,
                                          boolean forceV3Signature,
-                                         ProgressDialogUpdater progress)
+                                         Progressable progress)
             throws GeneralException, PGPException, IOException, NoSuchAlgorithmException,
             SignatureException {
         Security.addProvider(new BouncyCastleProvider());
@@ -1305,7 +1306,7 @@ public class Apg {
 
     public static Bundle decrypt(Context context,
                                  InputData data, OutputStream outStream,
-                                 String passPhrase, ProgressDialogUpdater progress,
+                                 String passPhrase, Progressable progress,
                                  boolean assumeSymmetric)
             throws IOException, GeneralException, PGPException, SignatureException {
         if (passPhrase == null) {
@@ -1521,7 +1522,7 @@ public class Apg {
 
     public static Bundle verifyText(BaseActivity context,
                                     InputData data, OutputStream outStream,
-                                    ProgressDialogUpdater progress)
+                                    Progressable progress)
             throws IOException, GeneralException, PGPException, SignatureException {
         Bundle returnData = new Bundle();
 

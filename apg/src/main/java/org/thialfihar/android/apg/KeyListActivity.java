@@ -43,8 +43,9 @@ import android.widget.Toast;
 
 import org.bouncycastle2.openpgp.PGPException;
 
-import org.thialfihar.android.apg.key.Key;
-import org.thialfihar.android.apg.key.KeyRing;
+import org.thialfihar.android.apg.core.Key;
+import org.thialfihar.android.apg.core.KeyRing;
+import org.thialfihar.android.apg.core.Progressable;
 import org.thialfihar.android.apg.provider.KeyRings;
 import org.thialfihar.android.apg.provider.Keys;
 import org.thialfihar.android.apg.provider.UserIds;

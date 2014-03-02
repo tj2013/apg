@@ -40,7 +40,7 @@ import org.bouncycastle2.openpgp.PGPException;
 import org.thialfihar.android.apg.Apg;
 import org.thialfihar.android.apg.Id;
 import org.thialfihar.android.apg.R;
-import org.thialfihar.android.apg.key.Key;
+import org.thialfihar.android.apg.core.Key;
 import org.thialfihar.android.apg.ui.widget.Editor.EditorListener;
 import org.thialfihar.android.apg.util.Choice;
 

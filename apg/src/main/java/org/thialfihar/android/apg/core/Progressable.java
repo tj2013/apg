@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package org.thialfihar.android.apg;
+package org.thialfihar.android.apg.core;
 
-public interface ProgressDialogUpdater {
+public interface Progressable {
     void setProgress(String message, int current, int total);
     void setProgress(int resourceId, int current, int total);
     void setProgress(int current, int total);

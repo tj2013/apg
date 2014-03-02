@@ -41,7 +41,8 @@ import android.widget.ViewFlipper;
 import org.bouncycastle2.jce.provider.BouncyCastleProvider;
 import org.bouncycastle2.openpgp.PGPException;
 
-import org.thialfihar.android.apg.key.KeyRing;
+import org.thialfihar.android.apg.core.KeyRing;
+import org.thialfihar.android.apg.core.Progressable;
 import org.thialfihar.android.apg.provider.DataProvider;
 import org.thialfihar.android.apg.util.Utils;
 

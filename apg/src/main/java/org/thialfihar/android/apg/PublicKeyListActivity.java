@@ -26,7 +26,7 @@ import android.view.View;
 import android.widget.ExpandableListView;
 import android.widget.ExpandableListView.ExpandableListContextMenuInfo;
 
-import org.thialfihar.android.apg.key.KeyRing;
+import org.thialfihar.android.apg.core.KeyRing;
 
 public class PublicKeyListActivity extends KeyListActivity {
     @Override

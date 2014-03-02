@@ -36,7 +36,7 @@ import org.bouncycastle2.openpgp.PGPPublicKey;
 
 import org.thialfihar.android.apg.Id;
 import org.thialfihar.android.apg.R;
-import org.thialfihar.android.apg.key.Key;
+import org.thialfihar.android.apg.core.Key;
 import org.thialfihar.android.apg.util.Choice;
 import org.thialfihar.android.apg.util.Utils;
 
