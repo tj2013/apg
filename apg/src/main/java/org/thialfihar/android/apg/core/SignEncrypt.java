@@ -36,7 +36,6 @@ import org.bouncycastle2.openpgp.operator.jcajce.JcePBEKeyEncryptionMethodGenera
 import org.bouncycastle2.openpgp.operator.jcajce.JcePGPDataEncryptorBuilder;
 import org.bouncycastle2.openpgp.operator.jcajce.JcePublicKeyKeyEncryptionMethodGenerator;
 
-import org.thialfihar.android.apg.Constants;
 import org.thialfihar.android.apg.Id;
 import org.thialfihar.android.apg.R;
 import org.thialfihar.android.apg.core.exception.PgpGeneralException;

@@ -21,6 +21,9 @@ import android.content.Context;
 import android.os.Bundle;
 
 import org.bouncycastle2.bcpg.ArmoredInputStream;
+import org.bouncycastle2.bcpg.BCPGInputStream;
+import org.bouncycastle2.bcpg.SignaturePacket;
+import org.bouncycastle2.bcpg.SignatureSubpacket;
 import org.bouncycastle2.bcpg.SignatureSubpacketTags;
 import org.bouncycastle2.openpgp.PGPCompressedData;
 import org.bouncycastle2.openpgp.PGPEncryptedData;
@@ -41,19 +44,16 @@ import org.bouncycastle2.openpgp.PGPSignatureList;
 import org.bouncycastle2.openpgp.PGPSignatureSubpacketVector;
 import org.bouncycastle2.openpgp.PGPUtil;
 import org.bouncycastle2.openpgp.operator.PBEDataDecryptorFactory;
-import org.bouncycastle2.openpgp.operator.PBESecretKeyDecryptor;
 import org.bouncycastle2.openpgp.operator.PGPDigestCalculatorProvider;
 import org.bouncycastle2.openpgp.operator.PublicKeyDataDecryptorFactory;
 import org.bouncycastle2.openpgp.operator.jcajce.JcaPGPContentVerifierBuilderProvider;
 import org.bouncycastle2.openpgp.operator.jcajce.JcaPGPDigestCalculatorProviderBuilder;
 import org.bouncycastle2.openpgp.operator.jcajce.JcePBEDataDecryptorFactoryBuilder;
-import org.bouncycastle2.openpgp.operator.jcajce.JcePBESecretKeyDecryptorBuilder;
 import org.bouncycastle2.openpgp.operator.jcajce.JcePublicKeyDataDecryptorFactoryBuilder;
 
-import org.thialfihar.android.apg.Constants;
 import org.thialfihar.android.apg.R;
 import org.thialfihar.android.apg.core.exception.PgpGeneralException;
-import org.thialfihar.android.apg.service.KeychainIntentService;
+import org.thialfihar.android.apg.core.Result;
 import org.thialfihar.android.apg.util.InputData;
 import org.thialfihar.android.apg.util.Log;
 
@@ -64,6 +64,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.security.SignatureException;
+import java.util.ArrayList;
 import java.util.Iterator;
 
 /**
@@ -107,7 +108,7 @@ public class DecryptVerify {
                        KeyProvider keyProvider) {
             this.context = context;
             this.inputData = inputData;
-            this.outStream = outputStream;
+            this.outputStream = outputStream;
             this.keyProvider = keyProvider;
         }
 
@@ -132,14 +133,14 @@ public class DecryptVerify {
     }
 
     public void updateProgress(int message, int current, int total) {
-        if (progress != null) {
-            progress.setProgress(message, current, total);
+        if (mProgress != null) {
+            mProgress.setProgress(message, current, total);
         }
     }
 
     public void updateProgress(int current, int total) {
-        if (progress != null) {
-            progress.setProgress(current, total);
+        if (mProgress != null) {
+            mProgress.setProgress(current, total);
         }
     }
 
@@ -185,7 +186,7 @@ public class DecryptVerify {
             throws IOException, PgpGeneralException, PGPException, SignatureException {
 
         // automatically works with ascii armor input and binary
-        InputStream in = PGPUtil.getDecoderStream(data.getInputStream());
+        InputStream in = PGPUtil.getDecoderStream(mInputData.getInputStream());
         if (in instanceof ArmoredInputStream) {
             ArmoredInputStream aIn = (ArmoredInputStream) in;
             // it is ascii armored
@@ -229,7 +230,7 @@ public class DecryptVerify {
         }
 
         if (enc == null) {
-            throw new PgpGeneralException(context.getString(R.string.error_invalid_data));
+            throw new PgpGeneralException(mContext.getString(R.string.error_invalid_data));
         }
 
         InputStream clear;
@@ -239,7 +240,7 @@ public class DecryptVerify {
 
         // TODO: currently we always only look at the first known key or symmetric encryption,
         // there might be more...
-        if (assumeSymmetric) {
+        if (mAssumeSymmetric) {
             PGPPBEEncryptedData pbe = null;
             Iterator<?> it = enc.getEncryptedDataObjects();
             // find secret key
@@ -253,16 +254,18 @@ public class DecryptVerify {
 
             if (pbe == null) {
                 throw new PgpGeneralException(
-                        context.getString(R.string.error_no_symmetric_encryption_packet));
+                        mContext.getString(R.string.error_no_symmetric_encryption_packet));
             }
 
             updateProgress(R.string.progress_preparing_streams, currentProgress, 100);
 
-            PGPDigestCalculatorProvider digestCalcProvider = new JcaPGPDigestCalculatorProviderBuilder()
+            PGPDigestCalculatorProvider digestCalcProvider =
+                new JcaPGPDigestCalculatorProviderBuilder()
                     .setProvider(Constants.BOUNCY_CASTLE_PROVIDER_NAME).build();
-            PBEDataDecryptorFactory decryptorFactory = new JcePBEDataDecryptorFactoryBuilder(
-                    digestCalcProvider).setProvider(Constants.BOUNCY_CASTLE_PROVIDER_NAME).build(
-                    passphrase.toCharArray());
+            PBEDataDecryptorFactory decryptorFactory =
+                new JcePBEDataDecryptorFactoryBuilder(digestCalcProvider)
+                    .setProvider(Constants.BOUNCY_CASTLE_PROVIDER_NAME)
+                    .build(mPassphrase.toCharArray());
 
             clear = pbe.getDataStream(decryptorFactory);
 
@@ -272,14 +275,14 @@ public class DecryptVerify {
             updateProgress(R.string.progress_finding_key, currentProgress, 100);
 
             PGPPublicKeyEncryptedData pbe = null;
-            PGPSecretKey secretKey = null;
+            Key secretKey = null;
             Iterator<?> it = enc.getEncryptedDataObjects();
             // find secret key
             while (it.hasNext()) {
                 Object obj = it.next();
                 if (obj instanceof PGPPublicKeyEncryptedData) {
                     PGPPublicKeyEncryptedData encData = (PGPPublicKeyEncryptedData) obj;
-                    secretKey = keyProvider.getSecretKey(encData.getKeyID());
+                    secretKey = mKeyProvider.getSecretKey(encData.getKeyID());
                     if (secretKey != null) {
                         pbe = encData;
                         break;
@@ -288,29 +291,28 @@ public class DecryptVerify {
             }
 
             if (secretKey == null) {
-                throw new PgpGeneralException(context.getString(R.string.error_no_secret_key_found));
+                throw new PgpGeneralException(mContext.getString(R.string.error_no_secret_key_found));
             }
 
             currentProgress += 5;
             updateProgress(R.string.progress_extracting_key, currentProgress, 100);
             PGPPrivateKey privateKey = null;
             try {
-                PBESecretKeyDecryptor keyDecryptor = new JcePBESecretKeyDecryptorBuilder()
-                        .setProvider(Constants.BOUNCY_CASTLE_PROVIDER_NAME).build(
-                                passphrase.toCharArray());
-                privateKey = secretKey.extractPrivateKey(keyDecryptor);
+                privateKey = secretKey.extractPrivateKey(mPassphrase);
             } catch (PGPException e) {
-                throw new PGPException(context.getString(R.string.error_wrong_passphrase));
+                throw new PGPException(mContext.getString(R.string.error_wrong_passphrase));
             }
             if (privateKey == null) {
                 throw new PgpGeneralException(
-                        context.getString(R.string.error_could_not_extract_private_key));
+                    mContext.getString(R.string.error_could_not_extract_private_key));
             }
             currentProgress += 5;
             updateProgress(R.string.progress_preparing_streams, currentProgress, 100);
 
-            PublicKeyDataDecryptorFactory decryptorFactory = new JcePublicKeyDataDecryptorFactoryBuilder()
-                    .setProvider(Constants.BOUNCY_CASTLE_PROVIDER_NAME).build(privateKey);
+            PublicKeyDataDecryptorFactory decryptorFactory =
+                new JcePublicKeyDataDecryptorFactoryBuilder()
+                    .setProvider(Constants.BOUNCY_CASTLE_PROVIDER_NAME)
+                    .build(privateKey);
 
             clear = pbe.getDataStream(decryptorFactory);
 
@@ -321,7 +323,7 @@ public class DecryptVerify {
         PGPObjectFactory plainFact = new PGPObjectFactory(clear);
         Object dataChunk = plainFact.nextObject();
         PGPOnePassSignature signature = null;
-        PGPPublicKey signatureKey = null;
+        Key signatureKey = null;
         int signatureIndex = -1;
 
         if (dataChunk instanceof PGPCompressedData) {
@@ -338,11 +340,11 @@ public class DecryptVerify {
         if (dataChunk instanceof PGPOnePassSignatureList) {
             updateProgress(R.string.progress_processing_signature, currentProgress, 100);
 
-            returnData.putBoolean(KeychainIntentService.RESULT_SIGNATURE, true);
+            returnData.putBoolean(Result.SIGNATURE, true);
             PGPOnePassSignatureList sigList = (PGPOnePassSignatureList) dataChunk;
             for (int i = 0; i < sigList.size(); ++i) {
                 signature = sigList.get(i);
-                signatureKey = keyProvider.getPublicKey(signature.getKeyID());
+                signatureKey = mKeyProvider.getPublicKey(signature.getKeyID());
                 if (signatureKeyId == 0) {
                     signatureKeyId = signature.getKeyID();
                 }
@@ -352,25 +354,25 @@ public class DecryptVerify {
                     signatureIndex = i;
                     signatureKeyId = signature.getKeyID();
                     String userId = null;
-                    PGPPublicKeyRing signKeyRing = keyProvider.getPublicKey(signatureKeyId);
+                    KeyRing signKeyRing = mKeyProvider.getPublicKeyRing(signatureKeyId);
                     if (signKeyRing != null) {
-                        userId = PgpKeyHelper.getMainUserId(PgpKeyHelper.getMasterKey(signKeyRing));
+                        userId = signKeyRing.getMasterKey().getMainUserId();
                     }
-                    returnData.putString(KeychainIntentService.RESULT_SIGNATURE_USER_ID, userId);
+                    returnData.putString(Result.SIGNATURE_USER_ID, userId);
                     break;
                 }
             }
 
-            returnData.putLong(KeychainIntentService.RESULT_SIGNATURE_KEY_ID, signatureKeyId);
+            returnData.putLong(Result.SIGNATURE_KEY_ID, signatureKeyId);
 
             if (signature != null) {
                 JcaPGPContentVerifierBuilderProvider contentVerifierBuilderProvider =
                     new JcaPGPContentVerifierBuilderProvider()
                         .setProvider(Constants.BOUNCY_CASTLE_PROVIDER_NAME);
 
-                signature.init(contentVerifierBuilderProvider, signatureKey);
+                signature.init(contentVerifierBuilderProvider, signatureKey.getPublicKey());
             } else {
-                returnData.putBoolean(KeychainIntentService.RESULT_SIGNATURE_UNKNOWN, true);
+                returnData.putBoolean(Result.SIGNATURE_UNKNOWN, true);
             }
 
             dataChunk = plainFact.nextObject();
@@ -400,16 +402,15 @@ public class DecryptVerify {
             int n;
             // TODO: progress calculation is broken here! Try to rework it based on commented code!
 //            int progress = 0;
-            long startPos = data.getStreamPosition();
+            long startPos = mInputData.getStreamPosition();
             while ((n = dataIn.read(buffer)) > 0) {
-                outStream.write(buffer, 0, n);
+                mOutputStream.write(buffer, 0, n);
 //                progress += n;
                 if (signature != null) {
                     try {
                         signature.update(buffer, 0, n);
                     } catch (SignatureException e) {
-                        returnData
-                                .putBoolean(KeychainIntentService.RESULT_SIGNATURE_SUCCESS, false);
+                        returnData.putBoolean(Result.SIGNATURE_SUCCESS, false);
                         signature = null;
                     }
                 }
@@ -417,11 +418,13 @@ public class DecryptVerify {
                 // unknown size, but try to at least have a moving, slowing down progress bar
 //                currentProgress = startProgress + (endProgress - startProgress) * progress
 //                        / (progress + 100000);
-                if (data.getSize() - startPos == 0) {
+                if (mInputData.getSize() - startPos == 0) {
                     currentProgress = endProgress;
                 } else {
-                    currentProgress = (int) (startProgress + (endProgress - startProgress)
-                            * (data.getStreamPosition() - startPos) / (data.getSize() - startPos));
+                    currentProgress = (int) (startProgress +
+                        (endProgress - startProgress) *
+                            (mInputData.getStreamPosition() - startPos) /
+                            (mInputData.getSize() - startPos));
                 }
                 updateProgress(currentProgress, 100);
             }
@@ -433,13 +436,13 @@ public class DecryptVerify {
                 PGPSignature messageSignature = signatureList.get(signatureIndex);
 
                 // these are not cleartext signatures!
-                returnData.putBoolean(KeychainIntentService.RESULT_CLEARTEXT_SIGNATURE_ONLY, false);
+                returnData.putBoolean(Result.CLEARTEXT_SIGNATURE_ONLY, false);
 
                 // Now check binding signatures
-                boolean keyBindingIsOk = verifyKeyBinding(context, messageSignature, signatureKey);
+                boolean keyBindingIsOk = verifyKeyBinding(messageSignature, signatureKey);
                 boolean sigIsOk = signature.verify(messageSignature);
 
-                returnData.putBoolean(KeychainIntentService.RESULT_SIGNATURE_SUCCESS,
+                returnData.putBoolean(Result.SIGNATURE_SUCCESS,
                                       keyBindingIsOk & sigIsOk);
             }
         }
@@ -454,7 +457,7 @@ public class DecryptVerify {
             } else {
                 // failed
                 Log.d(Constants.TAG, "Integrity verification: failed!");
-                throw new PgpGeneralException(context.getString(R.string.error_integrity_check_failed));
+                throw new PgpGeneralException(mContext.getString(R.string.error_integrity_check_failed));
             }
         } else {
             // no integrity check
@@ -482,7 +485,7 @@ public class DecryptVerify {
             throws IOException, PgpGeneralException, PGPException, SignatureException {
         Bundle returnData = new Bundle();
         // cleartext signatures are never encrypted ;)
-        returnData.putBoolean(KeychainIntentService.RESULT_CLEARTEXT_SIGNATURE_ONLY, true);
+        returnData.putBoolean(Result.CLEARTEXT_SIGNATURE_ONLY, true);
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
 
@@ -506,23 +509,23 @@ public class DecryptVerify {
         out.close();
 
         byte[] clearText = out.toByteArray();
-        outStream.write(clearText);
+        mOutputStream.write(clearText);
 
-        returnData.putBoolean(KeychainIntentService.RESULT_SIGNATURE, true);
+        returnData.putBoolean(Result.SIGNATURE, true);
 
         updateProgress(R.string.progress_processing_signature, 60, 100);
         PGPObjectFactory pgpFact = new PGPObjectFactory(aIn);
 
         PGPSignatureList sigList = (PGPSignatureList) pgpFact.nextObject();
         if (sigList == null) {
-            throw new PgpGeneralException(context.getString(R.string.error_corrupt_data));
+            throw new PgpGeneralException(mContext.getString(R.string.error_corrupt_data));
         }
         PGPSignature signature = null;
         long signatureKeyId = 0;
-        PGPPublicKey signatureKey = null;
+        Key signatureKey = null;
         for (int i = 0; i < sigList.size(); ++i) {
             signature = sigList.get(i);
-            signatureKey = keyProvidergetPublic(signature.getKeyID());
+            signatureKey = mKeyProvider.getPublicKey(signature.getKeyID());
             if (signatureKeyId == 0) {
                 signatureKeyId = signature.getKeyID();
             }
@@ -532,19 +535,19 @@ public class DecryptVerify {
             } else {
                 signatureKeyId = signature.getKeyID();
                 String userId = null;
-                PGPPublicKeyRing signKeyRing = keyProvider.getPublicKey(signatureKeyId);
+                KeyRing signKeyRing = mKeyProvider.getPublicKeyRing(signatureKeyId);
                 if (signKeyRing != null) {
-                    userId = PgpKeyHelper.getMainUserId(PgpKeyHelper.getMasterKey(signKeyRing));
+                    userId = signKeyRing.getMasterKey().getMainUserId();
                 }
-                returnData.putString(KeychainIntentService.RESULT_SIGNATURE_USER_ID, userId);
+                returnData.putString(Result.SIGNATURE_USER_ID, userId);
                 break;
             }
         }
 
-        returnData.putLong(KeychainIntentService.RESULT_SIGNATURE_KEY_ID, signatureKeyId);
+        returnData.putLong(Result.SIGNATURE_KEY_ID, signatureKeyId);
 
         if (signature == null) {
-            returnData.putBoolean(KeychainIntentService.RESULT_SIGNATURE_UNKNOWN, true);
+            returnData.putBoolean(Result.SIGNATURE_UNKNOWN, true);
             updateProgress(R.string.progress_done, 100, 100);
             return returnData;
         }
@@ -553,7 +556,7 @@ public class DecryptVerify {
                 new JcaPGPContentVerifierBuilderProvider()
                         .setProvider(Constants.BOUNCY_CASTLE_PROVIDER_NAME);
 
-        signature.init(contentVerifierBuilderProvider, signatureKey);
+        signature.init(contentVerifierBuilderProvider, signatureKey.getPublicKey());
 
         InputStream sigIn = new BufferedInputStream(new ByteArrayInputStream(clearText));
 
@@ -575,25 +578,24 @@ public class DecryptVerify {
         boolean sigIsOk = signature.verify();
 
         // Now check binding signatures
-        boolean keyBindingIsOk = verifyKeyBinding(context, signature, signatureKey);
+        boolean keyBindingIsOk = verifyKeyBinding(signature, signatureKey);
 
-        returnData.putBoolean(KeychainIntentService.RESULT_SIGNATURE_SUCCESS, sigIsOk & keyBindingIsOk);
+        returnData.putBoolean(Result.SIGNATURE_SUCCESS, sigIsOk & keyBindingIsOk);
 
         updateProgress(R.string.progress_done, 100, 100);
         return returnData;
     }
 
-    private static boolean verifyKeyBinding(Context context, PGPSignature signature,
-                                            PGPPublicKey signatureKey) {
+    private boolean verifyKeyBinding(PGPSignature signature, Key signatureKey) {
         long signatureKeyId = signature.getKeyID();
         boolean keyBindingIsOk = false;
         String userId = null;
-        PGPPublicKeyRing signKeyRing = keyProvider.getPublicKeyRing(signatureKeyId);
-        PGPPublicKey mKey = null;
+        KeyRing signKeyRing = mKeyProvider.getPublicKeyRing(signatureKeyId);
+        Key mKey = null;
         if (signKeyRing != null) {
-            mKey = PgpKeyHelper.getMasterKey(signKeyRing);
+            mKey = signKeyRing.getMasterKey();
         }
-        if (signature.getKeyID() != mKey.getKeyID()) {
+        if (signature.getKeyID() != mKey.getKeyId()) {
             keyBindingIsOk = verifyKeyBinding(mKey, signatureKey);
         } else {
             // if the key used to make the signature was the master key, no need to check binding sigs
@@ -602,7 +604,7 @@ public class DecryptVerify {
         return keyBindingIsOk;
     }
 
-    private static boolean verifyKeyBinding(PGPPublicKey masterPublicKey, PGPPublicKey signingPublicKey) {
+    private static boolean verifyKeyBinding(Key masterKey, Key signingKey) {
         boolean subkeyBindingIsOk = false;
         boolean tmpSubkeyBindingIsOk = false;
         boolean primkeyBindingIsOk = false;
@@ -610,20 +612,18 @@ public class DecryptVerify {
             new JcaPGPContentVerifierBuilderProvider()
                 .setProvider(Constants.BOUNCY_CASTLE_PROVIDER_NAME);
 
-        Iterator<PGPSignature> itr = signingPublicKey.getSignatures();
-
-        while (itr.hasNext()) {
+        for (PGPSignature signature : signingKey.getSignatures()) {
             // what does gpg do if the subkey binding is wrong?
             // gpg has an invalid subkey binding error on key import I think, but doesn't shout
             // about keys without subkey signing. Can't get it to import a slightly broken one
             // either, so we will err on bad subkey binding here.
-            PGPSignature sig = itr.next();
-            if (sig.getKeyID() == masterPublicKey.getKeyID() &&
-                sig.getSignatureType() == PGPSignature.SUBKEY_BINDING) {
+            if (signature.getKeyID() == masterKey.getKeyId() &&
+                signature.getSignatureType() == PGPSignature.SUBKEY_BINDING) {
                 // check and if ok, check primary key binding.
                 try {
-                    sig.init(contentVerifierBuilderProvider, masterPublicKey);
-                    tmpSubkeyBindingIsOk = sig.verifyCertification(masterPublicKey, signingPublicKey);
+                    signature.init(contentVerifierBuilderProvider, masterKey.getPublicKey());
+                    tmpSubkeyBindingIsOk = signature.verifyCertification(masterKey.getPublicKey(),
+                                                                         signingKey.getPublicKey());
                 } catch (PGPException e) {
                     continue;
                 } catch (SignatureException e) {
@@ -635,13 +635,13 @@ public class DecryptVerify {
                 }
 
                 if (tmpSubkeyBindingIsOk) {
-                    primkeyBindingIsOk = verifyPrimaryBinding(sig.getUnhashedSubPackets(),
-                                                              masterPublicKey, signingPublicKey);
+                    primkeyBindingIsOk = verifyPrimaryBinding(signature.getUnhashedSubPackets(),
+                                                              masterKey, signingKey);
                     if (primkeyBindingIsOk) {
                         break;
                     }
-                    primkeyBindingIsOk = verifyPrimaryBinding(sig.getHashedSubPackets(),
-                                                              masterPublicKey, signingPublicKey);
+                    primkeyBindingIsOk = verifyPrimaryBinding(signature.getHashedSubPackets(),
+                                                              masterKey, signingKey);
                     if (primkeyBindingIsOk) {
                         break;
                     }
@@ -651,9 +651,31 @@ public class DecryptVerify {
         return (subkeyBindingIsOk & primkeyBindingIsOk);
     }
 
+    public static PGPSignatureList getEmbeddedSignatures(PGPSignatureSubpacketVector packets)
+            throws IOException, PGPException {
+        SignatureSubpacket[] sigs = packets.getSubpackets(SignatureSubpacketTags.EMBEDDED_SIGNATURE);
+        ArrayList l = new ArrayList();
+        for (int i = 0; i < sigs.length; ++i) {
+            byte[] data = sigs[i].getData();
+            PGPSignature tmpSig = null;
+            BCPGInputStream in = new BCPGInputStream(new ByteArrayInputStream(data));
+            try {
+                tmpSig = new PGPSignature(new SignaturePacket(in));
+            } catch (IOException e) {
+                tmpSig = null;
+            } catch (PGPException e) {
+                tmpSig = null;
+            }
+            if (tmpSig != null) {
+                l.add(tmpSig);
+            }
+        }
+        return new PGPSignatureList((PGPSignature[])l.toArray(new PGPSignature[l.size()]));
+    }
+
     private static boolean verifyPrimaryBinding(PGPSignatureSubpacketVector packets,
-                                                PGPPublicKey masterPublicKey,
-                                                PGPPublicKey signingPublicKey) {
+                                                Key masterKey,
+                                                Key signingKey) {
         boolean primkeyBindingIsOk = false;
         JcaPGPContentVerifierBuilderProvider contentVerifierBuilderProvider =
             new JcaPGPContentVerifierBuilderProvider()
@@ -662,7 +684,7 @@ public class DecryptVerify {
 
         if (packets.hasSubpacket(SignatureSubpacketTags.EMBEDDED_SIGNATURE)) {
             try {
-                eSigList = packets.getEmbeddedSignatures();
+                eSigList = getEmbeddedSignatures(packets);
             } catch (IOException e) {
                 return false;
             } catch (PGPException e) {
@@ -672,8 +694,9 @@ public class DecryptVerify {
                 PGPSignature emSig = eSigList.get(j);
                 if (emSig.getSignatureType() == PGPSignature.PRIMARYKEY_BINDING) {
                     try {
-                        emSig.init(contentVerifierBuilderProvider, signingPublicKey);
-                        primkeyBindingIsOk = emSig.verifyCertification(masterPublicKey, signingPublicKey);
+                        emSig.init(contentVerifierBuilderProvider, signingKey.getPublicKey());
+                        primkeyBindingIsOk = emSig.verifyCertification(masterKey.getPublicKey(),
+                                                                       signingKey.getPublicKey());
                         if (primkeyBindingIsOk) {
                             break;
                         }
@@ -691,16 +714,16 @@ public class DecryptVerify {
     /**
      * Mostly taken from ClearSignedFileProcessor in Bouncy Castle
      *
-     * @param sig
+     * @param signature
      * @param line
      * @throws SignatureException
      * @throws IOException
      */
-    private static void processLine(PGPSignature sig, byte[] line)
+    private static void processLine(PGPSignature signature, byte[] line)
             throws SignatureException, IOException {
         int length = getLengthWithoutWhiteSpace(line);
         if (length > 0) {
-            sig.update(line, 0, length);
+            signature.update(line, 0, length);
         }
     }
 

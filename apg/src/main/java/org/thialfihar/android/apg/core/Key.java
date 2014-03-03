@@ -32,6 +32,7 @@ import java.io.IOException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.Vector;
 
 public class Key {
     private PGPSecretKey mSecretKey;
@@ -105,6 +106,14 @@ public class Key {
         return mPublicKey.isRevoked();
     }
 
+    public Vector<PGPSignature> getSignatures() {
+        Vector<PGPSignature> signatures = new Vector<PGPSignature>();
+        for (PGPSignature signature : new IterableIterator<PGPSignature>(mPublicKey.getSignatures())) {
+            signatures.add(signature);
+        }
+        return signatures;
+    }
+
     public IterableIterator<String> getUserIds() {
         return new IterableIterator<String>(mPublicKey.getUserIDs());
     }
@@ -115,7 +124,6 @@ public class Key {
         }
         return null;
     }
-
 
     public boolean isEncryptionKey() {
         if (!mPublicKey.isEncryptionKey()) {

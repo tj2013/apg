@@ -220,7 +220,7 @@
          they will be put after "errorMessage", e.g. "Error: file not found" -->
     <string name="error_fileDeleteFailed">deleting \'%s\' failed</string>
     <string name="error_fileNotFound">file not found</string>
-    <string name="error_noSecretKeyFound">no suitable secret key found</string>
+    <string name="error_no_secret_key_found">no suitable secret key found</string>
     <string name="error_noKnownEncryptionFound">no known kind of encryption found</string>
     <string name="error_externalStorageNotReady">external storage not ready</string>
     <string name="error_invalidEmail">invalid email \'%s\'</string>
@@ -237,10 +237,11 @@
     <string name="error_signature_failed">signature failed</string>
     <string name="error_no_signature_passphrase">no pass phrase given</string>
     <string name="error_no_signature_key">no signature key given</string>
-    <string name="error_invalidData">not valid encryption data</string>
-    <string name="error_corruptData">corrupt data</string>
-    <string name="error_noSymmetricEncryptionPacket">couldn\'t find a packet with symmetric encryption</string>
-    <string name="error_wrongPassPhrase">wrong pass phrase</string>
+    <string name="error_invalid_data">not valid encryption data</string>
+    <string name="error_corrupt_data">corrupt data</string>
+    <string name="error_integrity_check_failed">integrity check failed! Data has been modified!</string>
+    <string name="error_no_symmetric_encryption_packet">couldn\'t find a packet with symmetric encryption</string>
+    <string name="error_wrong_passphrase">wrong pass phrase</string>
     <string name="error_savingKeys">error saving some key(s)</string>
     <string name="error_could_not_extract_private_key">could not extract private key</string>
 
@@ -273,7 +274,7 @@
     <string name="progress_verifying_signature">verifying signature...</string>
     <string name="progress_signing">signing...</string>
     <string name="progress_reading_data">reading data...</string>
-    <string name="progress_findingKey">finding key...</string>
+    <string name="progress_finding_key">finding key...</string>
     <string name="progress_decompressing_data">decompressing data...</string>
     <string name="progress_verifying_integrity">verifying integrity...</string>
     <string name="progress_deleting_securely">deleting \'%s\' securely...</string>

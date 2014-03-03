@@ -20,4 +20,5 @@ import org.bouncycastle2.jce.provider.BouncyCastleProvider;
 
 public final class Constants {
     public static final String BOUNCY_CASTLE_PROVIDER_NAME = BouncyCastleProvider.PROVIDER_NAME;
+    public static final String TAG = "APG";
 }

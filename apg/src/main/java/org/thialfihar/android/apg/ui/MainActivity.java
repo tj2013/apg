@@ -37,6 +37,8 @@ import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import org.thialfihar.android.apg.util.Utils;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -161,7 +163,7 @@ public class MainActivity extends BaseActivity {
             showDialog(Id.dialog.help);
         }
 
-        if (Apg.isReleaseVersion(this) && !mPreferences.hasSeenChangeLog(Apg.getVersion(this))) {
+        if (Utils.isReleaseVersion(this) && !mPreferences.hasSeenChangeLog(Utils.getVersion(this))) {
             showDialog(Id.dialog.change_log);
         }
     }
@@ -198,7 +200,7 @@ public class MainActivity extends BaseActivity {
                                             public void onClick(DialogInterface dialog, int id) {
                                                 MainActivity.this.removeDialog(Id.dialog.change_log);
                                                 mPreferences.setHasSeenChangeLog(
-                                                        Apg.getVersion(MainActivity.this), true);
+                                                        Utils.getVersion(MainActivity.this), true);
                                             }
                                         });
 

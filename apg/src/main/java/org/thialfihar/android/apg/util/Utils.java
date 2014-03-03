@@ -20,6 +20,8 @@ import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
 
+import org.thialfihar.android.apg.Constants;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.SecureRandom;
