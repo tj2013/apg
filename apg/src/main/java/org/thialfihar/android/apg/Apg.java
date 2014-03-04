@@ -75,7 +75,6 @@ import org.thialfihar.android.apg.ui.widget.SectionView;
 import org.thialfihar.android.apg.ui.widget.UserIdEditor;
 import org.thialfihar.android.apg.util.InputData;
 import org.thialfihar.android.apg.util.PositionAwareInputStream;
-import org.thialfihar.android.apg.util.PrngFixes;
 import org.thialfihar.android.apg.util.Utils;
 
 import java.io.BufferedInputStream;
@@ -217,7 +216,6 @@ public class Apg {
         if (sDatabase == null) {
             sDatabase = new Database(context);
         }
-        PrngFixes.apply();
     }
 
     public static Database getDatabase() {

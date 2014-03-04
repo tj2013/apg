@@ -72,16 +72,6 @@ public class BaseActivity extends Activity
         mPreferences = Preferences.getPreferences(this);
         setLanguage(this, mPreferences.getLanguage());
 
-        Apg.initialize(this);
-
-        if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
-            File dir = new File(Constants.path.app_dir);
-            if (!dir.exists() && !dir.mkdirs()) {
-                // ignore this for now, it's not crucial
-                // that the directory doesn't exist at this point
-            }
-        }
-
         startCacheService(this, mPreferences);
     }
 
