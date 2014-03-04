@@ -40,10 +40,10 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.thialfihar.android.apg.KeyServer.InsufficientQuery;
-import org.thialfihar.android.apg.KeyServer.KeyInfo;
-import org.thialfihar.android.apg.KeyServer.QueryException;
-import org.thialfihar.android.apg.KeyServer.TooManyResponses;
+import org.thialfihar.android.apg.core.KeyServer.InsufficientQuery;
+import org.thialfihar.android.apg.core.KeyServer.KeyInfo;
+import org.thialfihar.android.apg.core.KeyServer.QueryException;
+import org.thialfihar.android.apg.core.KeyServer.TooManyResponses;
 import org.thialfihar.android.apg.util.Utils;
 
 import java.util.List;

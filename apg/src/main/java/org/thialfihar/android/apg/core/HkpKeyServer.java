@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.thialfihar.android.apg;
+package org.thialfihar.android.apg.core;
 
 import android.text.Html;
 
