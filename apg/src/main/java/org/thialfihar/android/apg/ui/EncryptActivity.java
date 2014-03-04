@@ -108,7 +108,7 @@ public class EncryptActivity extends BaseActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.encrypt);
+        setContentView(R.layout.encrypt_activity);
 
         mGenerateSignature = false;
 
