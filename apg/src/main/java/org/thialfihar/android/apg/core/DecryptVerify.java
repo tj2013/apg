@@ -35,10 +35,7 @@ import org.bouncycastle2.openpgp.PGPOnePassSignature;
 import org.bouncycastle2.openpgp.PGPOnePassSignatureList;
 import org.bouncycastle2.openpgp.PGPPBEEncryptedData;
 import org.bouncycastle2.openpgp.PGPPrivateKey;
-import org.bouncycastle2.openpgp.PGPPublicKey;
 import org.bouncycastle2.openpgp.PGPPublicKeyEncryptedData;
-import org.bouncycastle2.openpgp.PGPPublicKeyRing;
-import org.bouncycastle2.openpgp.PGPSecretKey;
 import org.bouncycastle2.openpgp.PGPSignature;
 import org.bouncycastle2.openpgp.PGPSignatureList;
 import org.bouncycastle2.openpgp.PGPSignatureSubpacketVector;
@@ -53,7 +50,6 @@ import org.bouncycastle2.openpgp.operator.jcajce.JcePublicKeyDataDecryptorFactor
 
 import org.thialfihar.android.apg.R;
 import org.thialfihar.android.apg.core.exception.PgpGeneralException;
-import org.thialfihar.android.apg.core.Result;
 import org.thialfihar.android.apg.util.InputData;
 import org.thialfihar.android.apg.util.Log;
 
@@ -670,7 +666,7 @@ public class DecryptVerify {
                 l.add(tmpSig);
             }
         }
-        return new PGPSignatureList((PGPSignature[])l.toArray(new PGPSignature[l.size()]));
+        return new PGPSignatureList((PGPSignature[]) l.toArray(new PGPSignature[l.size()]));
     }
 
     private static boolean verifyPrimaryBinding(PGPSignatureSubpacketVector packets,

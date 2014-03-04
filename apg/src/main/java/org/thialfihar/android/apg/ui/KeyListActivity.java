@@ -48,8 +48,8 @@ import org.thialfihar.android.apg.core.KeyRing;
 import org.thialfihar.android.apg.provider.KeyRings;
 import org.thialfihar.android.apg.provider.Keys;
 import org.thialfihar.android.apg.provider.UserIds;
-import org.thialfihar.android.apg.util.Utils;
 import org.thialfihar.android.apg.util.InputData;
+import org.thialfihar.android.apg.util.Utils;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
