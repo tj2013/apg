@@ -39,6 +39,7 @@ import android.widget.ViewFlipper;
 
 import org.bouncycastle2.openpgp.PGPException;
 
+import org.thialfihar.android.apg.service.PassphraseCacheService;
 import org.thialfihar.android.apg.core.Key;
 import org.thialfihar.android.apg.core.KeyRing;
 import org.thialfihar.android.apg.provider.DataProvider;
@@ -587,7 +588,8 @@ public class EncryptActivity extends BaseActivity {
                 return;
             }
 
-            if (getSecretKeyId() != 0 && Apg.getCachedPassPhrase(getSecretKeyId()) == null) {
+            if (getSecretKeyId() != 0 &&
+                PassphraseCacheService.getCachedPassphrase(this, getSecretKeyId()) == null) {
                 showDialog(Id.dialog.pass_phrase);
                 return;
             }
@@ -668,20 +670,20 @@ public class EncryptActivity extends BaseActivity {
             if (mGenerateSignature) {
                Apg.generateSignature(this, in, out, useAsciiArmour, mDataSource.isBinary(),
                                      getSecretKeyId(),
-                                     Apg.getCachedPassPhrase(getSecretKeyId()),
+                                     PassphraseCacheService.getCachedPassphrase(this, getSecretKeyId()),
                                      mPreferences.getDefaultHashAlgorithm(),
                                      mPreferences.getForceV3Signatures(),
                                      this);
             } else if (signOnly) {
                 Apg.signText(this, in, out, getSecretKeyId(),
-                             Apg.getCachedPassPhrase(getSecretKeyId()),
+                             PassphraseCacheService.getCachedPassphrase(this, getSecretKeyId()),
                              mPreferences.getDefaultHashAlgorithm(),
                              mPreferences.getForceV3Signatures(),
                              this);
             } else {
                 Apg.encrypt(this, in, out, useAsciiArmour,
                             encryptionKeyIds, signatureKeyId,
-                            Apg.getCachedPassPhrase(signatureKeyId), this,
+                            PassphraseCacheService.getCachedPassphrase(this, signatureKeyId), this,
                             mPreferences.getDefaultEncryptionAlgorithm(),
                             mPreferences.getDefaultHashAlgorithm(),
                             compressionId,

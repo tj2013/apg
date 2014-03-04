@@ -96,9 +96,7 @@ import java.security.SecureRandom;
 import java.security.Security;
 import java.security.SignatureException;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.Vector;
 
 public class Apg {
@@ -178,9 +176,7 @@ public class Apg {
                     CompressionAlgorithmTags.BZIP2,
                     CompressionAlgorithmTags.ZIP };
 
-    private static HashMap<Long, CachedPassPhrase> sPassPhraseCache = new HashMap<Long, CachedPassPhrase>();
     private static String sEditPassPhrase = null;
-
     private static Database sDatabase = null;
 
     public static class GeneralException extends Exception {
@@ -215,58 +211,6 @@ public class Apg {
 
     public static String getEditPassPhrase() {
         return sEditPassPhrase;
-    }
-
-    public static void setCachedPassPhrase(long keyId, String passPhrase) {
-        sPassPhraseCache.put(keyId, new CachedPassPhrase(new Date().getTime(), passPhrase));
-    }
-
-    public static String getCachedPassPhrase(long keyId) {
-        long realId = keyId;
-        if (realId != Id.key.symmetric) {
-            KeyRing keyRing = sDatabase.getSecretKeyRing(keyId);
-            if (keyRing == null) {
-                return null;
-            }
-            Key masterKey = keyRing.getMasterKey();
-            if (masterKey == null) {
-                return null;
-            }
-            realId = masterKey.getKeyId();
-        }
-        CachedPassPhrase cpp = sPassPhraseCache.get(realId);
-        if (cpp == null) {
-            return null;
-        }
-        // set it again to reset the cache life cycle
-        setCachedPassPhrase(realId, cpp.passPhrase);
-        return cpp.passPhrase;
-    }
-
-    public static int cleanUpCache(int ttl, int initialDelay) {
-        int delay = initialDelay;
-        long realTtl = ttl * 1000;
-        long now = new Date().getTime();
-        Vector<Long> oldKeys = new Vector<Long>();
-        for (Map.Entry<Long, CachedPassPhrase> pair : sPassPhraseCache.entrySet()) {
-            long lived = now - pair.getValue().timestamp;
-            if (lived >= realTtl) {
-                oldKeys.add(pair.getKey());
-            } else {
-                // see, whether the remaining time for this cache entry improves our
-                // check delay
-                long nextCheck = realTtl - lived + 1000;
-                if (nextCheck < delay) {
-                    delay = (int) nextCheck;
-                }
-            }
-        }
-
-        for (long keyId : oldKeys) {
-            sPassPhraseCache.remove(keyId);
-        }
-
-        return delay;
     }
 
     public static Key createKey(Context context,

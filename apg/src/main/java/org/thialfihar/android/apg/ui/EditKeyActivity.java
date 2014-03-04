@@ -37,6 +37,7 @@ import org.bouncycastle2.openpgp.PGPException;
 import org.thialfihar.android.apg.core.Key;
 import org.thialfihar.android.apg.core.KeyRing;
 import org.thialfihar.android.apg.provider.Database;
+import org.thialfihar.android.apg.service.PassphraseCacheService;
 import org.thialfihar.android.apg.ui.widget.KeyEditor;
 import org.thialfihar.android.apg.ui.widget.SectionView;
 
@@ -239,7 +240,7 @@ public class EditKeyActivity extends BaseActivity implements OnClickListener {
                 newPassPhrase = oldPassPhrase;
             }
             Apg.buildSecretKey(this, mUserIds, mKeys, oldPassPhrase, newPassPhrase, this);
-            Apg.setCachedPassPhrase(getMasterKeyId(), newPassPhrase);
+            PassphraseCacheService.addCachedPassphrase(this, getMasterKeyId(), newPassPhrase);
         } catch (NoSuchProviderException e) {
             error = "" + e;
         } catch (NoSuchAlgorithmException e) {

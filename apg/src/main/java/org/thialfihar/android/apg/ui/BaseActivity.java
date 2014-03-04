@@ -36,6 +36,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import org.thialfihar.android.apg.core.Progressable;
+import org.thialfihar.android.apg.service.PassphraseCacheService;
 import org.thialfihar.android.apg.util.Utils;
 
 import java.io.File;
@@ -71,14 +72,6 @@ public class BaseActivity extends Activity
 
         mPreferences = Preferences.getPreferences(this);
         setLanguage(this, mPreferences.getLanguage());
-
-        startCacheService(this, mPreferences);
-    }
-
-    public static void startCacheService(Activity activity, Preferences preferences) {
-        Intent intent = new Intent(activity, Service.class);
-        intent.putExtra(Service.EXTRA_TTL, preferences.getPassPhraseCacheTtl());
-        activity.startService(intent);
     }
 
     @Override
@@ -396,8 +389,8 @@ public class BaseActivity extends Activity
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
 
-    public void passPhraseCallback(long keyId, String passPhrase) {
-        Apg.setCachedPassPhrase(keyId, passPhrase);
+    public void passPhraseCallback(long keyId, String passphrase) {
+        PassphraseCacheService.addCachedPassphrase(this, keyId, passphrase);
     }
 
     public void sendMessage(Message msg) {

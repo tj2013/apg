@@ -41,6 +41,7 @@ import org.thialfihar.android.apg.Apg;
 import org.thialfihar.android.apg.Id;
 import org.thialfihar.android.apg.R;
 import org.thialfihar.android.apg.core.Key;
+import org.thialfihar.android.apg.service.PassphraseCacheService;
 import org.thialfihar.android.apg.ui.widget.Editor.EditorListener;
 import org.thialfihar.android.apg.util.Choice;
 
@@ -297,16 +298,16 @@ public class SectionView extends LinearLayout implements OnClickListener, Editor
         String error = null;
         try {
             Key masterKey = null;
-            String passPhrase;
+            String passphrase;
             if (mEditors.getChildCount() > 0) {
                 masterKey = ((KeyEditor) mEditors.getChildAt(0)).getValue();
-                passPhrase = Apg.getCachedPassPhrase(masterKey.getKeyId());
+                passphrase = PassphraseCacheService.getCachedPassphrase(getContext(), masterKey.getKeyId());
             } else {
-                passPhrase = "";
+                passphrase = "";
             }
             mNewKey = Apg.createKey(getContext(),
                                     mNewKeyAlgorithmChoice.getId(),
-                                    mNewKeySize, passPhrase,
+                                    mNewKeySize, passphrase,
                                     masterKey);
         } catch (NoSuchProviderException e) {
             error = "" + e;

@@ -28,6 +28,7 @@ import android.widget.ExpandableListView;
 import android.widget.ExpandableListView.ExpandableListContextMenuInfo;
 import android.widget.ExpandableListView.OnChildClickListener;
 
+import org.thialfihar.android.apg.service.PassphraseCacheService;
 public class SecretKeyListActivity extends KeyListActivity implements OnChildClickListener {
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -129,7 +130,7 @@ public class SecretKeyListActivity extends KeyListActivity implements OnChildCli
 
     public void checkPassPhraseAndEdit() {
         long keyId = ((KeyListAdapter) mList.getExpandableListAdapter()).getGroupId(mSelectedItem);
-        String passPhrase = Apg.getCachedPassPhrase(keyId);
+        String passPhrase = PassphraseCacheService.getCachedPassphrase(this, keyId);
         if (passPhrase == null) {
             showDialog(Id.dialog.pass_phrase);
         } else {

@@ -43,6 +43,7 @@ import org.bouncycastle2.openpgp.PGPException;
 
 import org.thialfihar.android.apg.core.KeyRing;
 import org.thialfihar.android.apg.provider.DataProvider;
+import org.thialfihar.android.apg.service.PassphraseCacheService;
 import org.thialfihar.android.apg.util.InputData;
 import org.thialfihar.android.apg.util.Utils;
 
@@ -443,7 +444,7 @@ public class DecryptActivity extends BaseActivity {
             }
 
             if (getSecretKeyId() == Id.key.symmetric ||
-                Apg.getCachedPassPhrase(getSecretKeyId()) == null) {
+                PassphraseCacheService.getCachedPassphrase(this, getSecretKeyId()) == null) {
                 showDialog(Id.dialog.pass_phrase);
             } else {
                 if (mDecryptTarget == Id.target.file) {
@@ -514,7 +515,8 @@ public class DecryptActivity extends BaseActivity {
             if (mSignedOnly) {
                 data = Apg.verifyText(this, in, out, this);
             } else {
-                data = Apg.decrypt(this, in, out, Apg.getCachedPassPhrase(getSecretKeyId()),
+                data = Apg.decrypt(this, in, out,
+                                   PassphraseCacheService.getCachedPassphrase(this, getSecretKeyId()),
                                    this, mAssumeSymmetricEncryption);
             }
 
