@@ -49,7 +49,7 @@ public class DataDestination {
         return mStreamFilename;
     }
 
-    protected OutputStream getOutputStream(Context context)
+    public OutputStream getOutputStream(Context context)
             throws Apg.GeneralException, FileNotFoundException, IOException {
         OutputStream out = null;
         mStreamFilename = null;

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.thialfihar.android.apg;
+package org.thialfihar.android.apg.ui;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -43,6 +43,11 @@ import android.widget.Toast;
 
 import org.bouncycastle2.openpgp.PGPException;
 
+import org.thialfihar.android.apg.Apg;
+import org.thialfihar.android.apg.Constants;
+import org.thialfihar.android.apg.FileDialog;
+import org.thialfihar.android.apg.Id;
+import org.thialfihar.android.apg.R;
 import org.thialfihar.android.apg.core.Key;
 import org.thialfihar.android.apg.core.KeyRing;
 import org.thialfihar.android.apg.provider.KeyRings;

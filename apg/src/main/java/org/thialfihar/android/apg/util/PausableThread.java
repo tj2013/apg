@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.thialfihar.android.apg;
+package org.thialfihar.android.apg.util;
 
 public class PausableThread extends Thread {
     private boolean mPaused = false;

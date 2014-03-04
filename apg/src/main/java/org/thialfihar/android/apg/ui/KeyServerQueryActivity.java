@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.thialfihar.android.apg;
+package org.thialfihar.android.apg.ui;
 
 import android.app.Activity;
 import android.app.Dialog;
@@ -40,6 +40,10 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.thialfihar.android.apg.Apg;
+import org.thialfihar.android.apg.Constants;
+import org.thialfihar.android.apg.Id;
+import org.thialfihar.android.apg.R;
 import org.thialfihar.android.apg.core.HkpKeyServer;
 import org.thialfihar.android.apg.core.KeyServer.InsufficientQuery;
 import org.thialfihar.android.apg.core.KeyServer.KeyInfo;

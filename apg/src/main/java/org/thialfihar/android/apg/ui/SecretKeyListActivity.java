@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.thialfihar.android.apg;
+package org.thialfihar.android.apg.ui;
 
 import android.app.Dialog;
 import android.content.Intent;
@@ -28,7 +28,13 @@ import android.widget.ExpandableListView;
 import android.widget.ExpandableListView.ExpandableListContextMenuInfo;
 import android.widget.ExpandableListView.OnChildClickListener;
 
+import org.thialfihar.android.apg.Apg;
+import org.thialfihar.android.apg.AskForSecretKeyPassPhrase;
+import org.thialfihar.android.apg.Constants;
+import org.thialfihar.android.apg.Id;
+import org.thialfihar.android.apg.R;
 import org.thialfihar.android.apg.service.PassphraseCacheService;
+
 public class SecretKeyListActivity extends KeyListActivity implements OnChildClickListener {
     @Override
     public void onCreate(Bundle savedInstanceState) {

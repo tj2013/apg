@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.thialfihar.android.apg;
+package org.thialfihar.android.apg.ui;
 
 import android.app.SearchManager;
 import android.content.Intent;
@@ -27,6 +27,10 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import org.thialfihar.android.apg.Apg;
+import org.thialfihar.android.apg.Id;
+import org.thialfihar.android.apg.R;
 
 import java.util.Vector;
 

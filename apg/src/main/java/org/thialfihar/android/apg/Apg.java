@@ -70,6 +70,7 @@ import org.thialfihar.android.apg.provider.Database;
 import org.thialfihar.android.apg.provider.KeyRings;
 import org.thialfihar.android.apg.provider.Keys;
 import org.thialfihar.android.apg.provider.UserIds;
+import org.thialfihar.android.apg.ui.BaseActivity;
 import org.thialfihar.android.apg.ui.widget.KeyEditor;
 import org.thialfihar.android.apg.ui.widget.SectionView;
 import org.thialfihar.android.apg.ui.widget.UserIdEditor;
@@ -212,7 +213,6 @@ public class Apg {
     public static String getEditPassPhrase() {
         return sEditPassPhrase;
     }
-
     public static Key createKey(Context context,
                                 int algorithmChoice, int keySize, String passPhrase,
                                 Key masterKey)

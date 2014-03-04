@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.thialfihar.android.apg;
+package org.thialfihar.android.apg.ui;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -26,6 +26,10 @@ import android.view.View;
 import android.widget.ExpandableListView;
 import android.widget.ExpandableListView.ExpandableListContextMenuInfo;
 
+import org.thialfihar.android.apg.Apg;
+import org.thialfihar.android.apg.Constants;
+import org.thialfihar.android.apg.Id;
+import org.thialfihar.android.apg.R;
 import org.thialfihar.android.apg.core.KeyRing;
 
 public class PublicKeyListActivity extends KeyListActivity {

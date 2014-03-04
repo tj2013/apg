@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.thialfihar.android.apg;
+package org.thialfihar.android.apg.ui;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -26,7 +26,13 @@ import android.preference.PreferenceScreen;
 
 import org.bouncycastle2.bcpg.HashAlgorithmTags;
 import org.bouncycastle2.openpgp.PGPEncryptedData;
+
+import org.thialfihar.android.apg.Apg;
+import org.thialfihar.android.apg.Constants;
+import org.thialfihar.android.apg.Id;
+import org.thialfihar.android.apg.R;
 import org.thialfihar.android.apg.ui.widget.IntegerListPreference;
+import org.thialfihar.android.apg.util.Preferences;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -91,7 +97,6 @@ public class PreferencesActivity extends PreferenceActivity {
                 mPassPhraseCacheTtl.setValue(newValue.toString());
                 mPassPhraseCacheTtl.setSummary(mPassPhraseCacheTtl.getEntry());
                 mPreferences.setPassPhraseCacheTtl(Integer.parseInt(newValue.toString()));
-                BaseActivity.startCacheService(PreferencesActivity.this, mPreferences);
                 return false;
             }
         });

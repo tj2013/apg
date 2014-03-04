@@ -14,13 +14,16 @@
  * limitations under the License.
  */
 
-package org.thialfihar.android.apg;
+package org.thialfihar.android.apg.util;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 
 import org.bouncycastle2.bcpg.HashAlgorithmTags;
 import org.bouncycastle2.openpgp.PGPEncryptedData;
+
+import org.thialfihar.android.apg.Constants;
+import org.thialfihar.android.apg.Id;
 
 import java.util.Vector;
 

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.thialfihar.android.apg;
+package org.thialfihar.android.apg.ui;
 
 import android.content.Context;
 import android.content.Intent;
@@ -27,6 +27,8 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
+import org.thialfihar.android.apg.Apg;
+import org.thialfihar.android.apg.R;
 import org.thialfihar.android.apg.ui.widget.Editor;
 import org.thialfihar.android.apg.ui.widget.Editor.EditorListener;
 import org.thialfihar.android.apg.ui.widget.KeyServerEditor;

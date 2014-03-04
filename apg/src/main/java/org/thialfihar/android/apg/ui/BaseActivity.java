@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.thialfihar.android.apg;
+package org.thialfihar.android.apg.ui;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -25,7 +25,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.view.LayoutInflater;
@@ -35,8 +34,15 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.thialfihar.android.apg.Apg;
+import org.thialfihar.android.apg.AskForSecretKeyPassPhrase;
+import org.thialfihar.android.apg.Constants;
+import org.thialfihar.android.apg.Id;
+import org.thialfihar.android.apg.R;
 import org.thialfihar.android.apg.core.Progressable;
 import org.thialfihar.android.apg.service.PassphraseCacheService;
+import org.thialfihar.android.apg.util.PausableThread;
+import org.thialfihar.android.apg.util.Preferences;
 import org.thialfihar.android.apg.util.Utils;
 
 import java.io.File;

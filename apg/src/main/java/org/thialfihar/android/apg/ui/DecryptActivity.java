@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.thialfihar.android.apg;
+package org.thialfihar.android.apg.ui;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -41,10 +41,18 @@ import android.widget.ViewFlipper;
 import org.bouncycastle2.jce.provider.BouncyCastleProvider;
 import org.bouncycastle2.openpgp.PGPException;
 
+import org.thialfihar.android.apg.Apg;
+import org.thialfihar.android.apg.Constants;
+import org.thialfihar.android.apg.DataDestination;
+import org.thialfihar.android.apg.DataSource;
+import org.thialfihar.android.apg.FileDialog;
+import org.thialfihar.android.apg.Id;
+import org.thialfihar.android.apg.R;
 import org.thialfihar.android.apg.core.KeyRing;
 import org.thialfihar.android.apg.provider.DataProvider;
 import org.thialfihar.android.apg.service.PassphraseCacheService;
 import org.thialfihar.android.apg.util.InputData;
+import org.thialfihar.android.apg.util.PausableThread;
 import org.thialfihar.android.apg.util.Utils;
 
 import java.io.ByteArrayOutputStream;
