@@ -40,6 +40,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.thialfihar.android.apg.core.HkpKeyServer;
 import org.thialfihar.android.apg.core.KeyServer.InsufficientQuery;
 import org.thialfihar.android.apg.core.KeyServer.KeyInfo;
 import org.thialfihar.android.apg.core.KeyServer.QueryException;

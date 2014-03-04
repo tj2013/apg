@@ -200,14 +200,14 @@ public class DecryptActivity extends BaseActivity {
                 textData = extras.getString(Apg.EXTRA_TEXT);
             }
             if (textData != null) {
-                Matcher matcher = Apg.PGP_MESSAGE.matcher(textData);
+                Matcher matcher = org.thialfihar.android.apg.core.Constants.PGP_MESSAGE.matcher(textData);
                 if (matcher.matches()) {
                     textData = matcher.group(1);
                     // replace non breakable spaces
                     textData = textData.replaceAll("\\xa0", " ");
                     mMessage.setText(textData);
                 } else {
-                    matcher = Apg.PGP_SIGNED_MESSAGE.matcher(textData);
+                    matcher = org.thialfihar.android.apg.core.Constants.PGP_SIGNED_MESSAGE.matcher(textData);
                     if (matcher.matches()) {
                         textData = matcher.group(1);
                         // replace non breakable spaces
@@ -244,14 +244,14 @@ public class DecryptActivity extends BaseActivity {
                 mData = extras.getByteArray(Apg.EXTRA_DATA);
                 String data = extras.getString(Apg.EXTRA_TEXT);
                 if (data != null) {
-                    Matcher matcher = Apg.PGP_MESSAGE.matcher(data);
+                    Matcher matcher = org.thialfihar.android.apg.core.Constants.PGP_MESSAGE.matcher(data);
                     if (matcher.matches()) {
                         data = matcher.group(1);
                         // replace non breakable spaces
                         data = data.replaceAll("\\xa0", " ");
                         mMessage.setText(data);
                     } else {
-                        matcher = Apg.PGP_SIGNED_MESSAGE.matcher(data);
+                        matcher = org.thialfihar.android.apg.core.Constants.PGP_SIGNED_MESSAGE.matcher(data);
                         if (matcher.matches()) {
                             data = matcher.group(1);
                             // replace non breakable spaces
@@ -270,9 +270,9 @@ public class DecryptActivity extends BaseActivity {
             ClipboardManager clip = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
             String data = "";
             if (clip.getText() != null) {
-                Matcher matcher = Apg.PGP_MESSAGE.matcher(clip.getText());
+                Matcher matcher = org.thialfihar.android.apg.core.Constants.PGP_MESSAGE.matcher(clip.getText());
                 if (!matcher.matches()) {
-                    matcher = Apg.PGP_SIGNED_MESSAGE.matcher(clip.getText());
+                    matcher = org.thialfihar.android.apg.core.Constants.PGP_SIGNED_MESSAGE.matcher(clip.getText());
                 }
                 if (matcher.matches()) {
                     data = matcher.group(1);
@@ -413,7 +413,7 @@ public class DecryptActivity extends BaseActivity {
 
         if (mDecryptTarget == Id.target.message) {
             String messageData = mMessage.getText().toString();
-            Matcher matcher = Apg.PGP_SIGNED_MESSAGE.matcher(messageData);
+            Matcher matcher = org.thialfihar.android.apg.core.Constants.PGP_SIGNED_MESSAGE.matcher(messageData);
             if (matcher.matches()) {
                 mSignedOnly = true;
                 decryptStart();

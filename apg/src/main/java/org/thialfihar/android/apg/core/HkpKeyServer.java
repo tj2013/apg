@@ -128,7 +128,7 @@ public class HkpKeyServer extends KeyServer {
     }
 
     @Override
-    List<KeyInfo> search(String query)
+    public List<KeyInfo> search(String query)
             throws QueryException, TooManyResponses, InsufficientQuery {
         Vector<KeyInfo> results = new Vector<KeyInfo>();
 
@@ -196,7 +196,7 @@ public class HkpKeyServer extends KeyServer {
     }
 
     @Override
-    String get(long keyId)
+    public String get(long keyId)
             throws QueryException {
         String request = "/pks/lookup?op=get&search=0x" + Utils.toHexString(keyId, 8);
 
@@ -206,7 +206,7 @@ public class HkpKeyServer extends KeyServer {
         } catch (HttpError e) {
             throw new QueryException("not found");
         }
-        Matcher matcher = Apg.PGP_PUBLIC_KEY.matcher(data);
+        Matcher matcher = Constants.PGP_PUBLIC_KEY.matcher(data);
         if (matcher.find()) {
             return matcher.group(1);
         }

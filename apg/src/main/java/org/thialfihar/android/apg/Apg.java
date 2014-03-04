@@ -100,7 +100,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Vector;
-import java.util.regex.Pattern;
 
 public class Apg {
     public static class Intent {
@@ -178,18 +177,6 @@ public class Apg {
                     CompressionAlgorithmTags.ZLIB,
                     CompressionAlgorithmTags.BZIP2,
                     CompressionAlgorithmTags.ZIP };
-
-    public static final Pattern PGP_MESSAGE =
-        Pattern.compile(".*?(-----BEGIN PGP MESSAGE-----.*?-----END PGP MESSAGE-----).*",
-                        Pattern.DOTALL);
-
-    public static final Pattern PGP_SIGNED_MESSAGE =
-        Pattern.compile(".*?(-----BEGIN PGP SIGNED MESSAGE-----.*?-----BEGIN PGP SIGNATURE-----.*?-----END PGP SIGNATURE-----).*",
-                        Pattern.DOTALL);
-
-    public static final Pattern PGP_PUBLIC_KEY =
-        Pattern.compile(".*?(-----BEGIN PGP PUBLIC KEY BLOCK-----.*?-----END PGP PUBLIC KEY BLOCK-----).*",
-                        Pattern.DOTALL);
 
     private static HashMap<Long, CachedPassPhrase> sPassPhraseCache = new HashMap<Long, CachedPassPhrase>();
     private static String sEditPassPhrase = null;
