@@ -63,13 +63,6 @@ public class Utils {
 
     public static String generateRandomString(int length) {
         SecureRandom random = new SecureRandom();
-        /*
-        try {
-            random = SecureRandom.getInstance("SHA1PRNG", new BouncyCastleProvider());
-        } catch (NoSuchAlgorithmException e) {
-            // TODO: need to handle this case somehow
-            return null;
-        }*/
         byte bytes[] = new byte[length];
         random.nextBytes(bytes);
         String result = "";
