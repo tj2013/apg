@@ -81,7 +81,7 @@ public class SectionView extends LinearLayout implements OnClickListener, Editor
                 String error = data.getString(Apg.EXTRA_ERROR);
                 if (error != null) {
                     Toast.makeText(getContext(),
-                                   getContext().getString(R.string.errorMessage, error),
+                                   getContext().getString(R.string.error_message, error),
                                    Toast.LENGTH_SHORT).show();
                 }
 
@@ -116,7 +116,7 @@ public class SectionView extends LinearLayout implements OnClickListener, Editor
         mType = type;
         switch (type) {
             case Id.type.user_id: {
-                mTitle.setText(R.string.section_userIds);
+                mTitle.setText(R.string.section_user_ids);
                 break;
             }
 
@@ -179,8 +179,8 @@ public class SectionView extends LinearLayout implements OnClickListener, Editor
 
                 View view = mInflater.inflate(R.layout.create_key, null);
                 dialog.setView(view);
-                dialog.setTitle(R.string.title_createKey);
-                dialog.setMessage(R.string.keyCreationElGamalInfo);
+                dialog.setTitle(R.string.title_create_key);
+                dialog.setMessage(R.string.key_creation_el_gamal_info);
 
                 boolean wouldBeMasterKey = (mEditors.getChildCount() == 0);
 

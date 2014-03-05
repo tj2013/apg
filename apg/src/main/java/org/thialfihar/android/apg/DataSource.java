@@ -85,7 +85,7 @@ public class DataSource {
                 String path = Uri.decode(mContentUri.toString().substring(7));
                 if (path.startsWith(Environment.getExternalStorageDirectory().getAbsolutePath())) {
                     if (!Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
-                        throw new GeneralException(context.getString(R.string.error_externalStorageNotReady));
+                        throw new GeneralException(context.getString(R.string.error_external_storage_not_ready));
                     }
                 }
                 in = new FileInputStream(path);

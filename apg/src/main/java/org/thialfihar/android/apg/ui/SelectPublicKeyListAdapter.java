@@ -168,13 +168,13 @@ public class SelectPublicKeyListAdapter extends BaseAdapter {
         boolean enabled = isEnabled(position);
 
         TextView mainUserId = (TextView) view.findViewById(R.id.mainUserId);
-        mainUserId.setText(R.string.unknownUserId);
+        mainUserId.setText(R.string.unknown_user_id);
         TextView mainUserIdRest = (TextView) view.findViewById(R.id.mainUserIdRest);
         mainUserIdRest.setText("");
         TextView keyId = (TextView) view.findViewById(R.id.keyId);
-        keyId.setText(R.string.noKey);
+        keyId.setText(R.string.no_key);
         TextView status = (TextView) view.findViewById(R.id.status);
-        status.setText(R.string.unknownStatus);
+        status.setText(R.string.unknown_status);
 
         String userId = mCursor.getString(2); // USER_ID
         if (userId != null) {
@@ -194,13 +194,13 @@ public class SelectPublicKeyListAdapter extends BaseAdapter {
         }
 
         if (enabled) {
-            status.setText(R.string.canEncrypt);
+            status.setText(R.string.can_encrypt);
         } else {
             if (mCursor.getInt(3) > 0) {
                 // has some CAN_ENCRYPT keys, but col(4) = 0, so must be revoked or expired
                 status.setText(R.string.expired);
             } else {
-                status.setText(R.string.noKey);
+                status.setText(R.string.no_key);
             }
         }
 

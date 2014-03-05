@@ -96,9 +96,9 @@ public class GeneralActivity extends BaseActivity {
 
         if (contentType == Id.content.keys) {
             choices.add(new Choice(Id.choice.action.import_public,
-                                   getString(R.string.action_importPublic)));
+                                   getString(R.string.action_import_public)));
             choices.add(new Choice(Id.choice.action.import_secret,
-                                   getString(R.string.action_importSecret)));
+                                   getString(R.string.action_import_secret)));
         }
 
         if (contentType == Id.content.encrypted_data) {

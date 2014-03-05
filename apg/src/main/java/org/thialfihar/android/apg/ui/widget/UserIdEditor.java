@@ -125,7 +125,7 @@ public class UserIdEditor extends LinearLayout implements Editor, OnClickListene
             Matcher emailMatcher = EMAIL_PATTERN.matcher(email);
             if (!emailMatcher.matches()) {
                 throw new InvalidEmailException(
-                        getContext().getString(R.string.error_invalidEmail, email));
+                        getContext().getString(R.string.error_invalid_email, email));
             }
         }
 

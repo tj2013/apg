@@ -286,7 +286,7 @@ public class DecryptActivity extends BaseActivity {
                 if (matcher.matches()) {
                     data = matcher.group(1);
                     mMessage.setText(data);
-                    Toast.makeText(this, R.string.usingClipboardContent, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, R.string.using_clipboard_content, Toast.LENGTH_SHORT).show();
                 }
             }
         }
@@ -354,7 +354,7 @@ public class DecryptActivity extends BaseActivity {
             startActivityForResult(intent, Id.request.filename);
         } catch (ActivityNotFoundException e) {
             // No compatible file manager was found.
-            Toast.makeText(this, R.string.noFilemanagerInstalled, Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.no_filemanager_installed, Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -405,15 +405,15 @@ public class DecryptActivity extends BaseActivity {
             }
 
             if (mInputFilename.equals("")) {
-                Toast.makeText(this, R.string.noFileSelected, Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, R.string.no_file_selected, Toast.LENGTH_SHORT).show();
                 return;
             }
 
             if (mInputFilename.startsWith("file")) {
                 File file = new File(mInputFilename);
                 if (!file.exists() || !file.isFile()) {
-                    Toast.makeText(this, getString(R.string.errorMessage,
-                                                   getString(R.string.error_fileNotFound)),
+                    Toast.makeText(this, getString(R.string.error_message,
+                                                   getString(R.string.error_file_not_found)),
                                    Toast.LENGTH_SHORT).show();
                     return;
                 }
@@ -439,14 +439,14 @@ public class DecryptActivity extends BaseActivity {
             try {
                 setSecretKeyId(Apg.getDecryptionKeyId(this, in));
                 if (getSecretKeyId() == Id.key.none) {
-                    throw new Apg.GeneralException(getString(R.string.error_noSecretKeyFound));
+                    throw new Apg.GeneralException(getString(R.string.error_no_secret_key_found));
                 }
                 mAssumeSymmetricEncryption = false;
             } catch (Apg.NoAsymmetricEncryptionException e) {
                 setSecretKeyId(Id.key.symmetric);
                 in = mDataSource.getInputData(this, false);
                 if (!Apg.hasSymmetricEncryption(this, in)) {
-                    throw new Apg.GeneralException(getString(R.string.error_noKnownEncryptionFound));
+                    throw new Apg.GeneralException(getString(R.string.error_no_known_encryption_found));
                 }
                 mAssumeSymmetricEncryption = true;
             }
@@ -462,14 +462,14 @@ public class DecryptActivity extends BaseActivity {
                 }
             }
         } catch (FileNotFoundException e) {
-            error = getString(R.string.error_fileNotFound);
+            error = getString(R.string.error_file_not_found);
         } catch (IOException e) {
             error = "" + e;
         } catch (Apg.GeneralException e) {
             error = "" + e;
         }
         if (error != null) {
-            Toast.makeText(this, getString(R.string.errorMessage, error),
+            Toast.makeText(this, getString(R.string.error_message, error),
                            Toast.LENGTH_SHORT).show();
         }
     }
@@ -590,11 +590,11 @@ public class DecryptActivity extends BaseActivity {
 
         String error = data.getString(Apg.EXTRA_ERROR);
         if (error != null) {
-            Toast.makeText(this, getString(R.string.errorMessage, error), Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.error_message, error), Toast.LENGTH_SHORT).show();
             return;
         }
 
-        Toast.makeText(this, R.string.decryptionSuccessful, Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, R.string.decryption_successful, Toast.LENGTH_SHORT).show();
         if (mReturnResult) {
             Intent intent = new Intent();
             intent.putExtras(data);
@@ -631,7 +631,7 @@ public class DecryptActivity extends BaseActivity {
             mSignatureKeyId = data.getLong(Apg.EXTRA_SIGNATURE_KEY_ID);
             mUserIdRest.setText("id: " + Utils.toHexString(mSignatureKeyId, 8));
             if (userId == null) {
-                userId = getResources().getString(R.string.unknownUserId);
+                userId = getResources().getString(R.string.unknown_user_id);
             }
             String chunks[] = userId.split(" <", 2);
             userId = chunks[0];
@@ -644,7 +644,7 @@ public class DecryptActivity extends BaseActivity {
                 mSignatureStatusImage.setImageResource(R.drawable.overlay_ok);
             } else if (data.getBoolean(Apg.EXTRA_SIGNATURE_UNKNOWN)) {
                 mSignatureStatusImage.setImageResource(R.drawable.overlay_error);
-                Toast.makeText(this, R.string.unknownSignatureKeyTouchToLookUp, Toast.LENGTH_LONG).show();
+                Toast.makeText(this, R.string.unknown_signature_key_touch_to_look_up, Toast.LENGTH_LONG).show();
             } else {
                 mSignatureStatusImage.setImageResource(R.drawable.overlay_error);
             }
@@ -709,8 +709,8 @@ public class DecryptActivity extends BaseActivity {
     protected Dialog onCreateDialog(int id) {
         switch (id) {
             case Id.dialog.output_filename: {
-                return FileDialog.build(this, getString(R.string.title_decryptToFile),
-                                        getString(R.string.specifyFileToDecryptTo),
+                return FileDialog.build(this, getString(R.string.title_decrypt_to_file),
+                                        getString(R.string.specify_file_to_decrypt_to),
                                         mOutputFilename,
                                         new FileDialog.OnClickListener() {
                                             public void onOkClick(String filename, boolean checked) {
@@ -723,8 +723,8 @@ public class DecryptActivity extends BaseActivity {
                                                 removeDialog(Id.dialog.output_filename);
                                             }
                                         },
-                                        getString(R.string.filemanager_titleSave),
-                                        getString(R.string.filemanager_btnSave),
+                                        getString(R.string.filemanager_title_save),
+                                        getString(R.string.filemanager_btn_save),
                                         null,
                                         Id.request.output_filename);
             }
@@ -733,8 +733,8 @@ public class DecryptActivity extends BaseActivity {
                 AlertDialog.Builder alert = new AlertDialog.Builder(this);
 
                 alert.setIcon(android.R.drawable.ic_dialog_alert);
-                alert.setTitle(R.string.title_unknownSignatureKey);
-                alert.setMessage(getString(R.string.lookupUnknownKey,
+                alert.setTitle(R.string.title_unknown_signature_key);
+                alert.setMessage(getString(R.string.lookup_unknown_key,
                                            Utils.toHexString(mUnknownSignatureKeyId, 8)));
 
                 alert.setPositiveButton(android.R.string.ok,

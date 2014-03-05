@@ -129,7 +129,7 @@ public class FileDialog {
             mActivity.startActivityForResult(intent, mRequestCode);
         } catch (ActivityNotFoundException e) {
             // No compatible file manager was found.
-            Toast.makeText(mActivity, R.string.noFilemanagerInstalled, Toast.LENGTH_SHORT).show();
+            Toast.makeText(mActivity, R.string.no_filemanager_installed, Toast.LENGTH_SHORT).show();
         }
     }
 }

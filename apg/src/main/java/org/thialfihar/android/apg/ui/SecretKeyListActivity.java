@@ -46,11 +46,11 @@ public class SecretKeyListActivity extends KeyListActivity implements OnChildCli
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        menu.add(0, Id.menu.option.import_keys, 0, R.string.menu_importKeys)
+        menu.add(0, Id.menu.option.import_keys, 0, R.string.menu_import_keys)
                 .setIcon(android.R.drawable.ic_menu_add);
-        menu.add(0, Id.menu.option.export_keys, 1, R.string.menu_exportKeys)
+        menu.add(0, Id.menu.option.export_keys, 1, R.string.menu_export_keys)
                 .setIcon(android.R.drawable.ic_menu_save);
-        menu.add(1, Id.menu.option.create, 2, R.string.menu_createKey)
+        menu.add(1, Id.menu.option.create, 2, R.string.menu_create_key)
                 .setIcon(android.R.drawable.ic_menu_add);
         menu.add(3, Id.menu.option.search, 3, R.string.menu_search)
                 .setIcon(android.R.drawable.ic_menu_search);
@@ -84,9 +84,9 @@ public class SecretKeyListActivity extends KeyListActivity implements OnChildCli
 
         if (type == ExpandableListView.PACKED_POSITION_TYPE_GROUP) {
             // TODO: user id? menu.setHeaderTitle("Key");
-            menu.add(0, Id.menu.edit, 0, R.string.menu_editKey);
-            menu.add(0, Id.menu.export, 1, R.string.menu_exportKey);
-            menu.add(0, Id.menu.delete, 2, R.string.menu_deleteKey);
+            menu.add(0, Id.menu.edit, 0, R.string.menu_edit_key);
+            menu.add(0, Id.menu.export, 1, R.string.menu_export_key);
+            menu.add(0, Id.menu.delete, 2, R.string.menu_delete_key);
         }
     }
 

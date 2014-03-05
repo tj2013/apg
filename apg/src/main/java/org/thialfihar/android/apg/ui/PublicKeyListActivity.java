@@ -42,9 +42,9 @@ public class PublicKeyListActivity extends KeyListActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        menu.add(0, Id.menu.option.import_keys, 0, R.string.menu_importKeys)
+        menu.add(0, Id.menu.option.import_keys, 0, R.string.menu_import_keys)
                 .setIcon(android.R.drawable.ic_menu_add);
-        menu.add(0, Id.menu.option.export_keys, 1, R.string.menu_exportKeys)
+        menu.add(0, Id.menu.option.export_keys, 1, R.string.menu_export_keys)
                 .setIcon(android.R.drawable.ic_menu_save);
         menu.add(1, Id.menu.option.search, 2, R.string.menu_search)
                 .setIcon(android.R.drawable.ic_menu_search);
@@ -64,9 +64,9 @@ public class PublicKeyListActivity extends KeyListActivity {
 
         if (type == ExpandableListView.PACKED_POSITION_TYPE_GROUP) {
             // TODO: user id? menu.setHeaderTitle("Key");
-            menu.add(0, Id.menu.export, 0, R.string.menu_exportKey);
-            menu.add(0, Id.menu.delete, 1, R.string.menu_deleteKey);
-            menu.add(0, Id.menu.update, 1, R.string.menu_updateKey);
+            menu.add(0, Id.menu.export, 0, R.string.menu_export_key);
+            menu.add(0, Id.menu.delete, 1, R.string.menu_delete_key);
+            menu.add(0, Id.menu.update, 1, R.string.menu_update_key);
         }
     }
 

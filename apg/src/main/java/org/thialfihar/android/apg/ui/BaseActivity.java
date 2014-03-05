@@ -201,7 +201,7 @@ public class BaseActivity extends Activity
 
                 alert.setIcon(android.R.drawable.ic_dialog_alert);
                 alert.setTitle(R.string.error);
-                alert.setMessage(R.string.passPhrasesDoNotMatch);
+                alert.setMessage(R.string.pass_phrases_do_not_match);
 
                 alert.setPositiveButton(android.R.string.ok,
                                         new DialogInterface.OnClickListener() {
@@ -219,7 +219,7 @@ public class BaseActivity extends Activity
 
                 alert.setIcon(android.R.drawable.ic_dialog_alert);
                 alert.setTitle(R.string.error);
-                alert.setMessage(R.string.passPhraseMustNotBeEmpty);
+                alert.setMessage(R.string.pass_phrase_must_not_be_empty);
 
                 alert.setPositiveButton(android.R.string.ok,
                                         new DialogInterface.OnClickListener() {
@@ -237,7 +237,7 @@ public class BaseActivity extends Activity
 
                 alert.setIcon(android.R.drawable.ic_dialog_alert);
                 alert.setTitle(R.string.warning);
-                alert.setMessage(this.getString(R.string.fileDeleteConfirmation, getDeleteFile()));
+                alert.setMessage(this.getString(R.string.file_delete_confirmation, getDeleteFile()));
 
                 alert.setPositiveButton(android.R.string.ok,
                         new DialogInterface.OnClickListener() {
@@ -255,11 +255,11 @@ public class BaseActivity extends Activity
                                        } catch (FileNotFoundException e) {
                                            data.putString(Apg.EXTRA_ERROR,
                                                           BaseActivity.this.getString(
-                                                             R.string.error_fileNotFound, file));
+                                                             R.string.error_file_not_found, file));
                                        } catch (IOException e) {
                                            data.putString(Apg.EXTRA_ERROR,
                                                           BaseActivity.this.getString(
-                                                             R.string.error_fileDeleteFailed, file));
+                                                             R.string.error_file_delete_failed, file));
                                        }
                                        Message msg = new Message();
                                        msg.setData(data);
@@ -387,9 +387,9 @@ public class BaseActivity extends Activity
         String error = data.getString(Apg.EXTRA_ERROR);
         String message;
         if (error != null) {
-            message = getString(R.string.errorMessage, error);
+            message = getString(R.string.error_message, error);
         } else {
-            message = getString(R.string.fileDeleteSuccessful);
+            message = getString(R.string.file_delete_successful);
         }
 
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();

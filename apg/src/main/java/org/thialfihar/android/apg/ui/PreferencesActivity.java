@@ -235,7 +235,7 @@ public class PreferencesActivity extends PreferenceActivity {
 
         mKeyServerPreference = (PreferenceScreen) findPreference(Constants.pref.key_servers);
         String servers[] = mPreferences.getKeyServers();
-        mKeyServerPreference.setSummary(getResources().getString(R.string.nKeyServers, servers.length));
+        mKeyServerPreference.setSummary(getResources().getString(R.string.n_key_servers, servers.length));
         mKeyServerPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             public boolean onPreferenceClick(Preference preference) {
                 Intent intent = new Intent(PreferencesActivity.this,
@@ -257,7 +257,7 @@ public class PreferencesActivity extends PreferenceActivity {
                 String servers[] = data.getStringArrayExtra(Apg.EXTRA_KEY_SERVERS);
                 mPreferences.setKeyServers(servers);
                 mKeyServerPreference.setSummary(
-                    getResources().getString(R.string.nKeyServers, servers.length));
+                    getResources().getString(R.string.n_key_servers, servers.length));
                 break;
             }
 

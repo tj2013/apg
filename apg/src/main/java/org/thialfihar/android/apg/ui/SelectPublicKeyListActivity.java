@@ -119,7 +119,7 @@ public class SelectPublicKeyListActivity extends BaseActivity {
             mFilterLayout.setVisibility(View.GONE);
         } else {
             mFilterLayout.setVisibility(View.VISIBLE);
-            mFilterInfo.setText(getString(R.string.filterInfo, searchString));
+            mFilterInfo.setText(getString(R.string.filter_info, searchString));
         }
 
         if (mListAdapter != null) {

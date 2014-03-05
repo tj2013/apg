@@ -140,13 +140,13 @@ public class MainActivity extends BaseActivity {
                             startActivity(intent);
                         }
                     }),
-                new LauncherIcon(R.drawable.key, R.string.title_manageKeys,
+                new LauncherIcon(R.drawable.key, R.string.title_manage_keys,
                     new OnClickListener() {
                         public void onClick(View v) {
                             startActivity(new Intent(MainActivity.this, PublicKeyListActivity.class));
                         }
                     }),
-                new LauncherIcon(R.drawable.key, R.string.title_manageOwnKeys,
+                new LauncherIcon(R.drawable.key, R.string.title_manage_own_keys,
                     new OnClickListener() {
                         public void onClick(View v) {
                             startActivity(new Intent(MainActivity.this, SecretKeyListActivity.class));
@@ -262,7 +262,7 @@ public class MainActivity extends BaseActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         menu.add(0, Id.menu.option.preferences, 0, R.string.menu_preferences)
                 .setIcon(android.R.drawable.ic_menu_preferences);
-        menu.add(0, Id.menu.option.key_server, 1, R.string.menu_keyServer)
+        menu.add(0, Id.menu.option.key_server, 1, R.string.menu_key_server)
                 .setIcon(android.R.drawable.ic_menu_search);
         menu.add(1, Id.menu.option.about, 2, R.string.menu_about)
                 .setIcon(android.R.drawable.ic_menu_info_details);

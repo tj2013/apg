@@ -88,11 +88,11 @@ public class KeyEditor extends LinearLayout implements Editor, OnClickListener {
         mUsage = (Spinner) findViewById(R.id.usage);
         Choice choices[] = {
                 new Choice(Id.choice.usage.sign_only,
-                           getResources().getString(R.string.choice_signOnly)),
+                           getResources().getString(R.string.choice_sign_only)),
                 new Choice(Id.choice.usage.encrypt_only,
-                           getResources().getString(R.string.choice_encryptOnly)),
+                           getResources().getString(R.string.choice_encrypt_only)),
                 new Choice(Id.choice.usage.sign_and_encrypt,
-                           getResources().getString(R.string.choice_signAndEncrypt)),
+                           getResources().getString(R.string.choice_sign_and_encrypt)),
         };
         ArrayAdapter<Choice> adapter =
                 new ArrayAdapter<Choice>(getContext(),
@@ -119,7 +119,7 @@ public class KeyEditor extends LinearLayout implements Editor, OnClickListener {
                                              date.get(Calendar.DAY_OF_MONTH));
                 dialog.setCancelable(true);
                 dialog.setButton(Dialog.BUTTON_NEGATIVE,
-                                 getContext().getString(R.string.btn_noDate),
+                                 getContext().getString(R.string.btn_no_date),
                                  new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         setExpiryDate(null);
@@ -148,15 +148,15 @@ public class KeyEditor extends LinearLayout implements Editor, OnClickListener {
         boolean isElGamalKey = (key.getAlgorithm() == PGPPublicKey.ELGAMAL_ENCRYPT);
         if (!isElGamalKey) {
             choices.add(new Choice(Id.choice.usage.sign_only,
-                                   getResources().getString(R.string.choice_signOnly)));
+                                   getResources().getString(R.string.choice_sign_only)));
         }
         if (!mIsMasterKey) {
             choices.add(new Choice(Id.choice.usage.encrypt_only,
-                                   getResources().getString(R.string.choice_encryptOnly)));
+                                   getResources().getString(R.string.choice_encrypt_only)));
         }
         if (!isElGamalKey) {
             choices.add(new Choice(Id.choice.usage.sign_and_encrypt,
-                                   getResources().getString(R.string.choice_signAndEncrypt)));
+                                   getResources().getString(R.string.choice_sign_and_encrypt)));
         }
 
         ArrayAdapter<Choice> adapter =

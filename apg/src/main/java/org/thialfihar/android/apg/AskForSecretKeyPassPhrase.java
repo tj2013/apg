@@ -48,12 +48,12 @@ public class AskForSecretKeyPassPhrase {
 
         if (secretKeyId == Id.key.symmetric || secretKeyId == Id.key.none) {
             secretKey = null;
-            alert.setMessage(context.getString(R.string.passPhraseForSymmetricEncryption));
+            alert.setMessage(context.getString(R.string.pass_phrase_for_symmetric_encryption));
         } else {
             secretKey = Apg.getSecretKeyRing(secretKeyId).getMasterKey();
             if (secretKey == null) {
-                alert.setTitle(R.string.title_keyNotFound);
-                alert.setMessage(context.getString(R.string.keyNotFound, secretKeyId));
+                alert.setTitle(R.string.title_key_not_found);
+                alert.setMessage(context.getString(R.string.key_not_found, secretKeyId));
                 alert.setPositiveButton(android.R.string.ok, new OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         activity.removeDialog(Id.dialog.pass_phrase);
@@ -63,7 +63,7 @@ public class AskForSecretKeyPassPhrase {
                 return alert.create();
             }
             String userId = Apg.getMainUserIdSafe(context, secretKey);
-            alert.setMessage(context.getString(R.string.passPhraseFor, userId));
+            alert.setMessage(context.getString(R.string.pass_phrase_for, userId));
         }
 
         LayoutInflater inflater =
@@ -87,13 +87,13 @@ public class AskForSecretKeyPassPhrase {
                                 PGPPrivateKey testKey = secretKey.extractPrivateKey(passPhrase);
                                 if (testKey == null) {
                                     Toast.makeText(activity,
-                                                   R.string.error_couldNotExtractPrivateKey,
+                                                   R.string.error_could_not_extract_private_key,
                                                    Toast.LENGTH_SHORT).show();
                                     return;
                                 }
                             } catch (PGPException e) {
                                 Toast.makeText(activity,
-                                               R.string.wrongPassPhrase,
+                                               R.string.wrong_pass_phrase,
                                                Toast.LENGTH_SHORT).show();
                                 return;
                             }

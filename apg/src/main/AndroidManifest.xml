@@ -40,7 +40,7 @@
 
         <activity
             android:name="ui.PublicKeyListActivity"
-            android:label="@string/title_managePublicKeys"
+            android:label="@string/title_manage_public_keys"
             android:configChanges="keyboardHidden|orientation|keyboard"
             android:launchMode="singleTop">
 
@@ -56,7 +56,7 @@
 
         <activity
             android:name="ui.SecretKeyListActivity"
-            android:label="@string/title_manageSecretKeys"
+            android:label="@string/title_manage_secret_keys"
             android:configChanges="keyboardHidden|orientation|keyboard"
             android:launchMode="singleTop">
 
@@ -72,12 +72,12 @@
 
         <activity
             android:name="ui.EditKeyActivity"
-            android:label="@string/title_editKey"
+            android:label="@string/title_edit_key"
             android:configChanges="keyboardHidden|orientation|keyboard"/>
 
         <activity
             android:name="ui.SelectPublicKeyListActivity"
-            android:label="@string/title_selectRecipients"
+            android:label="@string/title_select_recipients"
             android:configChanges="keyboardHidden|orientation|keyboard"
             android:launchMode="singleTop">
 
@@ -98,7 +98,7 @@
 
         <activity
             android:name="ui.SelectSecretKeyListActivity"
-            android:label="@string/title_selectSignature"
+            android:label="@string/title_select_signature"
             android:configChanges="keyboardHidden|orientation|keyboard"
             android:launchMode="singleTop">
 
@@ -178,7 +178,7 @@
 
         <activity
             android:name="ui.KeyServerQueryActivity"
-            android:label="@string/title_keyServerQuery"
+            android:label="@string/title_key_server_query"
             android:configChanges="keyboardHidden|orientation|keyboard"/>
 
         <activity
@@ -188,7 +188,7 @@
 
         <activity
             android:name="ui.KeyServerPreferenceActivity"
-            android:label="@string/title_keyServerPreference"
+            android:label="@string/title_key_server_preference"
             android:configChanges="keyboardHidden|orientation|keyboard"/>
 
         <service

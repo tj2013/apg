@@ -135,7 +135,7 @@ public class KeyServerQueryActivity extends BaseActivity {
     @Override
     protected Dialog onCreateDialog(int id) {
         ProgressDialog progress = (ProgressDialog) super.onCreateDialog(id);
-        progress.setMessage(this.getString(R.string.progress_queryingServer,
+        progress.setMessage(this.getString(R.string.progress_querying_server,
                                            (String) mKeyServer.getSelectedItem()));
         return progress;
     }
@@ -180,14 +180,14 @@ public class KeyServerQueryActivity extends BaseActivity {
         Bundle data = msg.getData();
         String error = data.getString(Apg.EXTRA_ERROR);
         if (error != null) {
-            Toast.makeText(this, getString(R.string.errorMessage, error), Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.error_message, error), Toast.LENGTH_SHORT).show();
             return;
         }
 
         if (mQueryType == Id.query.search) {
             if (mSearchResult != null) {
                 Toast.makeText(this,
-                               getString(R.string.keysFound, mSearchResult.size()),
+                               getString(R.string.keys_found, mSearchResult.size()),
                                Toast.LENGTH_SHORT).show();
                 mAdapter.setKeys(mSearchResult);
             }
@@ -252,11 +252,11 @@ public class KeyServerQueryActivity extends BaseActivity {
             View view = mInflater.inflate(R.layout.key_server_query_result_item, null);
 
             TextView mainUserId = (TextView) view.findViewById(R.id.mainUserId);
-            mainUserId.setText(R.string.unknownUserId);
+            mainUserId.setText(R.string.unknown_user_id);
             TextView mainUserIdRest = (TextView) view.findViewById(R.id.mainUserIdRest);
             mainUserIdRest.setText("");
             TextView keyId = (TextView) view.findViewById(R.id.keyId);
-            keyId.setText(R.string.noKey);
+            keyId.setText(R.string.no_key);
             TextView algorithm = (TextView) view.findViewById(R.id.algorithm);
             algorithm.setText("");
             TextView status = (TextView) view.findViewById(R.id.status);

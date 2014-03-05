@@ -45,7 +45,7 @@
             <TableRow>
 
                 <TextView android:id="@+id/label_size"
-                          android:text="@string/label_keySize"
+                          android:text="@string/label_key_size"
                           android:layout_height="wrap_content"
                           android:layout_width="wrap_content"
                           android:layout_gravity="center_vertical"

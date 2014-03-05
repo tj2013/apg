@@ -115,7 +115,7 @@
 
                          <TextView
                              android:id="@+id/label_fileCompression"
-                             android:text="@string/label_fileCompression"
+                             android:text="@string/label_file_compression"
                              android:textAppearance="?android:attr/textAppearanceMedium"
                              android:layout_height="wrap_content"
                              android:layout_width="0dip"
@@ -138,7 +138,7 @@
 
                         <TextView
                             android:id="@+id/label_deleteAfterEncryption"
-                            android:text="@string/label_deleteAfterEncryption"
+                            android:text="@string/label_delete_after_encryption"
                             android:textAppearance="?android:attr/textAppearanceMedium"
                             android:layout_gravity="center_vertical"
                             android:paddingRight="10dip"
@@ -161,7 +161,7 @@
 
                         <TextView
                             android:id="@+id/label_asciiArmour"
-                            android:text="@string/label_asciiArmour"
+                            android:text="@string/label_ascii_armour"
                             android:textAppearance="?android:attr/textAppearanceMedium"
                             android:layout_gravity="center_vertical"
                             android:paddingRight="10dip"
@@ -282,7 +282,7 @@
 
                         <TextView
                             android:id="@+id/label_selectPublicKeys"
-                            android:text="@string/label_selectPublicKeys"
+                            android:text="@string/label_select_public_keys"
                             android:textAppearance="?android:attr/textAppearanceMedium"
                             android:layout_height="wrap_content"
                             android:layout_width="0dip"
@@ -290,7 +290,7 @@
                             android:layout_gravity="center_vertical"/>
 
                         <Button
-                            android:text="@string/btn_selectEncryptKeys"
+                            android:text="@string/btn_select_encrypt_keys"
                             android:id="@+id/btn_selectEncryptKeys"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -309,7 +309,7 @@
 
                         <TextView
                             android:id="@+id/label_passPhrase"
-                            android:text="@string/label_passPhrase"
+                            android:text="@string/label_pass_phrase"
                             android:textAppearance="?android:attr/textAppearanceMedium"
                             android:layout_height="wrap_content"
                             android:layout_width="wrap_content"
@@ -328,7 +328,7 @@
 
                         <TextView
                             android:id="@+id/label_passPhraseAgain"
-                            android:text="@string/label_passPhraseAgain"
+                            android:text="@string/label_pass_phrase_again"
                             android:textAppearance="?android:attr/textAppearanceMedium"
                             android:layout_height="wrap_content"
                             android:layout_width="wrap_content"
@@ -365,7 +365,7 @@
 
         <Button
             android:id="@+id/btn_encryptToClipboard"
-            android:text="@string/btn_encryptToClipboard"
+            android:text="@string/btn_encrypt_to_clipboard"
             android:layout_weight="1"
             android:layout_width="0dip"
             android:layout_height="fill_parent"/>

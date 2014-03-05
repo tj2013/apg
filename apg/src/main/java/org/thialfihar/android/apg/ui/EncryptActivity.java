@@ -415,7 +415,7 @@ public class EncryptActivity extends BaseActivity {
             startActivityForResult(intent, Id.request.filename);
         } catch (ActivityNotFoundException e) {
             // No compatible file manager was found.
-            Toast.makeText(this, R.string.noFilemanagerInstalled, Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.no_filemanager_installed, Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -464,10 +464,10 @@ public class EncryptActivity extends BaseActivity {
                     if (mReturnResult) {
                         mEncryptButton.setText(R.string.btn_encrypt);
                     } else {
-                        mEncryptButton.setText(R.string.btn_encryptAndEmail);
+                        mEncryptButton.setText(R.string.btn_encrypt_and_email);
                     }
                     mEncryptButton.setEnabled(true);
-                    mEncryptToClipboardButton.setText(R.string.btn_encryptToClipboard);
+                    mEncryptToClipboardButton.setText(R.string.btn_encrypt_to_clipboard);
                     mEncryptToClipboardButton.setEnabled(true);
                 } else {
                     if (mEncryptionKeyIds == null || mEncryptionKeyIds.length == 0) {
@@ -475,29 +475,29 @@ public class EncryptActivity extends BaseActivity {
                             if (mReturnResult) {
                                 mEncryptButton.setText(R.string.btn_encrypt);
                             } else {
-                                mEncryptButton.setText(R.string.btn_encryptAndEmail);
+                                mEncryptButton.setText(R.string.btn_encrypt_and_email);
                             }
                             mEncryptButton.setEnabled(false);
-                            mEncryptToClipboardButton.setText(R.string.btn_encryptToClipboard);
+                            mEncryptToClipboardButton.setText(R.string.btn_encrypt_to_clipboard);
                             mEncryptToClipboardButton.setEnabled(false);
                         } else {
                             if (mReturnResult) {
                                 mEncryptButton.setText(R.string.btn_sign);
                             } else {
-                                mEncryptButton.setText(R.string.btn_signAndEmail);
+                                mEncryptButton.setText(R.string.btn_sign_and_email);
                             }
                             mEncryptButton.setEnabled(true);
-                            mEncryptToClipboardButton.setText(R.string.btn_signToClipboard);
+                            mEncryptToClipboardButton.setText(R.string.btn_sign_to_clipboard);
                             mEncryptToClipboardButton.setEnabled(true);
                         }
                     } else {
                         if (mReturnResult) {
                             mEncryptButton.setText(R.string.btn_encrypt);
                         } else {
-                            mEncryptButton.setText(R.string.btn_encryptAndEmail);
+                            mEncryptButton.setText(R.string.btn_encrypt_and_email);
                         }
                         mEncryptButton.setEnabled(true);
-                        mEncryptToClipboardButton.setText(R.string.btn_encryptToClipboard);
+                        mEncryptToClipboardButton.setText(R.string.btn_encrypt_to_clipboard);
                         mEncryptToClipboardButton.setEnabled(true);
                     }
                 }
@@ -551,15 +551,15 @@ public class EncryptActivity extends BaseActivity {
             }
 
             if (mInputFilename.equals("")) {
-                Toast.makeText(this, R.string.noFileSelected, Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, R.string.no_file_selected, Toast.LENGTH_SHORT).show();
                 return;
             }
 
             if (!mInputFilename.startsWith("content")) {
                 File file = new File(mInputFilename);
                 if (!file.exists() || !file.isFile()) {
-                    Toast.makeText(this, getString(R.string.errorMessage,
-                                                   getString(R.string.error_fileNotFound)),
+                    Toast.makeText(this, getString(R.string.error_message,
+                                                   getString(R.string.error_file_not_found)),
                                    Toast.LENGTH_SHORT).show();
                     return;
                 }
@@ -572,25 +572,25 @@ public class EncryptActivity extends BaseActivity {
             String passPhrase = mPassPhrase.getText().toString();
             String passPhraseAgain = mPassPhraseAgain.getText().toString();
             if (!passPhrase.equals(passPhraseAgain)) {
-                Toast.makeText(this, R.string.passPhrasesDoNotMatch, Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, R.string.pass_phrases_do_not_match, Toast.LENGTH_SHORT).show();
                 return;
             }
 
             gotPassPhrase = (passPhrase.length() != 0);
             if (!gotPassPhrase) {
-                Toast.makeText(this, R.string.passPhraseMustNotBeEmpty, Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, R.string.pass_phrase_must_not_be_empty, Toast.LENGTH_SHORT).show();
                 return;
             }
         } else {
             boolean encryptIt = (mEncryptionKeyIds != null && mEncryptionKeyIds.length > 0);
             // for now require at least one form of encryption for files
             if (!encryptIt && mEncryptTarget == Id.target.file) {
-                Toast.makeText(this, R.string.selectEncryptionKey, Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, R.string.select_encryption_key, Toast.LENGTH_SHORT).show();
                 return;
             }
 
             if (!encryptIt && getSecretKeyId() == 0) {
-                Toast.makeText(this, R.string.selectEncryptionOrSignatureKey,
+                Toast.makeText(this, R.string.select_encryption_or_signature_key,
                                Toast.LENGTH_SHORT).show();
                 return;
             }
@@ -750,12 +750,12 @@ public class EncryptActivity extends BaseActivity {
 
     private void updateView() {
         if (mEncryptionKeyIds == null || mEncryptionKeyIds.length == 0) {
-            mSelectKeysButton.setText(R.string.noKeysSelected);
+            mSelectKeysButton.setText(R.string.no_keys_selected);
         } else if (mEncryptionKeyIds.length == 1) {
-            mSelectKeysButton.setText(R.string.oneKeySelected);
+            mSelectKeysButton.setText(R.string.one_key_selected);
         } else {
             mSelectKeysButton.setText("" + mEncryptionKeyIds.length + " " +
-                                      getResources().getString(R.string.nKeysSelected));
+                                      getResources().getString(R.string.n_keys_selected));
         }
 
         if (getSecretKeyId() == 0) {
@@ -763,7 +763,7 @@ public class EncryptActivity extends BaseActivity {
             mMainUserId.setText("");
             mMainUserIdRest.setText("");
         } else {
-            String uid = getResources().getString(R.string.unknownUserId);
+            String uid = getResources().getString(R.string.unknown_user_id);
             String uidExtra = "";
             KeyRing keyRing = Apg.getSecretKeyRing(getSecretKeyId());
             if (keyRing != null) {
@@ -883,7 +883,7 @@ public class EncryptActivity extends BaseActivity {
         Bundle data = msg.getData();
         String error = data.getString(Apg.EXTRA_ERROR);
         if (error != null) {
-            Toast.makeText(this, getString(R.string.errorMessage, error), Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.error_message, error), Toast.LENGTH_SHORT).show();
             return;
         }
         switch (mEncryptTarget) {
@@ -891,7 +891,7 @@ public class EncryptActivity extends BaseActivity {
                 String message = data.getString(Apg.EXTRA_ENCRYPTED_MESSAGE);
                 ClipboardManager clip = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
                 clip.setText(message);
-                Toast.makeText(this, R.string.encryptionToClipboardSuccessful,
+                Toast.makeText(this, R.string.encryption_to_clipboard_successful,
                                Toast.LENGTH_SHORT).show();
                 break;
             }
@@ -919,12 +919,12 @@ public class EncryptActivity extends BaseActivity {
                 }
                 EncryptActivity.this.
                         startActivity(Intent.createChooser(emailIntent,
-                                                           getString(R.string.title_sendEmail)));
+                                                           getString(R.string.title_send_email)));
                 break;
             }
 
             case Id.target.file: {
-                Toast.makeText(this, R.string.encryptionSuccessful, Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, R.string.encryption_successful, Toast.LENGTH_SHORT).show();
                 if (mDeleteAfter.isChecked()) {
                     setDeleteFile(mInputFilename);
                     showDialog(Id.dialog.delete_file);
@@ -943,8 +943,8 @@ public class EncryptActivity extends BaseActivity {
     protected Dialog onCreateDialog(int id) {
         switch (id) {
             case Id.dialog.output_filename: {
-                return FileDialog.build(this, getString(R.string.title_encryptToFile),
-                                        getString(R.string.specifyFileToEncryptTo),
+                return FileDialog.build(this, getString(R.string.title_encrypt_to_file),
+                                        getString(R.string.specify_file_to_encrypt_to),
                                         mOutputFilename,
                                         new FileDialog.OnClickListener() {
                                             public void onOkClick(String filename, boolean checked) {
@@ -957,8 +957,8 @@ public class EncryptActivity extends BaseActivity {
                                                 removeDialog(Id.dialog.output_filename);
                                             }
                                         },
-                                        getString(R.string.filemanager_titleSave),
-                                        getString(R.string.filemanager_btnSave),
+                                        getString(R.string.filemanager_title_save),
+                                        getString(R.string.filemanager_btn_save),
                                         null,
                                         Id.request.output_filename);
             }

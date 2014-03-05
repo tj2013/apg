@@ -126,7 +126,7 @@ public class KeyListActivity extends BaseActivity {
             mFilterLayout.setVisibility(View.GONE);
         } else {
             mFilterLayout.setVisibility(View.VISIBLE);
-            mFilterInfo.setText(getString(R.string.filterInfo, searchString));
+            mFilterInfo.setText(getString(R.string.filter_info, searchString));
         }
 
         if (mListAdapter != null) {
@@ -215,8 +215,8 @@ public class KeyListActivity extends BaseActivity {
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
                 builder.setTitle(R.string.warning);
                 builder.setMessage(getString(mKeyType == Id.type.public_key ?
-                                                 R.string.keyDeletionConfirmation :
-                                                 R.string.secretKeyDeletionConfirmation, userId));
+                                                 R.string.key_deletion_confirmation :
+                                                 R.string.secret_key_deletion_confirmation, userId));
                 builder.setIcon(android.R.drawable.ic_dialog_alert);
                 builder.setPositiveButton(R.string.btn_delete,
                                           new DialogInterface.OnClickListener() {
@@ -235,8 +235,8 @@ public class KeyListActivity extends BaseActivity {
             }
 
             case Id.dialog.import_keys: {
-                return FileDialog.build(this, getString(R.string.title_importKeys),
-                                        getString(R.string.specifyFileToImportFrom),
+                return FileDialog.build(this, getString(R.string.title_import_keys),
+                                        getString(R.string.specify_file_to_import_from),
                                         mImportFilename,
                                         new FileDialog.OnClickListener() {
                                             public void onOkClick(String filename, boolean checked) {
@@ -250,9 +250,9 @@ public class KeyListActivity extends BaseActivity {
                                                 removeDialog(Id.dialog.import_keys);
                                             }
                                         },
-                                        getString(R.string.filemanager_titleOpen),
-                                        getString(R.string.filemanager_btnOpen),
-                                        getString(R.string.label_deleteAfterImport),
+                                        getString(R.string.filemanager_title_open),
+                                        getString(R.string.filemanager_btn_open),
+                                        getString(R.string.label_delete_after_import),
                                         Id.request.filename);
             }
 
@@ -262,15 +262,15 @@ public class KeyListActivity extends BaseActivity {
 
             case Id.dialog.export_keys: {
                 String title = (singleKeyExport ?
-                                    getString(R.string.title_exportKey) :
-                                    getString(R.string.title_exportKeys));
+                                    getString(R.string.title_export_key) :
+                                    getString(R.string.title_export_keys));
 
                 final int thisDialogId = (singleKeyExport ? Id.dialog.export_key : Id.dialog.export_keys);
 
                 return FileDialog.build(this, title,
                                         getString(mKeyType == Id.type.public_key ?
-                                                      R.string.specifyFileToExportTo :
-                                                      R.string.specifyFileToExportSecretKeysTo),
+                                                      R.string.specify_file_to_export_to :
+                                                      R.string.specify_file_to_export_secret_keys_to),
                                         mExportFilename,
                                         new FileDialog.OnClickListener() {
                                             public void onOkClick(String filename, boolean checked) {
@@ -283,8 +283,8 @@ public class KeyListActivity extends BaseActivity {
                                                 removeDialog(thisDialogId);
                                             }
                                         },
-                                        getString(R.string.filemanager_titleSave),
-                                        getString(R.string.filemanager_btnSave),
+                                        getString(R.string.filemanager_title_save),
+                                        getString(R.string.filemanager_btn_save),
                                         null,
                                         Id.request.filename);
             }
@@ -347,7 +347,7 @@ public class KeyListActivity extends BaseActivity {
                 data = Apg.exportKeyRings(this, keyRingIds, exportOutputStream, this);
             }
         } catch (FileNotFoundException e) {
-            error = getString(R.string.error_fileNotFound);
+            error = getString(R.string.error_file_not_found);
         } catch (IOException e) {
             error = "" + e;
         } catch (PGPException e) {
@@ -396,7 +396,7 @@ public class KeyListActivity extends BaseActivity {
                     String error = data.getString(Apg.EXTRA_ERROR);
                     if (error != null) {
                         Toast.makeText(KeyListActivity.this,
-                                       getString(R.string.errorMessage, error),
+                                       getString(R.string.error_message, error),
                                        Toast.LENGTH_SHORT).show();
                     } else {
                         int added = data.getInt("added");
@@ -404,13 +404,13 @@ public class KeyListActivity extends BaseActivity {
                         int bad = data.getInt("bad");
                         String message;
                         if (added > 0 && updated > 0) {
-                            message = getString(R.string.keysAddedAndUpdated, added, updated);
+                            message = getString(R.string.keys_added_and_updated, added, updated);
                         } else if (added > 0) {
-                            message = getString(R.string.keysAdded, added);
+                            message = getString(R.string.keys_added, added);
                         } else if (updated > 0) {
-                            message = getString(R.string.keysUpdated, updated);
+                            message = getString(R.string.keys_updated, updated);
                         } else {
-                            message = getString(R.string.noKeysAddedOrUpdated);
+                            message = getString(R.string.no_keys_added_or_updated);
                         }
                         Toast.makeText(KeyListActivity.this, message,
                                        Toast.LENGTH_SHORT).show();
@@ -419,7 +419,7 @@ public class KeyListActivity extends BaseActivity {
 
                             alert.setIcon(android.R.drawable.ic_dialog_alert);
                             alert.setTitle(R.string.warning);
-                            alert.setMessage(this.getString(R.string.badKeysEncountered, bad));
+                            alert.setMessage(this.getString(R.string.bad_keys_encountered, bad));
 
                             alert.setPositiveButton(android.R.string.ok,
                                     new DialogInterface.OnClickListener() {
@@ -445,17 +445,17 @@ public class KeyListActivity extends BaseActivity {
                     String error = data.getString(Apg.EXTRA_ERROR);
                     if (error != null) {
                         Toast.makeText(KeyListActivity.this,
-                                       getString(R.string.errorMessage, error),
+                                       getString(R.string.error_message, error),
                                        Toast.LENGTH_SHORT).show();
                     } else {
                         int exported = data.getInt("exported");
                         String message;
                         if (exported == 1) {
-                            message = getString(R.string.keyExported);
+                            message = getString(R.string.key_exported);
                         } else if (exported > 0) {
-                            message = getString(R.string.keysExported, exported);
+                            message = getString(R.string.keys_exported, exported);
                         } else {
-                            message = getString(R.string.noKeysExported);
+                            message = getString(R.string.no_keys_exported);
                         }
                         Toast.makeText(KeyListActivity.this, message,
                                        Toast.LENGTH_SHORT).show();
@@ -709,7 +709,7 @@ public class KeyListActivity extends BaseActivity {
             }
 
             if (mainUserId.getText().length() == 0) {
-                mainUserId.setText(R.string.unknownUserId);
+                mainUserId.setText(R.string.unknown_user_id);
             }
 
             if (mainUserIdRest.getText().length() == 0) {

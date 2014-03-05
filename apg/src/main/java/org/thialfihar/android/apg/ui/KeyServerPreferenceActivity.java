@@ -53,7 +53,7 @@ public class KeyServerPreferenceActivity extends BaseActivity
         mTitle = (TextView) findViewById(R.id.title);
         mSummary = (TextView) findViewById(R.id.summary);
 
-        mTitle.setText(R.string.label_keyServers);
+        mTitle.setText(R.string.label_key_servers);
 
         mEditors = (ViewGroup) findViewById(R.id.editors);
         mAdd = findViewById(R.id.add);

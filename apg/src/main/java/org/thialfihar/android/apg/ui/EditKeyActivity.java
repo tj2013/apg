@@ -129,7 +129,7 @@ public class EditKeyActivity extends BaseActivity implements OnClickListener {
 
         updatePassPhraseButtonText();
 
-        Toast.makeText(this, getString(R.string.warningMessage, getString(R.string.keyEditingIsBeta)),
+        Toast.makeText(this, getString(R.string.warning_message, getString(R.string.key_editing_is_beta)),
                        Toast.LENGTH_LONG).show();
     }
 
@@ -161,11 +161,11 @@ public class EditKeyActivity extends BaseActivity implements OnClickListener {
                 AlertDialog.Builder alert = new AlertDialog.Builder(this);
 
                 if (havePassPhrase()) {
-                    alert.setTitle(R.string.title_changePassPhrase);
+                    alert.setTitle(R.string.title_change_pass_phrase);
                 } else {
-                    alert.setTitle(R.string.title_setPassPhrase);
+                    alert.setTitle(R.string.title_set_pass_phrase);
                 }
-                alert.setMessage(R.string.enterPassPhraseTwice);
+                alert.setMessage(R.string.enter_pass_phrase_twice);
 
                 LayoutInflater inflater =
                     (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -224,7 +224,7 @@ public class EditKeyActivity extends BaseActivity implements OnClickListener {
 
     private void saveClicked() {
         if (!havePassPhrase()) {
-            Toast.makeText(this, R.string.setAPassPhrase, Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.set_a_pass_phrase, Toast.LENGTH_SHORT).show();
             return;
         }
         showDialog(Id.dialog.saving);
@@ -281,9 +281,9 @@ public class EditKeyActivity extends BaseActivity implements OnClickListener {
         String error = data.getString(Apg.EXTRA_ERROR);
         if (error != null) {
             Toast.makeText(EditKeyActivity.this,
-                           getString(R.string.errorMessage, error), Toast.LENGTH_SHORT).show();
+                           getString(R.string.error_message, error), Toast.LENGTH_SHORT).show();
         } else {
-            Toast.makeText(EditKeyActivity.this, R.string.keySaved, Toast.LENGTH_SHORT).show();
+            Toast.makeText(EditKeyActivity.this, R.string.key_saved, Toast.LENGTH_SHORT).show();
             setResult(RESULT_OK);
             finish();
         }
@@ -291,6 +291,6 @@ public class EditKeyActivity extends BaseActivity implements OnClickListener {
 
     private void updatePassPhraseButtonText() {
         mChangePassPhrase.setText(
-                havePassPhrase() ? R.string.btn_changePassPhrase : R.string.btn_setPassPhrase);
+                havePassPhrase() ? R.string.btn_change_pass_phrase : R.string.btn_set_pass_phrase);
     }
 }

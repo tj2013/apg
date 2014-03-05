@@ -116,7 +116,7 @@
 
                         <TextView
                             android:id="@+id/label_deleteAfterDecryption"
-                            android:text="@string/label_deleteAfterDecryption"
+                            android:text="@string/label_delete_after_decryption"
                             android:textAppearance="?android:attr/textAppearanceMedium"
                             android:layout_gravity="center_vertical"
                             android:paddingRight="10dip"
