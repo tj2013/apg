@@ -88,7 +88,7 @@
     <string name="label_pass_phrase">Passwort</string>
     <string name="label_pass_phrase_again">Wiederholen</string>
     <string name="label_algorithm">Algorithmus</string>
-    <string name="label_ascii_armour">ASCII Armor</string>
+    <string name="label_ascii_armor">ASCII Armor</string>
     <string name="label_select_public_keys">Öffentliche(r) Schlüssel</string>
     <string name="label_delete_after_encryption">Nach Verschlüsselung löschen</string>
     <string name="label_delete_after_decryption">Nach Entschlüsselung löschen</string>
@@ -103,7 +103,7 @@
     <string name="no_keys_selected">Auswählen</string>
     <string name="one_key_selected">1 ausgewählt</string>
     <string name="n_keys_selected">Ausgewählt</string>
-    <string name="unknown_user_id">&lt;Unbekannt&gt;</string>
+    <string name="user_id_no_name">&lt;Unbekannt&gt;</string>
 
     <string name="none">&lt;Kein&gt;</string>
     <string name="no_key">&lt;Kein Schlüssel&gt;</string>

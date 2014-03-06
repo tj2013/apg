@@ -99,7 +99,7 @@
     <string name="label_pass_phrase">Pass Phrase</string>
     <string name="label_pass_phrase_again">Conferma Pass Phrase</string>
     <string name="label_algorithm">Algoritmo</string>
-    <string name="label_ascii_armour">ASCII Armour</string>
+    <string name="label_ascii_armor">ASCII Armor</string>
     <string name="label_select_public_keys">Chiavi Pubbliche</string>
     <string name="label_delete_after_encryption">Cancella dopo la crittazione</string>
     <string name="label_delete_after_decryption">Cancella dopo la decrittazione</string>
@@ -127,7 +127,7 @@
     <string name="no_keys_selected">Seleziona</string>
     <string name="one_key_selected">1 Selezionato</string>
     <string name="n_keys_selected">Selezionato</string>
-    <string name="unknown_user_id">&lt;sconosciuto&gt;</string>
+    <string name="user_id_no_name">&lt;sconosciuto&gt;</string>
     <string name="none">&lt;nessuno&gt;</string>
     <string name="no_key">&lt;nessuna chiave&gt;</string>
     <string name="no_date">-</string>

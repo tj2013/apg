@@ -103,7 +103,7 @@
     <string name="label_pass_phrase">Passord</string>
     <string name="label_pass_phrase_again">Igjen</string>
     <string name="label_algorithm">Algoritme</string>
-    <string name="label_ascii_armour">ASCII Armour</string>
+    <string name="label_ascii_armor">ASCII Armor</string>
     <string name="label_select_public_keys">Offentlig(e) Nøkkel(/Nøkler) </string>
     <string name="label_delete_after_encryption">Slett Etter Kryptering</string>
     <string name="label_delete_after_decryption">Slett Etter Dekryptering</string>
@@ -131,7 +131,7 @@
     <string name="no_keys_selected">Velg</string>
     <string name="one_key_selected">1 Valgt</string>
     <string name="n_keys_selected">Valgt</string>
-    <string name="unknown_user_id">&lt;ukjent&gt;</string>
+    <string name="user_id_no_name">&lt;ukjent&gt;</string>
     <string name="none">&lt;ingen&gt;</string>
     <string name="no_key">&lt;ingen nøkkel&gt;</string>
     <string name="no_date">-</string>

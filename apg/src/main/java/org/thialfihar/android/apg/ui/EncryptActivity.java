@@ -93,7 +93,7 @@ public class EncryptActivity extends BaseActivity {
 
     private EditText mPassPhrase = null;
     private EditText mPassPhraseAgain = null;
-    private CheckBox mAsciiArmour = null;
+    private CheckBox mAsciiArmor = null;
     private Spinner mFileCompression = null;
 
     private EditText mFilename = null;
@@ -103,8 +103,8 @@ public class EncryptActivity extends BaseActivity {
     private String mInputFilename = null;
     private String mOutputFilename = null;
 
-    private boolean mAsciiArmourDemand = false;
-    private boolean mOverrideAsciiArmour = false;
+    private boolean mAsciiArmorDemand = false;
+    private boolean mOverrideAsciiArmor = false;
     private Uri mContentUri = null;
     private byte[] mData = null;
 
@@ -118,159 +118,7 @@ public class EncryptActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.encrypt_activity);
 
-        mGenerateSignature = false;
-
-        mSource = (ViewFlipper) findViewById(R.id.source);
-        mSourceLabel = (TextView) findViewById(R.id.sourceLabel);
-        mSourcePrevious = (ImageView) findViewById(R.id.sourcePrevious);
-        mSourceNext = (ImageView) findViewById(R.id.sourceNext);
-
-        mSourcePrevious.setClickable(true);
-        mSourcePrevious.setOnClickListener(new OnClickListener() {
-            public void onClick(View v) {
-                mSource.setInAnimation(AnimationUtils.loadAnimation(EncryptActivity.this,
-                                                                    R.anim.push_right_in));
-                mSource.setOutAnimation(AnimationUtils.loadAnimation(EncryptActivity.this,
-                                                                     R.anim.push_right_out));
-                mSource.showPrevious();
-                updateSource();
-            }
-        });
-
-        mSourceNext.setClickable(true);
-        OnClickListener nextSourceClickListener = new OnClickListener() {
-            public void onClick(View v) {
-                mSource.setInAnimation(AnimationUtils.loadAnimation(EncryptActivity.this,
-                                                                    R.anim.push_left_in));
-                mSource.setOutAnimation(AnimationUtils.loadAnimation(EncryptActivity.this,
-                                                                     R.anim.push_left_out));
-                mSource.showNext();
-                updateSource();
-            }
-        };
-        mSourceNext.setOnClickListener(nextSourceClickListener);
-
-        mSourceLabel.setClickable(true);
-        mSourceLabel.setOnClickListener(nextSourceClickListener);
-
-        mMode = (ViewFlipper) findViewById(R.id.mode);
-        mModeLabel = (TextView) findViewById(R.id.modeLabel);
-        mModePrevious = (ImageView) findViewById(R.id.modePrevious);
-        mModeNext = (ImageView) findViewById(R.id.modeNext);
-
-        mModePrevious.setClickable(true);
-        mModePrevious.setOnClickListener(new OnClickListener() {
-            public void onClick(View v) {
-                mMode.setInAnimation(AnimationUtils.loadAnimation(EncryptActivity.this,
-                                                                    R.anim.push_right_in));
-                mMode.setOutAnimation(AnimationUtils.loadAnimation(EncryptActivity.this,
-                                                                     R.anim.push_right_out));
-                mMode.showPrevious();
-                updateMode();
-            }
-        });
-
-        OnClickListener nextModeClickListener = new OnClickListener() {
-            public void onClick(View v) {
-                mMode.setInAnimation(AnimationUtils.loadAnimation(EncryptActivity.this,
-                                                                    R.anim.push_left_in));
-                mMode.setOutAnimation(AnimationUtils.loadAnimation(EncryptActivity.this,
-                                                                     R.anim.push_left_out));
-                mMode.showNext();
-                updateMode();
-            }
-        };
-        mModeNext.setOnClickListener(nextModeClickListener);
-
-        mModeLabel.setClickable(true);
-        mModeLabel.setOnClickListener(nextModeClickListener);
-
-        mMessage = (EditText) findViewById(R.id.message);
-        mSelectKeysButton = (Button) findViewById(R.id.btn_selectEncryptKeys);
-        mEncryptButton = (Button) findViewById(R.id.btn_encrypt);
-        mEncryptToClipboardButton = (Button) findViewById(R.id.btn_encryptToClipboard);
-        mSign = (CheckBox) findViewById(R.id.sign);
-        mMainUserId = (TextView) findViewById(R.id.mainUserId);
-        mMainUserIdRest = (TextView) findViewById(R.id.mainUserIdRest);
-
-        mPassPhrase = (EditText) findViewById(R.id.passPhrase);
-        mPassPhraseAgain = (EditText) findViewById(R.id.passPhraseAgain);
-
-        // measure the height of the source_file view and set the message view's min height to that,
-        // so it fills mSource fully... bit of a hack.
-        View tmp = findViewById(R.id.sourceFile);
-        tmp.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
-        int height = tmp.getMeasuredHeight();
-        mMessage.setMinimumHeight(height);
-
-        mFilename = (EditText) findViewById(R.id.filename);
-        mBrowse = (ImageButton) findViewById(R.id.btn_browse);
-        mBrowse.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                openFile();
-            }
-        });
-
-        mFileCompression = (Spinner) findViewById(R.id.fileCompression);
-        Choice[] choices = new Choice[] {
-                new Choice(Id.choice.compression.none, getString(R.string.choice_none) +
-                                                       " (" + getString(R.string.fast) + ")"),
-                new Choice(Id.choice.compression.zip, "ZIP (" + getString(R.string.fast) + ")"),
-                new Choice(Id.choice.compression.zlib, "ZLIB (" + getString(R.string.fast) + ")"),
-                new Choice(Id.choice.compression.bzip2, "BZIP2 (" + getString(R.string.very_slow) + ")"),
-        };
-        ArrayAdapter<Choice> adapter =
-                new ArrayAdapter<Choice>(this, android.R.layout.simple_spinner_item, choices);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        mFileCompression.setAdapter(adapter);
-
-        int defaultFileCompression = mPreferences.getDefaultFileCompression();
-        for (int i = 0; i < choices.length; ++i) {
-            if (choices[i].getId() == defaultFileCompression) {
-                mFileCompression.setSelection(i);
-                break;
-            }
-        }
-
-        mDeleteAfter = (CheckBox) findViewById(R.id.deleteAfterEncryption);
-
-        mAsciiArmour = (CheckBox) findViewById(R.id.asciiArmour);
-        mAsciiArmour.setChecked(mPreferences.getDefaultAsciiArmour());
-        mAsciiArmour.setOnClickListener(new OnClickListener() {
-            public void onClick(View view) {
-                guessOutputFilename();
-            }
-        });
-
-        mEncryptToClipboardButton.setOnClickListener(new OnClickListener() {
-            public void onClick(View v) {
-                encryptToClipboardClicked();
-            }
-        });
-
-        mEncryptButton.setOnClickListener(new OnClickListener() {
-            public void onClick(View v) {
-                encryptClicked();
-            }
-        });
-
-        mSelectKeysButton.setOnClickListener(new OnClickListener() {
-            public void onClick(View v) {
-                selectPublicKeys();
-            }
-        });
-
-        mSign.setOnClickListener(new OnClickListener() {
-            public void onClick(View v) {
-                CheckBox checkBox = (CheckBox) v;
-                if (checkBox.isChecked()) {
-                    selectSecretKey();
-                } else {
-                    setSecretKeyId(Id.key.none);
-                    updateView();
-                }
-            }
-        });
+        initializeView();
 
         mIntent = getIntent();
         if (Apg.Intent.ENCRYPT.equals(mIntent.getAction()) ||
@@ -290,14 +138,14 @@ public class EncryptActivity extends BaseActivity {
 
             if (Apg.Intent.GENERATE_SIGNATURE.equals(mIntent.getAction())) {
                 mGenerateSignature = true;
-                mOverrideAsciiArmour = true;
-                mAsciiArmourDemand = false;
+                mOverrideAsciiArmor = true;
+                mAsciiArmorDemand = false;
             }
 
             if (extras.containsKey(Apg.EXTRA_ASCII_ARMOUR)) {
-                mAsciiArmourDemand = extras.getBoolean(Apg.EXTRA_ASCII_ARMOUR, true);
-                mOverrideAsciiArmour = true;
-                mAsciiArmour.setChecked(mAsciiArmourDemand);
+                mAsciiArmorDemand = extras.getBoolean(Apg.EXTRA_ASCII_ARMOUR, true);
+                mOverrideAsciiArmor = true;
+                mAsciiArmor.setChecked(mAsciiArmorDemand);
             }
 
             mData = extras.getByteArray(Apg.EXTRA_DATA);
@@ -422,7 +270,7 @@ public class EncryptActivity extends BaseActivity {
     private void guessOutputFilename() {
         mInputFilename = mFilename.getText().toString();
         File file = new File(mInputFilename);
-        String ending = (mAsciiArmour.isChecked() ? ".asc" : ".gpg");
+        String ending = (mAsciiArmor.isChecked() ? ".asc" : ".gpg");
         mOutputFilename = Constants.path.app_dir + "/" + file.getName() + ending;
     }
 
@@ -637,7 +485,7 @@ public class EncryptActivity extends BaseActivity {
         try {
             InputData in;
             OutputStream out;
-            boolean useAsciiArmour = true;
+            boolean useAsciiArmor = true;
             long encryptionKeyIds[] = null;
             long signatureKeyId = 0;
             int compressionId = 0;
@@ -663,19 +511,19 @@ public class EncryptActivity extends BaseActivity {
             out = mDataDestination.getOutputStream(this);
 
             if (mEncryptTarget == Id.target.file) {
-                useAsciiArmour = mAsciiArmour.isChecked();
+                useAsciiArmor = mAsciiArmor.isChecked();
                 compressionId = ((Choice) mFileCompression.getSelectedItem()).getId();
             } else {
-                useAsciiArmour = true;
+                useAsciiArmor = true;
                 compressionId = mPreferences.getDefaultMessageCompression();
             }
 
-            if (mOverrideAsciiArmour) {
-                useAsciiArmour = mAsciiArmourDemand;
+            if (mOverrideAsciiArmor) {
+                useAsciiArmor = mAsciiArmorDemand;
             }
 
             if (mGenerateSignature) {
-               Apg.generateSignature(this, in, out, useAsciiArmour, mDataSource.isBinary(),
+               Apg.generateSignature(this, in, out, useAsciiArmor, mDataSource.isBinary(),
                                      getSecretKeyId(),
                                      PassphraseCacheService.getCachedPassphrase(this, getSecretKeyId()),
                                      mPreferences.getDefaultHashAlgorithm(),
@@ -688,7 +536,7 @@ public class EncryptActivity extends BaseActivity {
                              mPreferences.getForceV3Signatures(),
                              this);
             } else {
-                Apg.encrypt(this, in, out, useAsciiArmour,
+                Apg.encrypt(this, in, out, useAsciiArmor,
                             encryptionKeyIds, signatureKeyId,
                             PassphraseCacheService.getCachedPassphrase(this, signatureKeyId), this,
                             mPreferences.getDefaultEncryptionAlgorithm(),
@@ -701,7 +549,7 @@ public class EncryptActivity extends BaseActivity {
             out.close();
             if (mEncryptTarget != Id.target.file) {
                 if (out instanceof ByteArrayOutputStream) {
-                    if (useAsciiArmour) {
+                    if (useAsciiArmor) {
                         String extraData = new String(((ByteArrayOutputStream) out).toByteArray());
                         if (mGenerateSignature) {
                             data.putString(Apg.EXTRA_SIGNATURE_TEXT, extraData);
@@ -748,6 +596,161 @@ public class EncryptActivity extends BaseActivity {
         sendMessage(msg);
     }
 
+    private void initializeView() {
+        mSource = (ViewFlipper) findViewById(R.id.source);
+        mSourceLabel = (TextView) findViewById(R.id.sourceLabel);
+        mSourcePrevious = (ImageView) findViewById(R.id.sourcePrevious);
+        mSourceNext = (ImageView) findViewById(R.id.sourceNext);
+
+        mSourcePrevious.setClickable(true);
+        mSourcePrevious.setOnClickListener(new OnClickListener() {
+            public void onClick(View v) {
+                mSource.setInAnimation(AnimationUtils.loadAnimation(EncryptActivity.this,
+                                                                    R.anim.push_right_in));
+                mSource.setOutAnimation(AnimationUtils.loadAnimation(EncryptActivity.this,
+                                                                     R.anim.push_right_out));
+                mSource.showPrevious();
+                updateSource();
+            }
+        });
+
+        mSourceNext.setClickable(true);
+        OnClickListener nextSourceClickListener = new OnClickListener() {
+            public void onClick(View v) {
+                mSource.setInAnimation(AnimationUtils.loadAnimation(EncryptActivity.this,
+                                                                    R.anim.push_left_in));
+                mSource.setOutAnimation(AnimationUtils.loadAnimation(EncryptActivity.this,
+                                                                     R.anim.push_left_out));
+                mSource.showNext();
+                updateSource();
+            }
+        };
+        mSourceNext.setOnClickListener(nextSourceClickListener);
+
+        mSourceLabel.setClickable(true);
+        mSourceLabel.setOnClickListener(nextSourceClickListener);
+
+        mMode = (ViewFlipper) findViewById(R.id.mode);
+        mModeLabel = (TextView) findViewById(R.id.modeLabel);
+        mModePrevious = (ImageView) findViewById(R.id.modePrevious);
+        mModeNext = (ImageView) findViewById(R.id.modeNext);
+
+        mModePrevious.setClickable(true);
+        mModePrevious.setOnClickListener(new OnClickListener() {
+            public void onClick(View v) {
+                mMode.setInAnimation(AnimationUtils.loadAnimation(EncryptActivity.this,
+                                                                    R.anim.push_right_in));
+                mMode.setOutAnimation(AnimationUtils.loadAnimation(EncryptActivity.this,
+                                                                     R.anim.push_right_out));
+                mMode.showPrevious();
+                updateMode();
+            }
+        });
+
+        OnClickListener nextModeClickListener = new OnClickListener() {
+            public void onClick(View v) {
+                mMode.setInAnimation(AnimationUtils.loadAnimation(EncryptActivity.this,
+                                                                    R.anim.push_left_in));
+                mMode.setOutAnimation(AnimationUtils.loadAnimation(EncryptActivity.this,
+                                                                     R.anim.push_left_out));
+                mMode.showNext();
+                updateMode();
+            }
+        };
+        mModeNext.setOnClickListener(nextModeClickListener);
+
+        mModeLabel.setClickable(true);
+        mModeLabel.setOnClickListener(nextModeClickListener);
+
+        mMessage = (EditText) findViewById(R.id.message);
+        mSelectKeysButton = (Button) findViewById(R.id.btn_selectEncryptKeys);
+        mSign = (CheckBox) findViewById(R.id.sign);
+        mMainUserId = (TextView) findViewById(R.id.mainUserId);
+        mMainUserIdRest = (TextView) findViewById(R.id.mainUserIdRest);
+
+        mPassPhrase = (EditText) findViewById(R.id.passPhrase);
+        mPassPhraseAgain = (EditText) findViewById(R.id.passPhraseAgain);
+
+        // measure the height of the source_file view and set the message view's min height to that,
+        // so it fills mSource fully... bit of a hack.
+        View tmp = findViewById(R.id.sourceFile);
+        tmp.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
+        int height = tmp.getMeasuredHeight();
+        mMessage.setMinimumHeight(height);
+
+        mFilename = (EditText) findViewById(R.id.filename);
+        mBrowse = (ImageButton) findViewById(R.id.btn_browse);
+        mBrowse.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                openFile();
+            }
+        });
+
+        mFileCompression = (Spinner) findViewById(R.id.fileCompression);
+        Choice[] choices = new Choice[] {
+                new Choice(Id.choice.compression.none, getString(R.string.choice_none) +
+                                                       " (" + getString(R.string.fast) + ")"),
+                new Choice(Id.choice.compression.zip, "ZIP (" + getString(R.string.fast) + ")"),
+                new Choice(Id.choice.compression.zlib, "ZLIB (" + getString(R.string.fast) + ")"),
+                new Choice(Id.choice.compression.bzip2, "BZIP2 (" + getString(R.string.very_slow) + ")"),
+        };
+        ArrayAdapter<Choice> adapter =
+                new ArrayAdapter<Choice>(this, android.R.layout.simple_spinner_item, choices);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        mFileCompression.setAdapter(adapter);
+
+        int defaultFileCompression = mPreferences.getDefaultFileCompression();
+        for (int i = 0; i < choices.length; ++i) {
+            if (choices[i].getId() == defaultFileCompression) {
+                mFileCompression.setSelection(i);
+                break;
+            }
+        }
+
+        mDeleteAfter = (CheckBox) findViewById(R.id.deleteAfterEncryption);
+
+        mAsciiArmor = (CheckBox) findViewById(R.id.asciiArmor);
+        mAsciiArmor.setChecked(mPreferences.getDefaultAsciiArmor());
+        mAsciiArmor.setOnClickListener(new OnClickListener() {
+            public void onClick(View view) {
+                guessOutputFilename();
+            }
+        });
+
+        mSelectKeysButton.setOnClickListener(new OnClickListener() {
+            public void onClick(View v) {
+                selectPublicKeys();
+            }
+        });
+
+        mSign.setOnClickListener(new OnClickListener() {
+            public void onClick(View v) {
+                CheckBox checkBox = (CheckBox) v;
+                if (checkBox.isChecked()) {
+                    selectSecretKey();
+                } else {
+                    setSecretKeyId(Id.key.none);
+                    updateView();
+                }
+            }
+        });
+
+        mEncryptButton = (Button) findViewById(R.id.btn_encrypt);
+        mEncryptToClipboardButton = (Button) findViewById(R.id.btn_encryptToClipboard);
+        mEncryptToClipboardButton.setOnClickListener(new OnClickListener() {
+            public void onClick(View v) {
+                encryptToClipboardClicked();
+            }
+        });
+
+        mEncryptButton.setOnClickListener(new OnClickListener() {
+            public void onClick(View v) {
+                encryptClicked();
+            }
+        });
+
+    }
+
     private void updateView() {
         if (mEncryptionKeyIds == null || mEncryptionKeyIds.length == 0) {
             mSelectKeysButton.setText(R.string.no_keys_selected);
@@ -763,7 +766,7 @@ public class EncryptActivity extends BaseActivity {
             mMainUserId.setText("");
             mMainUserIdRest.setText("");
         } else {
-            String uid = getResources().getString(R.string.unknown_user_id);
+            String uid = getResources().getString(R.string.user_id_no_name);
             String uidExtra = "";
             KeyRing keyRing = Apg.getSecretKeyRing(getSecretKeyId());
             if (keyRing != null) {

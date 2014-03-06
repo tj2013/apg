@@ -631,7 +631,7 @@ public class DecryptActivity extends BaseActivity {
             mSignatureKeyId = data.getLong(Apg.EXTRA_SIGNATURE_KEY_ID);
             mUserIdRest.setText("id: " + Utils.toHexString(mSignatureKeyId, 8));
             if (userId == null) {
-                userId = getResources().getString(R.string.unknown_user_id);
+                userId = getResources().getString(R.string.user_id_no_name);
             }
             String chunks[] = userId.split(" <", 2);
             userId = chunks[0];

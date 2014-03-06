@@ -709,7 +709,7 @@ public class KeyListActivity extends BaseActivity {
             }
 
             if (mainUserId.getText().length() == 0) {
-                mainUserId.setText(R.string.unknown_user_id);
+                mainUserId.setText(R.string.user_id_no_name);
             }
 
             if (mainUserIdRest.getText().length() == 0) {

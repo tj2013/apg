@@ -139,7 +139,7 @@ public class Apg {
     public static final String EXTRA_SUBJECT = "subject";
     public static final String EXTRA_ENCRYPTION_KEY_IDS = "encryptionKeyIds";
     public static final String EXTRA_SELECTION = "selection";
-    public static final String EXTRA_ASCII_ARMOUR = "asciiArmour";
+    public static final String EXTRA_ASCII_ARMOUR = "asciiArmor";
     public static final String EXTRA_BINARY = "binary";
     public static final String EXTRA_KEY_SERVERS = "keyServers";
 
@@ -511,7 +511,7 @@ public class Apg {
         PositionAwareInputStream progressIn = new PositionAwareInputStream(data.getInputStream());
         // need to have access to the bufferedInput, so we can reuse it for the possible
         // PGPObject chunks after the first one, e.g. files with several consecutive ASCII
-        // armour blocks
+        // armor blocks
         BufferedInputStream bufferedInput = new BufferedInputStream(progressIn);
         int newKeys = 0;
         int oldKeys = 0;
@@ -662,7 +662,7 @@ public class Apg {
     public static String getMainUserIdSafe(Context context, Key key) {
         String userId = key.getMainUserId();
         if (userId == null) {
-            userId = context.getResources().getString(R.string.unknown_user_id);
+            userId = context.getResources().getString(R.string.user_id_no_name);
         }
         return userId;
     }

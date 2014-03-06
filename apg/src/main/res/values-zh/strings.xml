@@ -99,7 +99,7 @@
     <string name="label_pass_phrase">密码口令</string>
     <string name="label_pass_phrase_again">确认口令</string>
     <string name="label_algorithm">算法</string>
-    <string name="label_ascii_armour">二进制转文本编码</string>
+    <string name="label_ascii_armor">二进制转文本编码</string>
     <string name="label_select_public_keys">选择公钥</string>
     <string name="label_delete_after_encryption">加密后删除</string>
     <string name="label_delete_after_decryption">解密后删除</string>
@@ -127,7 +127,7 @@
     <string name="no_keys_selected">选择</string>
     <string name="one_key_selected">1个选定</string>
     <string name="n_keys_selected">个选定</string>
-    <string name="unknown_user_id">&lt;未知&gt;</string>
+    <string name="user_id_no_name">&lt;未知&gt;</string>
     <string name="none">&lt;无&gt;</string>
     <string name="no_key">&lt;无密钥&gt;</string>
     <string name="no_date">-</string>

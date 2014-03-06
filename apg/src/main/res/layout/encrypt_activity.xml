@@ -160,8 +160,8 @@
                         android:orientation="horizontal">
 
                         <TextView
-                            android:id="@+id/label_asciiArmour"
-                            android:text="@string/label_ascii_armour"
+                            android:id="@+id/label_asciiArmor"
+                            android:text="@string/label_ascii_armor"
                             android:textAppearance="?android:attr/textAppearanceMedium"
                             android:layout_gravity="center_vertical"
                             android:paddingRight="10dip"
@@ -170,7 +170,7 @@
                             android:layout_weight="1"/>
 
                         <CheckBox
-                            android:id="@+id/asciiArmour"
+                            android:id="@+id/asciiArmor"
                             android:layout_height="wrap_content"
                             android:layout_width="wrap_content"
                             android:layout_gravity="center_vertical"/>

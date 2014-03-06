@@ -168,7 +168,7 @@ public class SelectPublicKeyListAdapter extends BaseAdapter {
         boolean enabled = isEnabled(position);
 
         TextView mainUserId = (TextView) view.findViewById(R.id.mainUserId);
-        mainUserId.setText(R.string.unknown_user_id);
+        mainUserId.setText(R.string.user_id_no_name);
         TextView mainUserIdRest = (TextView) view.findViewById(R.id.mainUserIdRest);
         mainUserIdRest.setText("");
         TextView keyId = (TextView) view.findViewById(R.id.keyId);

@@ -96,7 +96,7 @@
     <string name="label_pass_phrase">Frase de Paso</string>
     <string name="label_pass_phrase_again">Otra Vez</string>
     <string name="label_algorithm">Algoritmo</string>
-    <string name="label_ascii_armour">Armadura ASCII</string>
+    <string name="label_ascii_armor">Armadura ASCII</string>
     <string name="label_select_public_keys">Llave(s) Publica(s)</string>
     <string name="label_delete_after_encryption">Borrar Una Vez Cifrado</string>
     <string name="label_delete_after_decryption">Borrar Una Vez Descifrado</string>
@@ -124,7 +124,7 @@
     <string name="no_keys_selected">Seleccionar</string>
     <string name="one_key_selected">1 Seleccionada</string>
     <string name="n_keys_selected">Seleccionada</string>
-    <string name="unknown_user_id">&lt;desconocido&gt;</string>
+    <string name="user_id_no_name">&lt;desconocido&gt;</string>
     <string name="none">&lt;ninguno&gt;</string>
     <string name="no_key">&lt;sin llave&gt;</string>
     <string name="no_date">-</string>

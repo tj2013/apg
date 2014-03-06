@@ -66,8 +66,8 @@
 
         <CheckBoxPreference
             android:persistent="false"
-            android:key="defaultAsciiArmour"
-            android:title="@string/label_ascii_armour" />
+            android:key="defaultAsciiArmor"
+            android:title="@string/label_ascii_armor" />
 
     </PreferenceCategory>
 

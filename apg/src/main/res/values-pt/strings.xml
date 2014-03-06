@@ -110,7 +110,7 @@
     <string name="label_pass_phrase">Senha</string>
     <string name="label_pass_phrase_again">Novamente</string>
     <string name="label_algorithm">Algoritmo</string>
-    <string name="label_ascii_armour">Armadura ASCII</string>
+    <string name="label_ascii_armor">Armadura ASCII</string>
     <string name="label_select_public_keys">Chave(s) Pública(s)</string>
     <string name="label_delete_after_encryption">Apagar Após Cifrar</string>
 
@@ -143,7 +143,7 @@
     <string name="one_key_selected">1 Selecionada</string>
     <string name="n_keys_selected">Selecionada</string>
 
-    <string name="unknown_user_id">&lt;desconhecido&gt;</string>
+    <string name="user_id_no_name">&lt;desconhecido&gt;</string>
     <string name="none">&lt;ninguém&gt;</string>
     <string name="no_key">&lt;sem chave&gt;</string>
     <string name="no_date">-</string>

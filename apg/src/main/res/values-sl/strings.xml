@@ -98,7 +98,7 @@
     <string name="label_pass_phrase">Geslo</string>
     <string name="label_pass_phrase_again">Ponovi</string>
     <string name="label_algorithm">Algoritem</string>
-    <string name="label_ascii_armour">ASCII Armour</string>
+    <string name="label_ascii_armor">ASCII Armor</string>
     <string name="label_select_public_keys">Javni ključ(i)</string>
     <string name="label_delete_after_encryption">Po šifriranju izbriši</string>
     <string name="label_delete_after_decryption">Po dešifriranju izbriši</string>
@@ -126,7 +126,7 @@
     <string name="no_keys_selected">Izberi</string>
     <string name="one_key_selected">1 izbran</string>
     <string name="n_keys_selected">Izbrani</string>
-    <string name="unknown_user_id">&lt;nepoznan&gt;</string>
+    <string name="user_id_no_name">&lt;nepoznan&gt;</string>
     <string name="none">&lt;brez&gt;</string>
     <string name="no_key">&lt;brez ključa&gt;</string>
     <string name="no_date">-</string>

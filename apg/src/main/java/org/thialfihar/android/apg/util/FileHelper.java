@@ -30,7 +30,6 @@ import android.widget.Toast;
 import org.thialfihar.android.apg.Constants;
 import org.thialfihar.android.apg.R;
 import org.thialfihar.android.apg.core.Progressable;
-import org.thialfihar.android.apg.util.Log;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -127,16 +126,14 @@ public class FileHelper {
 
             try {
                 cursor = context.getContentResolver().query(uri, projection, null, null, null);
-                int column_index = cursor.getColumnIndexOrThrow("_data");
+                int columnIndex = cursor.getColumnIndexOrThrow("_data");
                 if (cursor.moveToFirst()) {
-                    return cursor.getString(column_index);
+                    return cursor.getString(columnIndex);
                 }
             } catch (Exception e) {
                 // Eat it
             }
-        }
-
-        else if ("file".equalsIgnoreCase(uri.getScheme())) {
+        } else if ("file".equalsIgnoreCase(uri.getScheme())) {
             return uri.getPath();
         }
 
@@ -165,8 +162,9 @@ public class FileHelper {
         int pos = 0;
         String msg = context.getString(R.string.progress_deleting_securely, file.getName());
         while (pos < length) {
-            if (progress != null)
+            if (progress != null) {
                 progress.setProgress(msg, (int) (100 * pos / length), 100);
+            }
             random.nextBytes(data);
             raf.write(data);
             pos += data.length;

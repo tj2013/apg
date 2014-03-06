@@ -45,7 +45,7 @@ public class PreferencesActivity extends PreferenceActivity {
     private IntegerListPreference mHashAlgorithm = null;
     private IntegerListPreference mMessageCompression = null;
     private IntegerListPreference mFileCompression = null;
-    private CheckBoxPreference mAsciiArmour = null;
+    private CheckBoxPreference mAsciiArmor = null;
     private CheckBoxPreference mForceV3Signatures = null;
     private PreferenceScreen mKeyServerPreference = null;
     private Preferences mPreferences;
@@ -211,12 +211,12 @@ public class PreferencesActivity extends PreferenceActivity {
             }
         });
 
-        mAsciiArmour = (CheckBoxPreference) findPreference(Constants.pref.default_ascii_armour);
-        mAsciiArmour.setChecked(mPreferences.getDefaultAsciiArmour());
-        mAsciiArmour.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+        mAsciiArmor = (CheckBoxPreference) findPreference(Constants.pref.default_ascii_armor);
+        mAsciiArmor.setChecked(mPreferences.getDefaultAsciiArmor());
+        mAsciiArmor.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
             public boolean onPreferenceChange(Preference preference, Object newValue) {
-                mAsciiArmour.setChecked((Boolean) newValue);
-                mPreferences.setDefaultAsciiArmour((Boolean) newValue);
+                mAsciiArmor.setChecked((Boolean) newValue);
+                mPreferences.setDefaultAsciiArmor((Boolean) newValue);
                 return false;
             }
         });
