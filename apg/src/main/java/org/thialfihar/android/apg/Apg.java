@@ -65,11 +65,6 @@ import org.bouncycastle2.openpgp.PGPV3SignatureGenerator;
 import org.thialfihar.android.apg.core.Key;
 import org.thialfihar.android.apg.core.KeyRing;
 import org.thialfihar.android.apg.core.Progressable;
-import org.thialfihar.android.apg.provider.DataProvider;
-import org.thialfihar.android.apg.provider.Database;
-import org.thialfihar.android.apg.provider.KeyRings;
-import org.thialfihar.android.apg.provider.Keys;
-import org.thialfihar.android.apg.provider.UserIds;
 import org.thialfihar.android.apg.ui.BaseActivity;
 import org.thialfihar.android.apg.ui.widget.KeyEditor;
 import org.thialfihar.android.apg.ui.widget.SectionView;
@@ -143,22 +138,6 @@ public class Apg {
     public static final String EXTRA_BINARY = "binary";
     public static final String EXTRA_KEY_SERVERS = "keyServers";
 
-    public static final String AUTHORITY = DataProvider.AUTHORITY;
-
-    public static final Uri CONTENT_URI_SECRET_KEY_RINGS =
-            Uri.parse("content://" + AUTHORITY + "/key_rings/secret/");
-    public static final Uri CONTENT_URI_SECRET_KEY_RING_BY_KEY_ID =
-            Uri.parse("content://" + AUTHORITY + "/key_rings/secret/key_id/");
-    public static final Uri CONTENT_URI_SECRET_KEY_RING_BY_EMAILS =
-            Uri.parse("content://" + AUTHORITY + "/key_rings/secret/emails/");
-
-    public static final Uri CONTENT_URI_PUBLIC_KEY_RINGS =
-            Uri.parse("content://" + AUTHORITY + "/key_rings/public/");
-    public static final Uri CONTENT_URI_PUBLIC_KEY_RING_BY_KEY_ID =
-            Uri.parse("content://" + AUTHORITY + "/key_rings/public/key_id/");
-    public static final Uri CONTENT_URI_PUBLIC_KEY_RING_BY_EMAILS =
-            Uri.parse("content://" + AUTHORITY + "/key_rings/public/emails/");
-
     private static final int[] PREFERRED_SYMMETRIC_ALGORITHMS =
             new int[] {
                     SymmetricKeyAlgorithmTags.AES_256,
@@ -178,7 +157,6 @@ public class Apg {
                     CompressionAlgorithmTags.ZIP };
 
     private static String sEditPassphrase = null;
-    private static Database sDatabase = null;
 
     public static class GeneralException extends Exception {
         static final long serialVersionUID = 0xf812773342L;
@@ -197,13 +175,6 @@ public class Apg {
     }
 
     public static void initialize(Context context) {
-        if (sDatabase == null) {
-            sDatabase = new Database(context);
-        }
-    }
-
-    public static Database getDatabase() {
-        return sDatabase;
     }
 
     public static void setEditPassphrase(String passphrase) {
@@ -309,7 +280,7 @@ public class Apg {
                                       String oldPassphrase, String newPassphrase,
                                       Progressable progress)
             throws Apg.GeneralException, NoSuchProviderException, PGPException,
-            NoSuchAlgorithmException, SignatureException, IOException, Database.GeneralException {
+            NoSuchAlgorithmException, SignatureException, IOException {
 
         progress.setProgress(R.string.progress_building_key, 0, 100);
 
@@ -486,8 +457,8 @@ public class Apg {
         PGPPublicKeyRing publicKeyRing = keyGen.generatePublicKeyRing();
 
         progress.setProgress(R.string.progress_saving_key_ring, 90, 100);
-        sDatabase.saveKeyRing(new KeyRing(secretKeyRing));
-        sDatabase.saveKeyRing(new KeyRing(publicKeyRing));
+        //sDatabase.saveKeyRing(new KeyRing(secretKeyRing));
+        //sDatabase.saveKeyRing(new KeyRing(publicKeyRing));
 
         progress.setProgress(R.string.progress_done, 100, 100);
     }
@@ -532,7 +503,7 @@ public class Apg {
                     // saveKeyRing is never called
                     int retValue = 2107;
 
-                    try {
+                    //try {
                         if (type == Id.type.secret_key && obj instanceof PGPSecretKeyRing) {
                             secretKeyRing = (PGPSecretKeyRing) obj;
                             boolean save = true;
@@ -550,17 +521,13 @@ public class Apg {
                                 // all good if this fails, we likely didn't use the right password
                             }
                             if (save) {
-                                retValue = sDatabase.saveKeyRing(new KeyRing(secretKeyRing));
+                                retValue = 0;//sDatabase.saveKeyRing(new KeyRing(secretKeyRing));
                             }
                         } else if (type == Id.type.public_key && obj instanceof PGPPublicKeyRing) {
                             publicKeyRing = (PGPPublicKeyRing) obj;
-                            retValue = sDatabase.saveKeyRing(new KeyRing(publicKeyRing));
+                            retValue = 0;//sDatabase.saveKeyRing(new KeyRing(publicKeyRing));
                         }
-                    } catch (IOException e) {
-                        retValue = Id.return_value.error;
-                    } catch (Database.GeneralException e) {
-                        retValue = Id.return_value.error;
-                    }
+                    //}
 
                     if (retValue == Id.return_value.error) {
                         throw new GeneralException(context.getString(R.string.error_saving_keys));
@@ -610,7 +577,7 @@ public class Apg {
         int numKeys = 0;
         for (int i = 0; i < keyRingIds.size(); ++i) {
             progress.setProgress(i * 100 / keyRingIds.size(), 100);
-            Object obj = sDatabase.getKeyRing(keyRingIds.get(i));
+            Object obj = null;//sDatabase.getKeyRing(keyRingIds.get(i));
             PGPPublicKeyRing publicKeyRing;
             PGPSecretKeyRing secretKeyRing;
 
@@ -635,7 +602,7 @@ public class Apg {
 
     // TODO: this surely belongs in KeyRing
     public static Key getEncryptKey(long masterKeyId) {
-        KeyRing keyRing = sDatabase.getPublicKeyRing(masterKeyId);
+        KeyRing keyRing = null;// sDatabase.getPublicKeyRing(masterKeyId);
         if (keyRing == null) {
             return null;
         }
@@ -648,7 +615,7 @@ public class Apg {
 
     // TODO: this surely belongs in KeyRing
     public static Key getSigningKey(long masterKeyId) {
-        KeyRing keyRing = sDatabase.getSecretKeyRing(masterKeyId);
+        KeyRing keyRing = null;//sDatabase.getSecretKeyRing(masterKeyId);
         if (keyRing == null) {
             return null;
         }
@@ -668,33 +635,33 @@ public class Apg {
     }
 
     public static void deleteKey(int keyRingId) {
-        sDatabase.deleteKeyRing(keyRingId);
+        //sDatabase.deleteKeyRing(keyRingId);
     }
 
     public static KeyRing getKeyRing(int keyRingId) {
-        return sDatabase.getKeyRing(keyRingId);
+        return null;//sDatabase.getKeyRing(keyRingId);
     }
 
     public static KeyRing getSecretKeyRing(long keyId) {
-        return sDatabase.getSecretKeyRing(keyId);
+        return null;//sDatabase.getSecretKeyRing(keyId);
     }
 
     public static KeyRing getPublicKeyRing(long keyId) {
-        return sDatabase.getPublicKeyRing(keyId);
+        return null;//sDatabase.getPublicKeyRing(keyId);
     }
 
     public static Key getSecretKey(long keyId) {
-        return sDatabase.getSecretKey(keyId);
+        return null;//sDatabase.getSecretKey(keyId);
     }
 
     public static Key getPublicKey(long keyId) {
-        return sDatabase.getPublicKey(keyId);
+        return null;//sDatabase.getPublicKey(keyId);
     }
 
     public static Vector<Integer> getKeyRingIds(int type) {
-        SQLiteDatabase db = sDatabase.db();
+        SQLiteDatabase db = null;//sDatabase.db();
         Vector<Integer> keyIds = new Vector<Integer>();
-        Cursor c = db.query(KeyRings.TABLE_NAME,
+        /*Cursor c = db.query(KeyRings.TABLE_NAME,
                             new String[] { KeyRings._ID },
                             KeyRings.TYPE + " = ?", new String[] { "" + type },
                             null, null, null);
@@ -707,12 +674,13 @@ public class Apg {
         if (c != null) {
             c.close();
         }
-
+*/
         return keyIds;
     }
 
     public static String getMainUserId(long keyId, int type) {
-        SQLiteDatabase db = sDatabase.db();
+        /*
+        SQLiteDatabase db = null;//sDatabase.db();
         Cursor c = db.query(Keys.TABLE_NAME + " INNER JOIN " + KeyRings.TABLE_NAME + " ON (" +
                             KeyRings.TABLE_NAME + "." + KeyRings._ID + " = " +
                             Keys.TABLE_NAME + "." + Keys.KEY_RING_ID + ") " +
@@ -744,6 +712,8 @@ public class Apg {
         }
 
         return userId;
+        */
+        return "";
     }
 
     public static void encrypt(Context context,
@@ -782,7 +752,7 @@ public class Apg {
         }
 
         if (signatureKeyId != 0) {
-            signingKeyRing = sDatabase.getSecretKeyRing(signatureKeyId);
+            signingKeyRing = null;//sDatabase.getSecretKeyRing(signatureKeyId);
             signingKey = signingKeyRing.getUsableSigningKeys().get(0);
             if (signingKey == null) {
                 throw new GeneralException(context.getString(R.string.error_signature_failed));
@@ -922,7 +892,7 @@ public class Apg {
             throw new GeneralException(context.getString(R.string.error_no_signature_key));
         }
 
-        signingKeyRing = sDatabase.getSecretKeyRing(signatureKeyId);
+        signingKeyRing = null;//sDatabase.getSecretKeyRing(signatureKeyId);
         signingKey = getSigningKey(signatureKeyId);
         if (signingKey == null) {
             throw new GeneralException(context.getString(R.string.error_signature_failed));
@@ -1036,7 +1006,7 @@ public class Apg {
             throw new GeneralException(context.getString(R.string.error_no_signature_key));
         }
 
-        signingKeyRing = sDatabase.getSecretKeyRing(signatureKeyId);
+        signingKeyRing = null;//sDatabase.getSecretKeyRing(signatureKeyId);
         signingKey = getSigningKey(signatureKeyId);
         if (signingKey == null) {
             throw new GeneralException(context.getString(R.string.error_signature_failed));
@@ -1154,7 +1124,7 @@ public class Apg {
             if (obj instanceof PGPPublicKeyEncryptedData) {
                 gotAsymmetricEncryption = true;
                 PGPPublicKeyEncryptedData pbe = (PGPPublicKeyEncryptedData) obj;
-                secretKey = sDatabase.getSecretKey(pbe.getKeyID());
+                secretKey = null;//sDatabase.getSecretKey(pbe.getKeyID());
                 if (secretKey != null) {
                     break;
                 }
@@ -1266,7 +1236,7 @@ public class Apg {
                 Object obj = it.next();
                 if (obj instanceof PGPPublicKeyEncryptedData) {
                     PGPPublicKeyEncryptedData encData = (PGPPublicKeyEncryptedData) obj;
-                    secretKey = sDatabase.getSecretKey(encData.getKeyID());
+                    secretKey = null;//sDatabase.getSecretKey(encData.getKeyID());
                     if (secretKey != null) {
                         pbe = encData;
                         break;
@@ -1317,7 +1287,7 @@ public class Apg {
             PGPOnePassSignatureList sigList = (PGPOnePassSignatureList) dataChunk;
             for (int i = 0; i < sigList.size(); ++i) {
                 signature = sigList.get(i);
-                signatureKey = sDatabase.getPublicKey(signature.getKeyID());
+                signatureKey = null;//sDatabase.getPublicKey(signature.getKeyID());
                 if (signatureKeyId == 0) {
                     signatureKeyId = signature.getKeyID();
                 }
@@ -1327,7 +1297,7 @@ public class Apg {
                     signatureIndex = i;
                     signatureKeyId = signature.getKeyID();
                     String userId = null;
-                    KeyRing sigKeyRing = sDatabase.getPublicKeyRing(signatureKeyId);
+                    KeyRing sigKeyRing = null;//sDatabase.getPublicKeyRing(signatureKeyId);
                     if (sigKeyRing != null) {
                         userId = sigKeyRing.getMasterKey().getMainUserId();
                     }
@@ -1463,7 +1433,7 @@ public class Apg {
         Key signatureKey = null;
         for (int i = 0; i < sigList.size(); ++i) {
             signature = sigList.get(i);
-            signatureKey = sDatabase.getPublicKey(signature.getKeyID());
+            signatureKey = null;//sDatabase.getPublicKey(signature.getKeyID());
             if (signatureKeyId == 0) {
                 signatureKeyId = signature.getKeyID();
             }
@@ -1477,7 +1447,7 @@ public class Apg {
                 // pause here
                 context.getRunningThread().pause();
                 // see whether the key was found in the meantime
-                signatureKey = sDatabase.getPublicKey(signature.getKeyID());
+                signatureKey = null;//sDatabase.getPublicKey(signature.getKeyID());
             }
 
             if (signatureKey == null) {
@@ -1485,7 +1455,7 @@ public class Apg {
             } else {
                 signatureKeyId = signature.getKeyID();
                 String userId = null;
-                KeyRing sigKeyRing = sDatabase.getPublicKeyRing(signatureKeyId);
+                KeyRing sigKeyRing = null;//sDatabase.getPublicKeyRing(signatureKeyId);
                 if (sigKeyRing != null) {
                     userId = sigKeyRing.getMasterKey().getMainUserId();
                 }

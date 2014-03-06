@@ -22,6 +22,7 @@ public final class Constants {
     public static final boolean DEBUG = true;
     public static final String TAG = "APG";
     public static final String PACKAGE_NAME = "org.thialfihar.android.apg";
+    public static final String INTENT_PREFIX = PACKAGE_NAME + ".";
 
     public static final class path {
         public static final String app_dir = Environment.getExternalStorageDirectory() + "/APG";

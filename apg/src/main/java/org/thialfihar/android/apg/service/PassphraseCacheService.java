@@ -60,13 +60,12 @@ import java.util.Iterator;
 public class PassphraseCacheService extends Service {
     public static final String TAG = Constants.TAG + ": PassphraseCacheService";
 
-    public static final String INTENT_PREFIX = "org.thialfihar.android.apg.";
-    public static final String ACTION_PASSPHRASE_CACHE_ADD = INTENT_PREFIX
+    public static final String ACTION_PASSPHRASE_CACHE_ADD = Constants.INTENT_PREFIX
             + "PASSPHRASE_CACHE_ADD";
-    public static final String ACTION_PASSPHRASE_CACHE_GET = INTENT_PREFIX
+    public static final String ACTION_PASSPHRASE_CACHE_GET = Constants.INTENT_PREFIX
             + "PASSPHRASE_CACHE_GET";
 
-    public static final String BROADCAST_ACTION_PASSPHRASE_CACHE_SERVICE = INTENT_PREFIX
+    public static final String BROADCAST_ACTION_PASSPHRASE_CACHE_SERVICE = Constants.INTENT_PREFIX
             + "PASSPHRASE_CACHE_BROADCAST";
 
     public static final String EXTRA_TTL = "ttl";

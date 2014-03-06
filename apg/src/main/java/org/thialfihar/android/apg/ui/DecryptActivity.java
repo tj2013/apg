@@ -49,7 +49,8 @@ import org.thialfihar.android.apg.FileDialog;
 import org.thialfihar.android.apg.Id;
 import org.thialfihar.android.apg.R;
 import org.thialfihar.android.apg.core.KeyRing;
-import org.thialfihar.android.apg.provider.DataProvider;
+import org.thialfihar.android.apg.provider.KeychainContract;
+import org.thialfihar.android.apg.provider.KeychainProvider;
 import org.thialfihar.android.apg.service.PassphraseCacheService;
 import org.thialfihar.android.apg.util.InputData;
 import org.thialfihar.android.apg.util.PausableThread;
@@ -531,7 +532,7 @@ public class DecryptActivity extends BaseActivity {
             out.close();
 
             if (mDataDestination.getStreamFilename() != null) {
-                data.putString(Apg.EXTRA_RESULT_URI, "content://" + DataProvider.AUTHORITY +
+                data.putString(Apg.EXTRA_RESULT_URI, "content://" + KeychainContract.AUTHORITY +
                                "/data/" + mDataDestination.getStreamFilename());
             } else if (mDecryptTarget == Id.target.message) {
                 if (mReturnBinary) {

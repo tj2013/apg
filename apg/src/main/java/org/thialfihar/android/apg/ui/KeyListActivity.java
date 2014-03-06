@@ -50,9 +50,12 @@ import org.thialfihar.android.apg.Id;
 import org.thialfihar.android.apg.R;
 import org.thialfihar.android.apg.core.Key;
 import org.thialfihar.android.apg.core.KeyRing;
-import org.thialfihar.android.apg.provider.KeyRings;
-import org.thialfihar.android.apg.provider.Keys;
-import org.thialfihar.android.apg.provider.UserIds;
+import org.thialfihar.android.apg.provider.KeychainContract.KeyRings;
+import org.thialfihar.android.apg.provider.KeychainContract.Keys;
+import org.thialfihar.android.apg.provider.KeychainContract.KeyTypes;
+import org.thialfihar.android.apg.provider.KeychainContract.UserIds;
+import org.thialfihar.android.apg.provider.KeychainDatabase;
+import org.thialfihar.android.apg.provider.KeychainDatabase.Tables;
 import org.thialfihar.android.apg.util.InputData;
 import org.thialfihar.android.apg.util.Utils;
 
@@ -203,12 +206,12 @@ public class KeyListActivity extends BaseActivity {
                 mSelectedItem = -1;
                 // TODO: better way to do this?
                 String userId = "<unknown>";
-                KeyRing keyRing = Apg.getKeyRing(keyRingId);
+                KeyRing keyRing = null;//Apg.getKeyRing(keyRingId);
                 if (keyRing != null) {
                     if (keyRing.isPublic()) {
-                        userId = Apg.getMainUserIdSafe(this, keyRing.getMasterKey());
+                        userId = "";//Apg.getMainUserIdSafe(this, keyRing.getMasterKey());
                     } else {
-                        userId = Apg.getMainUserIdSafe(this, keyRing.getMasterKey());
+                        userId = "";//Apg.getMainUserIdSafe(this, keyRing.getMasterKey());
                     }
                 }
 
@@ -337,8 +340,8 @@ public class KeyListActivity extends BaseActivity {
                 Vector<Integer> keyRingIds = new Vector<Integer>();
                 if (mSelectedItem == -1) {
                     keyRingIds = Apg.getKeyRingIds(mKeyType == Id.type.public_key ?
-                                                       Id.database.type_public :
-                                                       Id.database.type_secret);
+                                                       KeyTypes.PUBLIC :
+                                                       KeyTypes.SECRET);
                 } else {
                     int keyRingId = mListAdapter.getKeyRingId(mSelectedItem);
                     keyRingIds.add(keyRingId);
@@ -518,24 +521,24 @@ public class KeyListActivity extends BaseActivity {
             mSearchString = searchString;
 
             mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            mDatabase = Apg.getDatabase().db();
+            mDatabase = null;//new KeychainDatabase(context).db(); //Apg.getDatabase().db();
             SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
-            qb.setTables(KeyRings.TABLE_NAME + " INNER JOIN " + Keys.TABLE_NAME + " ON " +
-                                          "(" + KeyRings.TABLE_NAME + "." + KeyRings._ID + " = " +
-                                          Keys.TABLE_NAME + "." + Keys.KEY_RING_ID + " AND " +
-                                          Keys.TABLE_NAME + "." + Keys.IS_MASTER_KEY + " = '1'" +
+            qb.setTables(Tables.KEY_RINGS + " INNER JOIN " + Tables.KEYS + " ON " +
+                                          "(" + Tables.KEY_RINGS + "." + KeyRings._ID + " = " +
+                                          Tables.KEYS + "." + Keys.KEY_RING_ROW_ID + " AND " +
+                                          Tables.KEYS + "." + Keys.IS_MASTER_KEY + " = '1'" +
                                           ") " +
-                                          " INNER JOIN " + UserIds.TABLE_NAME + " ON " +
-                                          "(" + Keys.TABLE_NAME + "." + Keys._ID + " = " +
-                                          UserIds.TABLE_NAME + "." + UserIds.KEY_ID + " AND " +
-                                          UserIds.TABLE_NAME + "." + UserIds.RANK + " = '0')");
+                                          " INNER JOIN " + Tables.USER_IDS + " ON " +
+                                          "(" + Tables.KEYS + "." + Keys._ID + " = " +
+                                          Tables.USER_IDS + "." + UserIds.KEY_RING_ROW_ID + " AND " +
+                                          Tables.USER_IDS + "." + UserIds.RANK + " = '0')");
 
             if (searchString != null && searchString.trim().length() > 0) {
                 String[] chunks = searchString.trim().split(" +");
                 qb.appendWhere("EXISTS (SELECT tmp." + UserIds._ID + " FROM " +
-                                        UserIds.TABLE_NAME + " AS tmp WHERE " +
-                                        "tmp." + UserIds.KEY_ID + " = " +
-                                        Keys.TABLE_NAME + "." + Keys._ID);
+                                        Tables.USER_IDS + " AS tmp WHERE " +
+                                        "tmp." + UserIds.KEY_RING_ROW_ID + " = " +
+                                        Tables.KEYS + "." + Keys._ID);
                 for (int i = 0; i < chunks.length; ++i) {
                     qb.appendWhere(" AND tmp." + UserIds.USER_ID + " LIKE ");
                     qb.appendWhereEscapeString("%" + chunks[i] + "%");
@@ -545,14 +548,15 @@ public class KeyListActivity extends BaseActivity {
 
             mCursor = qb.query(mDatabase,
                     new String[] {
-                        KeyRings.TABLE_NAME + "." + KeyRings._ID,           // 0
-                        KeyRings.TABLE_NAME + "." + KeyRings.MASTER_KEY_ID, // 1
-                        UserIds.TABLE_NAME + "." + UserIds.USER_ID,         // 2
+                        Tables.KEY_RINGS + "." + KeyRings._ID,           // 0
+                        Tables.KEY_RINGS + "." + KeyRings.MASTER_KEY_ID, // 1
+                        Tables.USER_IDS + "." + UserIds.USER_ID,         // 2
                     },
-                    KeyRings.TABLE_NAME + "." + KeyRings.TYPE + " = ?",
+                    Tables.KEY_RINGS + "." + KeyRings.TYPE + " = ?",
                     new String[] { "" + (mKeyType == Id.type.public_key ?
-                                             Id.database.type_public : Id.database.type_secret) },
-                    null, null, UserIds.TABLE_NAME + "." + UserIds.USER_ID + " ASC");
+                                             KeyTypes.PUBLIC :
+                                             KeyTypes.SECRET) },
+                    null, null, Tables.USER_IDS + "." + UserIds.USER_ID + " ASC");
 
             // content provider way for reference, might have to go back to it sometime:
             /*Uri contentUri = null;
@@ -599,7 +603,7 @@ public class KeyListActivity extends BaseActivity {
 
             mCursor.moveToPosition(groupPosition);
             children = new Vector<KeyChild>();
-            Cursor c = mDatabase.query(Keys.TABLE_NAME,
+            Cursor c = mDatabase.query(Tables.KEYS,
                     new String[] {
                         Keys._ID,           // 0
                         Keys.KEY_ID,        // 1
@@ -609,32 +613,32 @@ public class KeyListActivity extends BaseActivity {
                         Keys.CAN_SIGN,      // 5
                         Keys.CAN_ENCRYPT,   // 6
                     },
-                    Keys.KEY_RING_ID + " = ?",
+                    Keys.KEY_RING_ROW_ID + " = ?",
                     new String[] { mCursor.getString(0) },
                     null, null, Keys.RANK + " ASC");
 
-            int masterKeyId = -1;
+            int keyRingRodId = -1;
             long fingerPrintId = -1;
             for (int i = 0; i < c.getCount(); ++i) {
                 c.moveToPosition(i);
                 children.add(new KeyChild(c.getLong(1), c.getInt(2) == 1, c.getInt(3), c.getInt(4),
                                           c.getInt(5) == 1, c.getInt(6) == 1));
                 if (i == 0) {
-                    masterKeyId = c.getInt(0);
+                    keyRingRodId = c.getInt(0);
                     fingerPrintId = c.getLong(1);
                 }
             }
             c.close();
 
-            if (masterKeyId != -1) {
+            if (keyRingRodId != -1) {
                 children.insertElementAt(
                     new KeyChild(Apg.getPublicKey(fingerPrintId).getFingerprint(), true), 0);
-                c = mDatabase.query(UserIds.TABLE_NAME,
+                c = mDatabase.query(Tables.USER_IDS,
                          new String[] {
                              UserIds.USER_ID, // 0
                          },
-                         UserIds.KEY_ID + " = ? AND " + UserIds.RANK + " > 0",
-                         new String[] { "" + masterKeyId },
+                         UserIds.KEY_RING_ROW_ID + " = ? AND " + UserIds.RANK + " > 0",
+                         new String[] { "" + keyRingRodId },
                          null, null, UserIds.RANK + " ASC");
 
                  for (int i = 0; i < c.getCount(); ++i) {

@@ -40,7 +40,7 @@ import org.thialfihar.android.apg.Id;
 import org.thialfihar.android.apg.R;
 import org.thialfihar.android.apg.core.Key;
 import org.thialfihar.android.apg.core.KeyRing;
-import org.thialfihar.android.apg.provider.Database;
+import org.thialfihar.android.apg.provider.KeychainProvider;
 import org.thialfihar.android.apg.service.PassphraseCacheService;
 import org.thialfihar.android.apg.ui.widget.KeyEditor;
 import org.thialfihar.android.apg.ui.widget.SectionView;
@@ -254,8 +254,6 @@ public class EditKeyActivity extends BaseActivity implements OnClickListener {
         } catch (SignatureException e) {
             error = "" + e;
         } catch (Apg.GeneralException e) {
-            error = "" + e;
-        } catch (Database.GeneralException e) {
             error = "" + e;
         } catch (IOException e) {
             error = "" + e;

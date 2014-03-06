@@ -54,7 +54,7 @@ import org.thialfihar.android.apg.R;
 import org.thialfihar.android.apg.core.Key;
 import org.thialfihar.android.apg.core.KeyRing;
 import org.thialfihar.android.apg.core.exception.PgpGeneralException;
-import org.thialfihar.android.apg.provider.DataProvider;
+import org.thialfihar.android.apg.provider.KeychainProvider;
 import org.thialfihar.android.apg.service.PassphraseCacheService;
 import org.thialfihar.android.apg.ui.dialog.FileDialogFragment;
 import org.thialfihar.android.apg.ui.dialog.PassphraseDialogFragment;
@@ -736,7 +736,7 @@ public class EncryptActivity extends DrawerActivity {
     }
 
     private void selectPublicKeys() {
-        Intent intent = new Intent(this, SelectPublicKeyListActivity.class);
+        Intent intent = new Intent(this, SelectPublicKeyActivity.class);
         Vector<Long> keyIds = new Vector<Long>();
         if (mSecretKeyId != 0) {
             keyIds.add(mSecretKeyId);
@@ -758,7 +758,7 @@ public class EncryptActivity extends DrawerActivity {
     }
 
     private void selectSecretKey() {
-        Intent intent = new Intent(this, SelectSecretKeyListActivity.class);
+        Intent intent = new Intent(this, SelectSecretKeyActivity.class);
         startActivityForResult(intent, Id.request.secret_keys);
     }
 

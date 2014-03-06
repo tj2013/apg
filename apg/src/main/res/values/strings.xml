@@ -75,6 +75,7 @@
     <string name="btn_change_passphrase">Change Pass Phrase</string>
     <string name="btn_set_passphrase">Set Pass Phrase</string>
     <string name="btn_search">Search</string>
+    <string name="btn_okay">Ok</string>
 
     <!-- nav_lower_case: capitalized single words -->
     <string name="nav_encrypt">Encrypt</string>
@@ -221,6 +222,7 @@
     <string name="key_editing_is_beta">Key editing is still kind of beta.</string>
     <string name="bad_keys_encountered">%s bad secret key(s) ignored. Perhaps you exported with the option\n --export-secret-subkeys\nMake sure you export with\n --export-secret-keys\ninstead.</string>
     <string name="lookup_unknown_key">Unknown key %s, do you want to try finding it on a keyserver?</string>
+    <string name="list_empty">This list is empty.</string>
 
     <!-- error_lower_case: phrases, no punctuation, all lowercase,
          they will be put after "error_message", e.g. "Error: file not found" -->
@@ -286,6 +288,16 @@
     <string name="progress_deleting_securely">deleting \'%s\' securely...</string>
     <string name="progress_querying">querying...</string>
     <string name="progress_querying_erver">querying %s...</string>
+
+    <string name="api_settings_show_advanced">Show advanced settings</string>
+    <string name="api_settings_hide_advanced">Hide advanced settings</string>
+    <string name="api_settings_no_key">No key selected</string>
+    <string name="api_settings_select_key">Select key</string>
+    <string name="api_settings_save">Save</string>
+    <string name="api_settings_cancel">Cancel</string>
+    <string name="api_settings_revoke">Revoke access</string>
+    <string name="api_settings_package_name">Package Name</string>
+    <string name="api_settings_package_signature">SHA-256 of Package Signature</string>
 
     <!-- permission strings -->
     <string name="permission_read_key_details_label">Read key details from APG.</string>

@@ -77,7 +77,7 @@
             android:configChanges="keyboardHidden|orientation|keyboard"/>
 
         <activity
-            android:name=".ui.SelectPublicKeyListActivity"
+            android:name=".ui.SelectPublicKeyActivity"
             android:label="@string/title_select_recipients"
             android:configChanges="keyboardHidden|orientation|keyboard"
             android:launchMode="singleTop">
@@ -98,7 +98,7 @@
         </activity>
 
         <activity
-            android:name=".ui.SelectSecretKeyListActivity"
+            android:name=".ui.SelectSecretKeyActivity"
             android:label="@string/title_select_signature"
             android:configChanges="keyboardHidden|orientation|keyboard"
             android:launchMode="singleTop">
@@ -202,7 +202,7 @@
 
         <provider
             android:readPermission="org.thialfihar.android.apg.permission.READ_KEY_DETAILS"
-            android:name="org.thialfihar.android.apg.provider.DataProvider"
+            android:name="org.thialfihar.android.apg.provider.KeychainProvider"
             android:authorities="org.thialfihar.android.apg.provider"/>
 
     </application>
