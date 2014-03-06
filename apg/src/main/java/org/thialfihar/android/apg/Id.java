@@ -20,111 +20,111 @@ import org.bouncycastle2.bcpg.CompressionAlgorithmTags;
 
 public final class Id {
     public static final class menu {
-        public static final int export = 0x21070001;
-        public static final int delete = 0x21070002;
-        public static final int edit = 0x21070003;
-        public static final int update = 0x21070004;
+        public static final int export = 0x0001;
+        public static final int delete = 0x0002;
+        public static final int edit = 0x0003;
+        public static final int update = 0x0004;
 
         public static final class option {
-            public static final int new_passphrase = 0x21070001;
-            public static final int create = 0x21070002;
-            public static final int about = 0x21070003;
-            public static final int manage_public_keys = 0x21070004;
-            public static final int manage_secret_keys = 0x21070005;
-            public static final int import_keys = 0x21070006;
-            public static final int export_keys = 0x21070007;
-            public static final int preferences = 0x21070008;
-            public static final int search = 0x21070009;
-            public static final int help = 0x21070010;
-            public static final int key_server = 0x21070011;
+            public static final int new_passphrase = 0x0001;
+            public static final int create = 0x0002;
+            public static final int about = 0x0003;
+            public static final int manage_public_keys = 0x0004;
+            public static final int manage_secret_keys = 0x0005;
+            public static final int import_keys = 0x0006;
+            public static final int export_keys = 0x0007;
+            public static final int preferences = 0x0008;
+            public static final int search = 0x0009;
+            public static final int help = 0x0010;
+            public static final int key_server = 0x0011;
         }
     }
 
     public static final class message {
-        public static final int progress_update = 0x21070001;
-        public static final int done = 0x21070002;
-        public static final int import_keys = 0x21070003;
-        public static final int export_keys = 0x21070004;
-        public static final int import_done = 0x21070005;
-        public static final int export_done = 0x21070006;
-        public static final int create_key = 0x21070007;
-        public static final int edit_key = 0x21070008;
-        public static final int delete_done = 0x21070009;
-        public static final int query_done = 0x21070010;
-        public static final int unknown_signature_key = 0x21070011;
+        public static final int progress_update = 0x0001;
+        public static final int done = 0x0002;
+        public static final int import_keys = 0x0003;
+        public static final int export_keys = 0x0004;
+        public static final int import_done = 0x0005;
+        public static final int export_done = 0x0006;
+        public static final int create_key = 0x0007;
+        public static final int edit_key = 0x0008;
+        public static final int delete_done = 0x0009;
+        public static final int query_done = 0x0010;
+        public static final int unknown_signature_key = 0x0011;
     }
 
     public static final class request {
-        public static final int public_keys = 0x21070001;
-        public static final int secret_keys = 0x21070002;
-        public static final int filename = 0x21070003;
-        public static final int output_filename = 0x21070004;
-        public static final int key_server_preference = 0x21070005;
-        public static final int look_up_key_id = 0x21070006;
+        public static final int public_keys = 0x0001;
+        public static final int secret_keys = 0x0002;
+        public static final int filename = 0x0003;
+        public static final int output_filename = 0x0004;
+        public static final int key_server_preference = 0x0005;
+        public static final int look_up_key_id = 0x0006;
     }
 
     public static final class dialog {
-        public static final int passphrase = 0x21070001;
-        public static final int encrypting = 0x21070002;
-        public static final int decrypting = 0x21070003;
-        public static final int new_passphrase = 0x21070004;
-        public static final int passphrases_do_not_match = 0x21070005;
-        public static final int no_passphrase = 0x21070006;
-        public static final int saving = 0x21070007;
-        public static final int delete_key = 0x21070008;
-        public static final int import_keys = 0x21070009;
-        public static final int importing = 0x2107000a;
-        public static final int export_key = 0x2107000b;
-        public static final int export_keys = 0x2107000c;
-        public static final int exporting = 0x2107000d;
-        public static final int new_account = 0x2107000e;
-        public static final int about = 0x2107000f;
-        public static final int change_log = 0x21070010;
-        public static final int output_filename = 0x21070011;
-        public static final int delete_file = 0x21070012;
-        public static final int deleting = 0x21070013;
-        public static final int help = 0x21070014;
-        public static final int querying = 0x21070015;
-        public static final int lookup_unknown_key = 0x21070016;
+        public static final int passphrase = 0x0001;
+        public static final int encrypting = 0x0002;
+        public static final int decrypting = 0x0003;
+        public static final int new_passphrase = 0x0004;
+        public static final int passphrases_do_not_match = 0x0005;
+        public static final int no_passphrase = 0x0006;
+        public static final int saving = 0x0007;
+        public static final int delete_key = 0x0008;
+        public static final int import_keys = 0x0009;
+        public static final int importing = 0x000a;
+        public static final int export_key = 0x000b;
+        public static final int export_keys = 0x000c;
+        public static final int exporting = 0x000d;
+        public static final int new_account = 0x000e;
+        public static final int about = 0x000f;
+        public static final int change_log = 0x0010;
+        public static final int output_filename = 0x0011;
+        public static final int delete_file = 0x0012;
+        public static final int deleting = 0x0013;
+        public static final int help = 0x0014;
+        public static final int querying = 0x0015;
+        public static final int lookup_unknown_key = 0x0016;
     }
 
     public static final class task {
-        public static final int import_keys = 0x21070001;
-        public static final int export_keys = 0x21070002;
+        public static final int import_keys = 0x0001;
+        public static final int export_keys = 0x0002;
     }
 
     public static final class type {
-        public static final int public_key = 0x21070001;
-        public static final int secret_key = 0x21070002;
-        public static final int user_id = 0x21070003;
-        public static final int key = 0x21070004;
+        public static final int public_key = 0x0001;
+        public static final int secret_key = 0x0002;
+        public static final int user_id = 0x0003;
+        public static final int key = 0x0004;
     }
 
     public static final class choice {
         public static final class algorithm {
-            public static final int dsa = 0x21070001;
-            public static final int elgamal = 0x21070002;
-            public static final int rsa = 0x21070003;
+            public static final int dsa = 0x0001;
+            public static final int elgamal = 0x0002;
+            public static final int rsa = 0x0003;
         }
 
         public static final class compression {
-            public static final int none = 0x21070001;
+            public static final int none = 0x0001;
             public static final int zlib = CompressionAlgorithmTags.ZLIB;
             public static final int bzip2 = CompressionAlgorithmTags.BZIP2;
             public static final int zip = CompressionAlgorithmTags.ZIP;
         }
 
         public static final class usage {
-            public static final int sign_only = 0x21070001;
-            public static final int encrypt_only = 0x21070002;
-            public static final int sign_and_encrypt = 0x21070003;
+            public static final int sign_only = 0x0001;
+            public static final int encrypt_only = 0x0002;
+            public static final int sign_and_encrypt = 0x0003;
         }
 
         public static final class action {
-            public static final int encrypt = 0x21070001;
-            public static final int decrypt = 0x21070002;
-            public static final int import_public = 0x21070003;
-            public static final int import_secret = 0x21070004;
+            public static final int encrypt = 0x0001;
+            public static final int decrypt = 0x0002;
+            public static final int import_public = 0x0003;
+            public static final int import_secret = 0x0004;
         }
     }
 
@@ -137,17 +137,17 @@ public final class Id {
     }
 
     public static final class target {
-        public static final int clipboard = 0x21070001;
-        public static final int email = 0x21070002;
-        public static final int file = 0x21070003;
-        public static final int message = 0x21070004;
+        public static final int clipboard = 0x0001;
+        public static final int email = 0x0002;
+        public static final int file = 0x0003;
+        public static final int message = 0x0004;
     }
 
     public static final class mode {
-        public static final int undefined = 0x21070001;
-        public static final int byte_array = 0x21070002;
-        public static final int file = 0x21070003;
-        public static final int stream = 0x21070004;
+        public static final int undefined = 0x0001;
+        public static final int byte_array = 0x0002;
+        public static final int file = 0x0003;
+        public static final int stream = 0x0004;
     }
 
     public static final class key {
@@ -162,7 +162,7 @@ public final class Id {
     }
 
     public static final class query {
-        public static final int search = 0x21070001;
-        public static final int get = 0x21070002;
+        public static final int search = 0x0001;
+        public static final int get = 0x0002;
     }
 }

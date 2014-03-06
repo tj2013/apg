@@ -28,8 +28,11 @@ import java.security.SecureRandom;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Utils {
+    private static final Pattern USER_ID_PATTERN = Pattern.compile("^(.*?)(?: \\((.*)\\))?(?: <(.*)>)?$");
 
     public static long getNumDaysBetween(Date first, GregorianCalendar second) {
         GregorianCalendar tmp = new GregorianCalendar();
@@ -119,5 +122,33 @@ public class Utils {
 
     public static String getFullVersion(Context context) {
         return "APG v" + getVersion(context);
+    }
+
+    public static String[] splitUserId(String userId) {
+        String[] result = new String[] { null, null, null };
+
+        if (userId == null || userId.equals("")) {
+            return result;
+        }
+
+        /*
+         * User ID matching:
+         * http://fiddle.re/t4p6f
+         *
+         * test cases:
+         * "Max Mustermann (this is a comment) <max@example.com>"
+         * "Max Mustermann <max@example.com>"
+         * "Max Mustermann (this is a comment)"
+         * "Max Mustermann [this is nothing]"
+         */
+        Matcher matcher = USER_ID_PATTERN.matcher(userId);
+        if (matcher.matches()) {
+            result[0] = matcher.group(1);
+            result[1] = matcher.group(3);
+            result[2] = matcher.group(2);
+            return result;
+        }
+
+        return result;
     }
 }

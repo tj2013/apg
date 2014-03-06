@@ -29,9 +29,9 @@ import android.widget.TextView;
 
 import org.thialfihar.android.apg.Id;
 import org.thialfihar.android.apg.R;
-//import org.thialfihar.android.apg.pgp.PgpKeyHelper;
 import org.thialfihar.android.apg.provider.KeychainContract.KeyRings;
 import org.thialfihar.android.apg.provider.KeychainContract.UserIds;
+import org.thialfihar.android.apg.util.Utils;
 
 public class SelectKeyCursorAdapter extends CursorAdapter {
 
@@ -101,7 +101,7 @@ public class SelectKeyCursorAdapter extends CursorAdapter {
         TextView status = (TextView) view.findViewById(R.id.status);
 
         String userId = cursor.getString(mIndexUserId);
-        String[] userIdSplit = new String[1];//PgpKeyHelper.splitUserId(userId);
+        String[] userIdSplit = Utils.splitUserId(userId);
 
         if (userIdSplit[0] != null) {
             mainUserId.setText(userIdSplit[0]);
@@ -117,7 +117,7 @@ public class SelectKeyCursorAdapter extends CursorAdapter {
         // TODO: needed to key id to no?
         keyId.setText(R.string.no_key);
         long masterKeyId = cursor.getLong(mIndexMasterKeyId);
-        keyId.setText("");//PgpKeyHelper.convertKeyIdToHex(masterKeyId));
+        keyId.setText(Utils.toHexString(masterKeyId, 8));
 
         // TODO: needed to set unknown_status?
         status.setText(R.string.unknown_status);

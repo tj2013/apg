@@ -31,7 +31,7 @@ import org.thialfihar.android.apg.util.Log;
 
 public class KeychainDatabase extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "apg";
-    private static final int DATABASE_VERSION = 2;
+    private static final int DATABASE_VERSION = 4;
 
     public interface Tables {
         String KEY_RINGS = "key_rings";
@@ -96,7 +96,7 @@ public class KeychainDatabase extends SQLiteOpenHelper {
 
         // Upgrade from oldVersion through all cases to newest one
         for (int version = oldVersion; version < newVersion; ++version) {
-            Log.w(Constants.TAG, "Upgrading database to version " + version);
+            Log.w(Constants.TAG, "Upgrading database to version " + (version + 1));
 
             switch (version) {
                 case 3:
@@ -104,6 +104,8 @@ public class KeychainDatabase extends SQLiteOpenHelper {
                                     " INTEGER DEFAULT 0;");
                     db.execSQL("UPDATE " + Tables.KEYS + " SET " + KeysColumns.CAN_CERTIFY +
                                     " = 1 WHERE " + KeysColumns.IS_MASTER_KEY + " = 1;");
+                    db.execSQL("ALTER TABLE " + Tables.KEYS + " ADD COLUMN " + KeysColumns.RANK +
+                                    " INTEGER DEFAULT 0;");
                     break;
                 default:
                     break;

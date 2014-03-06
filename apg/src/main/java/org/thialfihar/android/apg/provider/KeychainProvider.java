@@ -72,40 +72,7 @@ public class KeychainProvider extends ContentProvider {
 
     private static final UriMatcher sUriMatcher;
 
-    public static HashMap<String, String> sKeyRingsProjection;
-    public static HashMap<String, String> sKeysProjection;
-    public static HashMap<String, String> sUserIdsProjection;
-
     static {
-        sKeyRingsProjection = new HashMap<String, String>();
-        sKeyRingsProjection.put(KeyRings._ID, KeyRings._ID);
-        sKeyRingsProjection.put(KeyRings.MASTER_KEY_ID, KeyRings.MASTER_KEY_ID);
-        sKeyRingsProjection.put(KeyRings.TYPE, KeyRings.TYPE);
-        sKeyRingsProjection.put(KeyRings.WHO_ID, KeyRings.WHO_ID);
-        sKeyRingsProjection.put(KeyRings.KEY_RING_DATA, KeyRings.KEY_RING_DATA);
-
-        sKeysProjection = new HashMap<String, String>();
-        sKeysProjection.put(Keys._ID, Keys._ID);
-        sKeysProjection.put(Keys.KEY_ID, Keys.KEY_ID);
-        sKeysProjection.put(Keys.TYPE, Keys.TYPE);
-        sKeysProjection.put(Keys.IS_MASTER_KEY, Keys.IS_MASTER_KEY);
-        sKeysProjection.put(Keys.ALGORITHM, Keys.ALGORITHM);
-        sKeysProjection.put(Keys.KEY_SIZE, Keys.KEY_SIZE);
-        sKeysProjection.put(Keys.CAN_SIGN, Keys.CAN_SIGN);
-        sKeysProjection.put(Keys.CAN_CERTIFY, Keys.CAN_CERTIFY);
-        sKeysProjection.put(Keys.CAN_ENCRYPT, Keys.CAN_ENCRYPT);
-        sKeysProjection.put(Keys.IS_REVOKED, Keys.IS_REVOKED);
-        sKeysProjection.put(Keys.CREATION, Keys.CREATION);
-        sKeysProjection.put(Keys.EXPIRY, Keys.EXPIRY);
-        sKeysProjection.put(Keys.KEY_DATA, Keys.KEY_DATA);
-        sKeysProjection.put(Keys.RANK, Keys.RANK);
-
-        sUserIdsProjection = new HashMap<String, String>();
-        sUserIdsProjection.put(UserIds._ID, UserIds._ID);
-        sUserIdsProjection.put(UserIds.KEY_RING_ROW_ID, UserIds.KEY_RING_ROW_ID);
-        sUserIdsProjection.put(UserIds.USER_ID, UserIds.USER_ID);
-        sUserIdsProjection.put(UserIds.RANK, UserIds.RANK);
-
         sUriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
         sUriMatcher.addURI(AUTHORITY, "key_rings/public/master_key_id/*", PUBLIC_KEY_RING_BY_MASTER_KEY_ID);
         sUriMatcher.addURI(AUTHORITY, "key_rings/public/key_id/*", PUBLIC_KEY_RING_BY_KEY_ID);
@@ -146,6 +113,52 @@ public class KeychainProvider extends ContentProvider {
         mKeychainDatabase = new KeychainDatabase(getContext());
         return true;
     }
+
+    private HashMap<String, String> getProjectionMapForKeyRings() {
+        HashMap<String, String> projectionMap = new HashMap<String, String>();
+
+        projectionMap.put(BaseColumns._ID, Tables.KEY_RINGS + "." + BaseColumns._ID);
+        projectionMap.put(KeyRingsColumns.KEY_RING_DATA, Tables.KEY_RINGS + "."
+                + KeyRingsColumns.KEY_RING_DATA);
+        projectionMap.put(KeyRingsColumns.MASTER_KEY_ID, Tables.KEY_RINGS + "." + KeyRingsColumns.MASTER_KEY_ID);
+        // TODO: deprecated master key id
+        //projectionMap.put(KeyRingsColumns.MASTER_KEY_ID, Tables.KEYS + "." + KeysColumns.KEY_ID);
+
+        //projectionMap.put(KeysColumns.FINGERPRINT, Tables.KEYS + "." + KeysColumns.FINGERPRINT);
+        projectionMap.put(KeysColumns.IS_REVOKED, Tables.KEYS + "." + KeysColumns.IS_REVOKED);
+
+        projectionMap.put(UserIdsColumns.USER_ID, Tables.USER_IDS + "." + UserIdsColumns.USER_ID);
+
+        return projectionMap;
+    }
+
+    /**
+     * Set result of query to specific columns, don't show blob column
+     *
+     * @return
+     */
+    private HashMap<String, String> getProjectionMapForKeys() {
+        HashMap<String, String> projectionMap = new HashMap<String, String>();
+
+        projectionMap.put(BaseColumns._ID, BaseColumns._ID);
+        projectionMap.put(KeysColumns.KEY_ID, KeysColumns.KEY_ID);
+        projectionMap.put(KeysColumns.IS_MASTER_KEY, KeysColumns.IS_MASTER_KEY);
+        projectionMap.put(KeysColumns.ALGORITHM, KeysColumns.ALGORITHM);
+        projectionMap.put(KeysColumns.KEY_SIZE, KeysColumns.KEY_SIZE);
+        projectionMap.put(KeysColumns.CAN_CERTIFY, KeysColumns.CAN_CERTIFY);
+        projectionMap.put(KeysColumns.CAN_SIGN, KeysColumns.CAN_SIGN);
+        projectionMap.put(KeysColumns.CAN_ENCRYPT, KeysColumns.CAN_ENCRYPT);
+        projectionMap.put(KeysColumns.IS_REVOKED, KeysColumns.IS_REVOKED);
+        projectionMap.put(KeysColumns.CREATION, KeysColumns.CREATION);
+        projectionMap.put(KeysColumns.EXPIRY, KeysColumns.EXPIRY);
+        projectionMap.put(KeysColumns.KEY_RING_ROW_ID, KeysColumns.KEY_RING_ROW_ID);
+        projectionMap.put(KeysColumns.KEY_DATA, KeysColumns.KEY_DATA);
+        projectionMap.put(KeysColumns.RANK, KeysColumns.RANK);
+        //projectionMap.put(KeysColumns.FINGERPRINT, KeysColumns.FINGERPRINT);
+
+        return projectionMap;
+    }
+
 
     /**
      * {@inheritDoc}
@@ -253,7 +266,7 @@ public class KeychainProvider extends ContentProvider {
                 + UserIdsColumns.KEY_RING_ROW_ID + " AND " + Tables.USER_IDS + "."
                 + UserIdsColumns.RANK + " = '0')");
 
-        qb.setProjectionMap(sKeyRingsProjection);
+        qb.setProjectionMap(getProjectionMapForKeyRings());
 
         return qb;
     }
@@ -276,7 +289,7 @@ public class KeychainProvider extends ContentProvider {
                 + UserIdsColumns.KEY_RING_ROW_ID + " AND " + Tables.USER_IDS + "."
                 + UserIdsColumns.RANK + " = '0')");
 
-        qb.setProjectionMap(sKeyRingsProjection);
+        qb.setProjectionMap(getProjectionMapForKeyRings());
 
         return qb;
     }
@@ -399,7 +412,7 @@ public class KeychainProvider extends ContentProvider {
                 qb.appendWhere(" AND " + KeysColumns.KEY_RING_ROW_ID + " = ");
                 qb.appendWhereEscapeString(uri.getPathSegments().get(2));
 
-                qb.setProjectionMap(sKeysProjection);
+                qb.setProjectionMap(getProjectionMapForKeys());
 
                 break;
 
@@ -415,7 +428,7 @@ public class KeychainProvider extends ContentProvider {
                 qb.appendWhere(" AND " + BaseColumns._ID + " = ");
                 qb.appendWhereEscapeString(uri.getLastPathSegment());
 
-                qb.setProjectionMap(sKeysProjection);
+                qb.setProjectionMap(getProjectionMapForKeys());
 
                 break;
 
