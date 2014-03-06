@@ -265,13 +265,13 @@ public class Key {
         }
     }
 
-    public PGPPrivateKey extractPrivateKey(String passPhrase) throws PGPException {
+    public PGPPrivateKey extractPrivateKey(String passphrase) throws PGPException {
         if (isPublic()) {
             return null;
         }
         PBESecretKeyDecryptor keyDecryptor =
             new JcePBESecretKeyDecryptorBuilder().setProvider(
-                Constants.BOUNCY_CASTLE_PROVIDER_NAME).build(passPhrase.toCharArray());
+                Constants.BOUNCY_CASTLE_PROVIDER_NAME).build(passphrase.toCharArray());
         return extractPrivateKey(keyDecryptor);
     }
 

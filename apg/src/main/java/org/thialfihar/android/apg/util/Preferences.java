@@ -52,8 +52,8 @@ public class Preferences {
         editor.commit();
     }
 
-    public int getPassPhraseCacheTtl() {
-        int ttl = mSharedPreferences.getInt(Constants.pref.pass_phrase_cache_ttl, 180);
+    public int getPassphraseCacheTtl() {
+        int ttl = mSharedPreferences.getInt(Constants.pref.passphrase_cache_ttl, 180);
         // fix the value if it was set to "never" in previous versions, which currently is not
         // supported
         if (ttl == 0) {
@@ -62,9 +62,9 @@ public class Preferences {
         return ttl;
     }
 
-    public void setPassPhraseCacheTtl(int value) {
+    public void setPassphraseCacheTtl(int value) {
         SharedPreferences.Editor editor = mSharedPreferences.edit();
-        editor.putInt(Constants.pref.pass_phrase_cache_ttl, value);
+        editor.putInt(Constants.pref.passphrase_cache_ttl, value);
         editor.commit();
     }
 

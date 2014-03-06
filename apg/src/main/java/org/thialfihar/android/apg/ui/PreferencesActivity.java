@@ -40,7 +40,7 @@ import java.util.Vector;
 
 public class PreferencesActivity extends PreferenceActivity {
     private ListPreference mLanguage = null;
-    private IntegerListPreference mPassPhraseCacheTtl = null;
+    private IntegerListPreference mPassphraseCacheTtl = null;
     private IntegerListPreference mEncryptionAlgorithm = null;
     private IntegerListPreference mHashAlgorithm = null;
     private IntegerListPreference mMessageCompression = null;
@@ -87,16 +87,16 @@ public class PreferencesActivity extends PreferenceActivity {
             }
         });
 
-        mPassPhraseCacheTtl = (IntegerListPreference) findPreference(Constants.pref.pass_phrase_cache_ttl);
-        mPassPhraseCacheTtl.setValue("" + mPreferences.getPassPhraseCacheTtl());
-        mPassPhraseCacheTtl.setSummary(mPassPhraseCacheTtl.getEntry());
-        mPassPhraseCacheTtl.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener()
+        mPassphraseCacheTtl = (IntegerListPreference) findPreference(Constants.pref.passphrase_cache_ttl);
+        mPassphraseCacheTtl.setValue("" + mPreferences.getPassphraseCacheTtl());
+        mPassphraseCacheTtl.setSummary(mPassphraseCacheTtl.getEntry());
+        mPassphraseCacheTtl.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener()
         {
             public boolean onPreferenceChange(Preference preference, Object newValue)
             {
-                mPassPhraseCacheTtl.setValue(newValue.toString());
-                mPassPhraseCacheTtl.setSummary(mPassPhraseCacheTtl.getEntry());
-                mPreferences.setPassPhraseCacheTtl(Integer.parseInt(newValue.toString()));
+                mPassphraseCacheTtl.setValue(newValue.toString());
+                mPassphraseCacheTtl.setSummary(mPassphraseCacheTtl.getEntry());
+                mPreferences.setPassphraseCacheTtl(Integer.parseInt(newValue.toString()));
                 return false;
             }
         });

@@ -91,8 +91,8 @@ public class EncryptActivity extends BaseActivity {
 
     private int mEncryptTarget;
 
-    private EditText mPassPhrase = null;
-    private EditText mPassPhraseAgain = null;
+    private EditText mPassphrase = null;
+    private EditText mPassphraseAgain = null;
     private CheckBox mAsciiArmor = null;
     private Spinner mFileCompression = null;
 
@@ -416,17 +416,17 @@ public class EncryptActivity extends BaseActivity {
 
         // symmetric encryption
         if (mMode.getCurrentView().getId() == R.id.modeSymmetric) {
-            boolean gotPassPhrase = false;
-            String passPhrase = mPassPhrase.getText().toString();
-            String passPhraseAgain = mPassPhraseAgain.getText().toString();
-            if (!passPhrase.equals(passPhraseAgain)) {
-                Toast.makeText(this, R.string.pass_phrases_do_not_match, Toast.LENGTH_SHORT).show();
+            boolean gotPassphrase = false;
+            String passphrase = mPassphrase.getText().toString();
+            String passphraseAgain = mPassphraseAgain.getText().toString();
+            if (!passphrase.equals(passphraseAgain)) {
+                Toast.makeText(this, R.string.passphrases_do_not_match, Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            gotPassPhrase = (passPhrase.length() != 0);
-            if (!gotPassPhrase) {
-                Toast.makeText(this, R.string.pass_phrase_must_not_be_empty, Toast.LENGTH_SHORT).show();
+            gotPassphrase = (passphrase.length() != 0);
+            if (!gotPassphrase) {
+                Toast.makeText(this, R.string.passphrase_must_not_be_empty, Toast.LENGTH_SHORT).show();
                 return;
             }
         } else {
@@ -443,9 +443,9 @@ public class EncryptActivity extends BaseActivity {
                 return;
             }
 
-            if (getSecretKeyId() != 0 &&
-                PassphraseCacheService.getCachedPassphrase(this, getSecretKeyId()) == null) {
-                showDialog(Id.dialog.pass_phrase);
+            if (mSecretKeyId != 0 &&
+                PassphraseCacheService.getCachedPassphrase(this, mSecretKeyId) == null) {
+                showDialog(Id.dialog.passphrase);
                 return;
             }
         }
@@ -462,8 +462,8 @@ public class EncryptActivity extends BaseActivity {
     }
 
     @Override
-    public void passPhraseCallback(long keyId, String passPhrase) {
-        super.passPhraseCallback(keyId, passPhrase);
+    public void passphraseCallback(long keyId, String passphrase) {
+        super.passphraseCallback(keyId, passphrase);
         if (mEncryptTarget == Id.target.file) {
             askForOutputFilename();
         } else {
@@ -491,11 +491,11 @@ public class EncryptActivity extends BaseActivity {
             int compressionId = 0;
             boolean signOnly = false;
 
-            String passPhrase = null;
+            String passphrase = null;
             if (mMode.getCurrentView().getId() == R.id.modeSymmetric) {
-                passPhrase = mPassPhrase.getText().toString();
-                if (passPhrase.length() == 0) {
-                    passPhrase = null;
+                passphrase = mPassphrase.getText().toString();
+                if (passphrase.length() == 0) {
+                    passphrase = null;
                 }
             } else {
                 encryptionKeyIds = mEncryptionKeyIds;
@@ -525,13 +525,13 @@ public class EncryptActivity extends BaseActivity {
             if (mGenerateSignature) {
                Apg.generateSignature(this, in, out, useAsciiArmor, mDataSource.isBinary(),
                                      getSecretKeyId(),
-                                     PassphraseCacheService.getCachedPassphrase(this, getSecretKeyId()),
+                                     PassphraseCacheService.getCachedPassphrase(this, mSecretKeyId),
                                      mPreferences.getDefaultHashAlgorithm(),
                                      mPreferences.getForceV3Signatures(),
                                      this);
             } else if (signOnly) {
-                Apg.signText(this, in, out, getSecretKeyId(),
-                             PassphraseCacheService.getCachedPassphrase(this, getSecretKeyId()),
+                Apg.signText(this, in, out, mSecretKeyId,
+                             PassphraseCacheService.getCachedPassphrase(this, mSecretKeyId),
                              mPreferences.getDefaultHashAlgorithm(),
                              mPreferences.getForceV3Signatures(),
                              this);
@@ -543,7 +543,7 @@ public class EncryptActivity extends BaseActivity {
                             mPreferences.getDefaultHashAlgorithm(),
                             compressionId,
                             mPreferences.getForceV3Signatures(),
-                            passPhrase);
+                            passphrase);
             }
 
             out.close();
@@ -668,8 +668,8 @@ public class EncryptActivity extends BaseActivity {
         mMainUserId = (TextView) findViewById(R.id.mainUserId);
         mMainUserIdRest = (TextView) findViewById(R.id.mainUserIdRest);
 
-        mPassPhrase = (EditText) findViewById(R.id.passPhrase);
-        mPassPhraseAgain = (EditText) findViewById(R.id.passPhraseAgain);
+        mPassphrase = (EditText) findViewById(R.id.passphrase);
+        mPassphraseAgain = (EditText) findViewById(R.id.passphraseAgain);
 
         // measure the height of the source_file view and set the message view's min height to that,
         // so it fills mSource fully... bit of a hack.

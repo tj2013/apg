@@ -16,7 +16,7 @@
 
 <resources>
 
-    <string-array name="pass_phrase_cache_ttl_entries">
+    <string-array name="passphrase_cache_ttl_entries">
         <item>@string/choice_15secs</item>
         <item>@string/choice_1min</item>
         <item>@string/choice_3mins</item>
@@ -30,7 +30,7 @@
         <item>@string/choice_8hours</item>
     </string-array>
 
-    <string-array name="pass_phrase_cache_ttl_values">
+    <string-array name="passphrase_cache_ttl_values">
         <item>15</item>
         <item>60</item>
         <item>180</item>

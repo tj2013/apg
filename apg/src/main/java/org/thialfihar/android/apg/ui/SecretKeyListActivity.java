@@ -29,7 +29,7 @@ import android.widget.ExpandableListView.ExpandableListContextMenuInfo;
 import android.widget.ExpandableListView.OnChildClickListener;
 
 import org.thialfihar.android.apg.Apg;
-import org.thialfihar.android.apg.AskForSecretKeyPassPhrase;
+import org.thialfihar.android.apg.AskForSecretKeyPassphrase;
 import org.thialfihar.android.apg.Constants;
 import org.thialfihar.android.apg.Id;
 import org.thialfihar.android.apg.R;
@@ -103,7 +103,7 @@ public class SecretKeyListActivity extends KeyListActivity implements OnChildCli
         switch (menuItem.getItemId()) {
             case Id.menu.edit: {
                 mSelectedItem = groupPosition;
-                checkPassPhraseAndEdit();
+                checkPassphraseAndEdit();
                 return true;
             }
 
@@ -116,16 +116,16 @@ public class SecretKeyListActivity extends KeyListActivity implements OnChildCli
     public boolean onChildClick(ExpandableListView parent, View v, int groupPosition,
                                 int childPosition, long id) {
         mSelectedItem = groupPosition;
-        checkPassPhraseAndEdit();
+        checkPassphraseAndEdit();
         return true;
     }
 
     @Override
     protected Dialog onCreateDialog(int id) {
         switch (id) {
-            case Id.dialog.pass_phrase: {
+            case Id.dialog.passphrase: {
                 long keyId = ((KeyListAdapter) mList.getExpandableListAdapter()).getGroupId(mSelectedItem);
-                return AskForSecretKeyPassPhrase.createDialog(this, keyId, this);
+                return AskForSecretKeyPassphrase.createDialog(this, keyId, this);
             }
 
             default: {
@@ -134,26 +134,26 @@ public class SecretKeyListActivity extends KeyListActivity implements OnChildCli
         }
     }
 
-    public void checkPassPhraseAndEdit() {
+    public void checkPassphraseAndEdit() {
         long keyId = ((KeyListAdapter) mList.getExpandableListAdapter()).getGroupId(mSelectedItem);
-        String passPhrase = PassphraseCacheService.getCachedPassphrase(this, keyId);
-        if (passPhrase == null) {
-            showDialog(Id.dialog.pass_phrase);
+        String passphrase = PassphraseCacheService.getCachedPassphrase(this, keyId);
+        if (passphrase == null) {
+            showDialog(Id.dialog.passphrase);
         } else {
-            Apg.setEditPassPhrase(passPhrase);
+            Apg.setEditPassphrase(passphrase);
             editKey();
         }
     }
 
     @Override
-    public void passPhraseCallback(long keyId, String passPhrase) {
-        super.passPhraseCallback(keyId, passPhrase);
-        Apg.setEditPassPhrase(passPhrase);
+    public void passphraseCallback(long keyId, String passphrase) {
+        super.passphraseCallback(keyId, passphrase);
+        Apg.setEditPassphrase(passphrase);
         editKey();
     }
 
     private void createKey() {
-        Apg.setEditPassPhrase("");
+        Apg.setEditPassphrase("");
         Intent intent = new Intent(this, EditKeyActivity.class);
         startActivityForResult(intent, Id.message.create_key);
     }

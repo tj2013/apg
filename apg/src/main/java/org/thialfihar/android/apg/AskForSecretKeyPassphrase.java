@@ -32,13 +32,13 @@ import org.bouncycastle2.openpgp.PGPPrivateKey;
 
 import org.thialfihar.android.apg.core.Key;
 
-public class AskForSecretKeyPassPhrase {
-    public static interface PassPhraseCallbackInterface {
-        void passPhraseCallback(long keyId, String passPhrase);
+public class AskForSecretKeyPassphrase {
+    public static interface PassphraseCallbackInterface {
+        void passphraseCallback(long keyId, String passphrase);
     }
 
     public static Dialog createDialog(Activity context, long secretKeyId,
-                                      PassPhraseCallbackInterface callback) {
+                                      PassphraseCallbackInterface callback) {
         AlertDialog.Builder alert = new AlertDialog.Builder(context);
 
         alert.setTitle(R.string.title_authentication);
@@ -48,7 +48,7 @@ public class AskForSecretKeyPassPhrase {
 
         if (secretKeyId == Id.key.symmetric || secretKeyId == Id.key.none) {
             secretKey = null;
-            alert.setMessage(context.getString(R.string.pass_phrase_for_symmetric_encryption));
+            alert.setMessage(context.getString(R.string.passphrase_for_symmetric_encryption));
         } else {
             secretKey = Apg.getSecretKeyRing(secretKeyId).getMasterKey();
             if (secretKey == null) {
@@ -56,35 +56,35 @@ public class AskForSecretKeyPassPhrase {
                 alert.setMessage(context.getString(R.string.key_not_found, secretKeyId));
                 alert.setPositiveButton(android.R.string.ok, new OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
-                        activity.removeDialog(Id.dialog.pass_phrase);
+                        activity.removeDialog(Id.dialog.passphrase);
                     }
                 });
                 alert.setCancelable(false);
                 return alert.create();
             }
             String userId = Apg.getMainUserIdSafe(context, secretKey);
-            alert.setMessage(context.getString(R.string.pass_phrase_for, userId));
+            alert.setMessage(context.getString(R.string.passphrase_for, userId));
         }
 
         LayoutInflater inflater =
             (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View view = inflater.inflate(R.layout.pass_phrase, null);
-        final EditText input = (EditText) view.findViewById(R.id.passPhrase);
-        final EditText inputNotUsed = (EditText) view.findViewById(R.id.passPhraseAgain);
+        View view = inflater.inflate(R.layout.passphrase, null);
+        final EditText input = (EditText) view.findViewById(R.id.passphrase);
+        final EditText inputNotUsed = (EditText) view.findViewById(R.id.passphraseAgain);
         inputNotUsed.setVisibility(View.GONE);
 
         alert.setView(view);
 
-        final PassPhraseCallbackInterface cb = callback;
+        final PassphraseCallbackInterface cb = callback;
         alert.setPositiveButton(android.R.string.ok,
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        activity.removeDialog(Id.dialog.pass_phrase);
-                        String passPhrase = "" + input.getText();
+                        activity.removeDialog(Id.dialog.passphrase);
+                        String passphrase = "" + input.getText();
                         long keyId;
                         if (secretKey != null) {
                             try {
-                                PGPPrivateKey testKey = secretKey.extractPrivateKey(passPhrase);
+                                PGPPrivateKey testKey = secretKey.extractPrivateKey(passphrase);
                                 if (testKey == null) {
                                     Toast.makeText(activity,
                                                    R.string.error_could_not_extract_private_key,
@@ -93,7 +93,7 @@ public class AskForSecretKeyPassPhrase {
                                 }
                             } catch (PGPException e) {
                                 Toast.makeText(activity,
-                                               R.string.wrong_pass_phrase,
+                                               R.string.wrong_passphrase,
                                                Toast.LENGTH_SHORT).show();
                                 return;
                             }
@@ -101,14 +101,14 @@ public class AskForSecretKeyPassPhrase {
                         } else {
                             keyId = Id.key.symmetric;
                         }
-                        cb.passPhraseCallback(keyId, passPhrase);
+                        cb.passphraseCallback(keyId, passphrase);
                     }
                 });
 
         alert.setNegativeButton(android.R.string.cancel,
                                 new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int id) {
-                                        activity.removeDialog(Id.dialog.pass_phrase);
+                                        activity.removeDialog(Id.dialog.passphrase);
                                     }
                                 });
 

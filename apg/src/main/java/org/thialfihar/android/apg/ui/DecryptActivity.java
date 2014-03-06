@@ -453,7 +453,7 @@ public class DecryptActivity extends BaseActivity {
 
             if (getSecretKeyId() == Id.key.symmetric ||
                 PassphraseCacheService.getCachedPassphrase(this, getSecretKeyId()) == null) {
-                showDialog(Id.dialog.pass_phrase);
+                showDialog(Id.dialog.passphrase);
             } else {
                 if (mDecryptTarget == Id.target.file) {
                     askForOutputFilename();
@@ -493,8 +493,8 @@ public class DecryptActivity extends BaseActivity {
     }
 
     @Override
-    public void passPhraseCallback(long keyId, String passPhrase) {
-        super.passPhraseCallback(keyId, passPhrase);
+    public void passphraseCallback(long keyId, String passphrase) {
+        super.passphraseCallback(keyId, passphrase);
         if (mDecryptTarget == Id.target.file) {
             askForOutputFilename();
         } else {

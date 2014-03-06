@@ -61,10 +61,10 @@ public class EditKeyActivity extends BaseActivity implements OnClickListener {
     private Button mSaveButton;
     private Button mDiscardButton;
 
-    private String mCurrentPassPhrase = null;
-    private String mNewPassPhrase = null;
+    private String mCurrentPassphrase = null;
+    private String mNewPassphrase = null;
 
-    private Button mChangePassPhrase;
+    private Button mChangePassphrase;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -96,10 +96,10 @@ public class EditKeyActivity extends BaseActivity implements OnClickListener {
             }
         }
 
-        mChangePassPhrase = (Button) findViewById(R.id.btn_change_pass_phrase);
-        mChangePassPhrase.setOnClickListener(new OnClickListener() {
+        mChangePassphrase = (Button) findViewById(R.id.btn_change_passphrase);
+        mChangePassphrase.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
-                showDialog(Id.dialog.new_pass_phrase);
+                showDialog(Id.dialog.new_passphrase);
             }
         });
 
@@ -122,12 +122,12 @@ public class EditKeyActivity extends BaseActivity implements OnClickListener {
         mKeys.setKeys(keys);
         container.addView(mKeys);
 
-        mCurrentPassPhrase = Apg.getEditPassPhrase();
-        if (mCurrentPassPhrase == null) {
-            mCurrentPassPhrase = "";
+        mCurrentPassphrase = Apg.getEditPassphrase();
+        if (mCurrentPassphrase == null) {
+            mCurrentPassphrase = "";
         }
 
-        updatePassPhraseButtonText();
+        updatePassphraseButtonText();
 
         Toast.makeText(this, getString(R.string.warning_message, getString(R.string.key_editing_is_beta)),
                        Toast.LENGTH_LONG).show();
@@ -140,9 +140,9 @@ public class EditKeyActivity extends BaseActivity implements OnClickListener {
         return ((KeyEditor) mKeys.getEditors().getChildAt(0)).getValue().getKeyId();
     }
 
-    public boolean havePassPhrase() {
-        return (!mCurrentPassPhrase.equals("")) ||
-               (mNewPassPhrase != null && !mNewPassPhrase.equals(""));
+    public boolean havePassphrase() {
+        return (!mCurrentPassphrase.equals("")) ||
+               (mNewPassphrase != null && !mNewPassphrase.equals(""));
     }
 
     @Override
@@ -157,50 +157,50 @@ public class EditKeyActivity extends BaseActivity implements OnClickListener {
     @Override
     protected Dialog onCreateDialog(int id) {
         switch (id) {
-            case Id.dialog.new_pass_phrase: {
+            case Id.dialog.new_passphrase: {
                 AlertDialog.Builder alert = new AlertDialog.Builder(this);
 
-                if (havePassPhrase()) {
-                    alert.setTitle(R.string.title_change_pass_phrase);
+                if (havePassphrase()) {
+                    alert.setTitle(R.string.title_change_passphrase);
                 } else {
-                    alert.setTitle(R.string.title_set_pass_phrase);
+                    alert.setTitle(R.string.title_set_passphrase);
                 }
-                alert.setMessage(R.string.enter_pass_phrase_twice);
+                alert.setMessage(R.string.enter_passphrase_twice);
 
                 LayoutInflater inflater =
                     (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                View view = inflater.inflate(R.layout.pass_phrase, null);
-                final EditText input1 = (EditText) view.findViewById(R.id.passPhrase);
-                final EditText input2 = (EditText) view.findViewById(R.id.passPhraseAgain);
+                View view = inflater.inflate(R.layout.passphrase, null);
+                final EditText input1 = (EditText) view.findViewById(R.id.passphrase);
+                final EditText input2 = (EditText) view.findViewById(R.id.passphraseAgain);
 
                 alert.setView(view);
 
                 alert.setPositiveButton(android.R.string.ok,
                                         new DialogInterface.OnClickListener() {
                                             public void onClick(DialogInterface dialog, int id) {
-                                                removeDialog(Id.dialog.new_pass_phrase);
+                                                removeDialog(Id.dialog.new_passphrase);
 
-                                                String passPhrase1 = "" + input1.getText();
-                                                String passPhrase2 = "" + input2.getText();
-                                                if (!passPhrase1.equals(passPhrase2)) {
-                                                    showDialog(Id.dialog.pass_phrases_do_not_match);
+                                                String passphrase1 = "" + input1.getText();
+                                                String passphrase2 = "" + input2.getText();
+                                                if (!passphrase1.equals(passphrase2)) {
+                                                    showDialog(Id.dialog.passphrases_do_not_match);
                                                     return;
                                                 }
 
-                                                if (passPhrase1.equals("")) {
-                                                    showDialog(Id.dialog.no_pass_phrase);
+                                                if (passphrase1.equals("")) {
+                                                    showDialog(Id.dialog.no_passphrase);
                                                     return;
                                                 }
 
-                                                mNewPassPhrase = passPhrase1;
-                                                updatePassPhraseButtonText();
+                                                mNewPassphrase = passphrase1;
+                                                updatePassphraseButtonText();
                                             }
                                         });
 
                 alert.setNegativeButton(android.R.string.cancel,
                                         new DialogInterface.OnClickListener() {
                                             public void onClick(DialogInterface dialog, int id) {
-                                                removeDialog(Id.dialog.new_pass_phrase);
+                                                removeDialog(Id.dialog.new_passphrase);
                                             }
                                         });
 
@@ -223,8 +223,8 @@ public class EditKeyActivity extends BaseActivity implements OnClickListener {
     }
 
     private void saveClicked() {
-        if (!havePassPhrase()) {
-            Toast.makeText(this, R.string.set_a_pass_phrase, Toast.LENGTH_SHORT).show();
+        if (!havePassphrase()) {
+            Toast.makeText(this, R.string.set_a_passphrase, Toast.LENGTH_SHORT).show();
             return;
         }
         showDialog(Id.dialog.saving);
@@ -238,13 +238,13 @@ public class EditKeyActivity extends BaseActivity implements OnClickListener {
         Message msg = new Message();
 
         try {
-            String oldPassPhrase = mCurrentPassPhrase;
-            String newPassPhrase = mNewPassPhrase;
-            if (newPassPhrase == null) {
-                newPassPhrase = oldPassPhrase;
+            String oldPassphrase = mCurrentPassphrase;
+            String newPassphrase = mNewPassphrase;
+            if (newPassphrase == null) {
+                newPassphrase = oldPassphrase;
             }
-            Apg.buildSecretKey(this, mUserIds, mKeys, oldPassPhrase, newPassPhrase, this);
-            PassphraseCacheService.addCachedPassphrase(this, getMasterKeyId(), newPassPhrase);
+            Apg.buildSecretKey(this, mUserIds, mKeys, oldPassphrase, newPassphrase, this);
+            PassphraseCacheService.addCachedPassphrase(this, getMasterKeyId(), newPassphrase);
         } catch (NoSuchProviderException e) {
             error = "" + e;
         } catch (NoSuchAlgorithmException e) {
@@ -289,8 +289,8 @@ public class EditKeyActivity extends BaseActivity implements OnClickListener {
         }
     }
 
-    private void updatePassPhraseButtonText() {
-        mChangePassPhrase.setText(
-                havePassPhrase() ? R.string.btn_change_pass_phrase : R.string.btn_set_pass_phrase);
+    private void updatePassphraseButtonText() {
+        mChangePassphrase.setText(
+                havePassphrase() ? R.string.btn_change_passphrase : R.string.btn_set_passphrase);
     }
 }

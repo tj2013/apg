@@ -177,7 +177,7 @@ public class Apg {
                     CompressionAlgorithmTags.BZIP2,
                     CompressionAlgorithmTags.ZIP };
 
-    private static String sEditPassPhrase = null;
+    private static String sEditPassphrase = null;
     private static Database sDatabase = null;
 
     public static class GeneralException extends Exception {
@@ -206,15 +206,15 @@ public class Apg {
         return sDatabase;
     }
 
-    public static void setEditPassPhrase(String passPhrase) {
-        sEditPassPhrase = passPhrase;
+    public static void setEditPassphrase(String passphrase) {
+        sEditPassphrase = passphrase;
     }
 
-    public static String getEditPassPhrase() {
-        return sEditPassPhrase;
+    public static String getEditPassphrase() {
+        return sEditPassphrase;
     }
     public static Key createKey(Context context,
-                                int algorithmChoice, int keySize, String passPhrase,
+                                int algorithmChoice, int keySize, String passphrase,
                                 Key masterKey)
                   throws NoSuchAlgorithmException, PGPException, NoSuchProviderException,
                   GeneralException, InvalidAlgorithmParameterException {
@@ -225,8 +225,8 @@ public class Apg {
 
         Security.addProvider(new BouncyCastleProvider());
 
-        if (passPhrase == null) {
-            passPhrase = "";
+        if (passphrase == null) {
+            passphrase = "";
         }
 
         int algorithm = 0;
@@ -274,7 +274,7 @@ public class Apg {
         if (masterKey == null) {
             // enough for now, as we assemble the key again later anyway
             secretKey = new PGPSecretKey(PGPSignature.DEFAULT_CERTIFICATION, keyPair, "",
-                                         PGPEncryptedData.CAST5, passPhrase.toCharArray(),
+                                         PGPEncryptedData.CAST5, passphrase.toCharArray(),
                                          null, null,
                                          new SecureRandom(), new BouncyCastleProvider().getName());
 
@@ -284,13 +284,13 @@ public class Apg {
                 new PGPPublicKey(tmpKey.getAlgorithm(),
                                  tmpKey.getKey(new BouncyCastleProvider()),
                                  tmpKey.getCreationTime());
-            PGPPrivateKey masterPrivateKey = masterKey.extractPrivateKey(passPhrase);
+            PGPPrivateKey masterPrivateKey = masterKey.extractPrivateKey(passphrase);
 
             PGPKeyPair masterKeyPair = new PGPKeyPair(masterPublicKey, masterPrivateKey);
             PGPKeyRingGenerator ringGen =
                 new PGPKeyRingGenerator(PGPSignature.POSITIVE_CERTIFICATION,
                                         masterKeyPair, "",
-                                        PGPEncryptedData.CAST5, passPhrase.toCharArray(),
+                                        PGPEncryptedData.CAST5, passphrase.toCharArray(),
                                         null, null,
                                         new SecureRandom(), new BouncyCastleProvider().getName());
             ringGen.addSubKey(keyPair);
@@ -306,7 +306,7 @@ public class Apg {
 
     public static void buildSecretKey(Activity context,
                                       SectionView userIdsView, SectionView keysView,
-                                      String oldPassPhrase, String newPassPhrase,
+                                      String oldPassphrase, String newPassphrase,
                                       Progressable progress)
             throws Apg.GeneralException, NoSuchProviderException, PGPException,
             NoSuchAlgorithmException, SignatureException, IOException, Database.GeneralException {
@@ -315,12 +315,12 @@ public class Apg {
 
         Security.addProvider(new BouncyCastleProvider());
 
-        if (oldPassPhrase == null || oldPassPhrase.equals("")) {
-            oldPassPhrase = "";
+        if (oldPassphrase == null || oldPassphrase.equals("")) {
+            oldPassphrase = "";
         }
 
-        if (newPassPhrase == null || newPassPhrase.equals("")) {
-            newPassPhrase = "";
+        if (newPassphrase == null || newPassphrase.equals("")) {
+            newPassphrase = "";
         }
 
         Vector<String> userIds = new Vector<String>();
@@ -388,7 +388,7 @@ public class Apg {
             new PGPPublicKey(tmpKey.getAlgorithm(),
                              tmpKey.getKey(new BouncyCastleProvider()),
                              tmpKey.getCreationTime());
-        PGPPrivateKey masterPrivateKey = masterKey.extractPrivateKey(oldPassPhrase);
+        PGPPrivateKey masterPrivateKey = masterKey.extractPrivateKey(oldPassphrase);
 
         progress.setProgress(R.string.progress_certifying_master_key, 20, 100);
         for (int i = 0; i < userIds.size(); ++i) {
@@ -435,7 +435,7 @@ public class Apg {
         PGPKeyRingGenerator keyGen =
                 new PGPKeyRingGenerator(PGPSignature.POSITIVE_CERTIFICATION,
                                         masterKeyPair, mainUserId,
-                                        PGPEncryptedData.CAST5, newPassPhrase.toCharArray(),
+                                        PGPEncryptedData.CAST5, newPassphrase.toCharArray(),
                                         hashedPacketsGen.generate(), unhashedPacketsGen.generate(),
                                         new SecureRandom(), new BouncyCastleProvider().getName());
 
@@ -445,7 +445,7 @@ public class Apg {
             Key subKey = keys.get(i);
             keyEditor = (KeyEditor) keyEditors.getChildAt(i);
             PGPPublicKey subPublicKey = subKey.getPublicKey();
-            PGPPrivateKey subPrivateKey = subKey.extractPrivateKey(oldPassPhrase);
+            PGPPrivateKey subPrivateKey = subKey.extractPrivateKey(oldPassphrase);
             PGPKeyPair subKeyPair =
                 new PGPKeyPair(subPublicKey.getAlgorithm(),
                                subPublicKey.getKey(new BouncyCastleProvider()),
@@ -750,11 +750,11 @@ public class Apg {
                                InputData data, OutputStream outStream,
                                boolean armored,
                                long encryptionKeyIds[], long signatureKeyId,
-                               String signaturePassPhrase,
+                               String signaturePassphrase,
                                Progressable progress,
                                int symmetricAlgorithm, int hashAlgorithm, int compression,
                                boolean forceV3Signature,
-                               String passPhrase)
+                               String passphrase)
             throws IOException, GeneralException, PGPException, NoSuchProviderException,
             NoSuchAlgorithmException, SignatureException {
         Security.addProvider(new BouncyCastleProvider());
@@ -777,8 +777,8 @@ public class Apg {
         KeyRing signingKeyRing = null;
         PGPPrivateKey signaturePrivateKey = null;
 
-        if (encryptionKeyIds.length == 0 && passPhrase == null) {
-            throw new GeneralException(context.getString(R.string.error_no_encryption_keys_or_pass_phrase));
+        if (encryptionKeyIds.length == 0 && passphrase == null) {
+            throw new GeneralException(context.getString(R.string.error_no_encryption_keys_or_passphrase));
         }
 
         if (signatureKeyId != 0) {
@@ -788,11 +788,11 @@ public class Apg {
                 throw new GeneralException(context.getString(R.string.error_signature_failed));
             }
 
-            if (signaturePassPhrase == null) {
-                throw new GeneralException(context.getString(R.string.error_no_signature_pass_phrase));
+            if (signaturePassphrase == null) {
+                throw new GeneralException(context.getString(R.string.error_no_signature_passphrase));
             }
             progress.setProgress(R.string.progress_extracting_signature_key, 0, 100);
-            signaturePrivateKey = signingKey.extractPrivateKey(signaturePassPhrase);
+            signaturePrivateKey = signingKey.extractPrivateKey(signaturePassphrase);
             if (signaturePrivateKey == null) {
                 throw new GeneralException(context.getString(R.string.error_could_not_extract_private_key));
             }
@@ -805,7 +805,7 @@ public class Apg {
 
         if (encryptionKeyIds.length == 0) {
             // symmetric encryption
-            cPk.addMethod(passPhrase.toCharArray());
+            cPk.addMethod(passphrase.toCharArray());
         }
         for (int i = 0; i < encryptionKeyIds.length; ++i) {
             Key key = getEncryptKey(encryptionKeyIds[i]);
@@ -903,7 +903,7 @@ public class Apg {
 
     public static void signText(Context context,
                                 InputData data, OutputStream outStream,
-                                long signatureKeyId, String signaturePassPhrase,
+                                long signatureKeyId, String signaturePassphrase,
                                 int hashAlgorithm,
                                 boolean forceV3Signature,
                                 Progressable progress)
@@ -928,10 +928,10 @@ public class Apg {
             throw new GeneralException(context.getString(R.string.error_signature_failed));
         }
 
-        if (signaturePassPhrase == null) {
-            throw new GeneralException(context.getString(R.string.error_no_signature_pass_phrase));
+        if (signaturePassphrase == null) {
+            throw new GeneralException(context.getString(R.string.error_no_signature_passphrase));
         }
-        signaturePrivateKey = signingKey.extractPrivateKey(signaturePassPhrase);
+        signaturePrivateKey = signingKey.extractPrivateKey(signaturePassphrase);
         if (signaturePrivateKey == null) {
             throw new GeneralException(context.getString(R.string.error_could_not_extract_private_key));
         }
@@ -1010,7 +1010,7 @@ public class Apg {
     public static void generateSignature(Context context,
                                          InputData data, OutputStream outStream,
                                          boolean armored, boolean binary,
-                                         long signatureKeyId, String signaturePassPhrase,
+                                         long signatureKeyId, String signaturePassphrase,
                                          int hashAlgorithm,
                                          boolean forceV3Signature,
                                          Progressable progress)
@@ -1042,10 +1042,10 @@ public class Apg {
             throw new GeneralException(context.getString(R.string.error_signature_failed));
         }
 
-        if (signaturePassPhrase == null) {
-            throw new GeneralException(context.getString(R.string.error_no_signature_pass_phrase));
+        if (signaturePassphrase == null) {
+            throw new GeneralException(context.getString(R.string.error_no_signature_passphrase));
         }
-        signaturePrivateKey = signingKey.extractPrivateKey(signaturePassPhrase);
+        signaturePrivateKey = signingKey.extractPrivateKey(signaturePassphrase);
         if (signaturePrivateKey == null) {
             throw new GeneralException(context.getString(R.string.error_could_not_extract_private_key));
         }
@@ -1203,11 +1203,11 @@ public class Apg {
 
     public static Bundle decrypt(Context context,
                                  InputData data, OutputStream outStream,
-                                 String passPhrase, Progressable progress,
+                                 String passphrase, Progressable progress,
                                  boolean assumeSymmetric)
             throws IOException, GeneralException, PGPException, SignatureException {
-        if (passPhrase == null) {
-            passPhrase = "";
+        if (passphrase == null) {
+            passphrase = "";
         }
         Bundle returnData = new Bundle();
         InputStream in = PGPUtil.getDecoderStream(data.getInputStream());
@@ -1253,7 +1253,7 @@ public class Apg {
             }
 
             progress.setProgress(R.string.progress_preparing_streams, currentProgress, 100);
-            clear = pbe.getDataStream(passPhrase.toCharArray(), new BouncyCastleProvider());
+            clear = pbe.getDataStream(passphrase.toCharArray(), new BouncyCastleProvider());
             encryptedData = pbe;
             currentProgress += 5;
         } else {
@@ -1282,9 +1282,9 @@ public class Apg {
             progress.setProgress(R.string.progress_extracting_key, currentProgress, 100);
             PGPPrivateKey privateKey = null;
             try {
-                privateKey = secretKey.extractPrivateKey(passPhrase);
+                privateKey = secretKey.extractPrivateKey(passphrase);
             } catch (PGPException e) {
-                throw new PGPException(context.getString(R.string.error_wrong_pass_phrase));
+                throw new PGPException(context.getString(R.string.error_wrong_passphrase));
             }
             if (privateKey == null) {
                 throw new GeneralException(context.getString(R.string.error_could_not_extract_private_key));

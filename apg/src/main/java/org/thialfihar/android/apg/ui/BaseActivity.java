@@ -35,7 +35,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import org.thialfihar.android.apg.Apg;
-import org.thialfihar.android.apg.AskForSecretKeyPassPhrase;
+import org.thialfihar.android.apg.AskForSecretKeyPassphrase;
 import org.thialfihar.android.apg.Constants;
 import org.thialfihar.android.apg.Id;
 import org.thialfihar.android.apg.R;
@@ -53,7 +53,7 @@ import java.util.Locale;
 
 public class BaseActivity extends Activity
                           implements Runnable, Progressable,
-                          AskForSecretKeyPassPhrase.PassPhraseCallbackInterface {
+                          AskForSecretKeyPassphrase.PassphraseCallbackInterface {
 
     private ProgressDialog mProgressDialog = null;
     private PausableThread mRunningThread = null;
@@ -192,21 +192,21 @@ public class BaseActivity extends Activity
                 return alert.create();
             }
 
-            case Id.dialog.pass_phrase: {
-                return AskForSecretKeyPassPhrase.createDialog(this, getSecretKeyId(), this);
+            case Id.dialog.passphrase: {
+                return AskForSecretKeyPassphrase.createDialog(this, getSecretKeyId(), this);
             }
 
-            case Id.dialog.pass_phrases_do_not_match: {
+            case Id.dialog.passphrases_do_not_match: {
                 AlertDialog.Builder alert = new AlertDialog.Builder(this);
 
                 alert.setIcon(android.R.drawable.ic_dialog_alert);
                 alert.setTitle(R.string.error);
-                alert.setMessage(R.string.pass_phrases_do_not_match);
+                alert.setMessage(R.string.passphrases_do_not_match);
 
                 alert.setPositiveButton(android.R.string.ok,
                                         new DialogInterface.OnClickListener() {
                                             public void onClick(DialogInterface dialog, int id) {
-                                                removeDialog(Id.dialog.pass_phrases_do_not_match);
+                                                removeDialog(Id.dialog.passphrases_do_not_match);
                                             }
                                         });
                 alert.setCancelable(false);
@@ -214,17 +214,17 @@ public class BaseActivity extends Activity
                 return alert.create();
             }
 
-            case Id.dialog.no_pass_phrase: {
+            case Id.dialog.no_passphrase: {
                 AlertDialog.Builder alert = new AlertDialog.Builder(this);
 
                 alert.setIcon(android.R.drawable.ic_dialog_alert);
                 alert.setTitle(R.string.error);
-                alert.setMessage(R.string.pass_phrase_must_not_be_empty);
+                alert.setMessage(R.string.passphrase_must_not_be_empty);
 
                 alert.setPositiveButton(android.R.string.ok,
                                         new DialogInterface.OnClickListener() {
                                             public void onClick(DialogInterface dialog, int id) {
-                                                removeDialog(Id.dialog.no_pass_phrase);
+                                                removeDialog(Id.dialog.no_passphrase);
                                             }
                                         });
                 alert.setCancelable(false);
@@ -395,7 +395,7 @@ public class BaseActivity extends Activity
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
 
-    public void passPhraseCallback(long keyId, String passphrase) {
+    public void passphraseCallback(long keyId, String passphrase) {
         PassphraseCacheService.addCachedPassphrase(this, keyId, passphrase);
     }
 

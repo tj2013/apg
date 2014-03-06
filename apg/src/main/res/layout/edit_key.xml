@@ -45,11 +45,11 @@
                     android:layout_weight="1"/>
 
                 <Button
-                    android:id="@+id/btn_change_pass_phrase"
+                    android:id="@+id/btn_change_passphrase"
                     android:layout_width="0dip"
                     android:layout_height="wrap_content"
                     android:layout_weight="2"
-                    android:text="@string/btn_set_pass_phrase"/>
+                    android:text="@string/btn_set_passphrase"/>
 
                 <View
                     android:layout_width="0dip"
