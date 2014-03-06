@@ -52,7 +52,7 @@ public class PreferencesActivity extends PreferenceActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        mPreferences = Preferences.getPreferences(this);
+        mPreferences = Preferences.getInstance(this);
         BaseActivity.setLanguage(this, mPreferences.getLanguage());
         super.onCreate(savedInstanceState);
 

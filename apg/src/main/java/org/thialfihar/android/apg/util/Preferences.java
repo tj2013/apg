@@ -31,7 +31,7 @@ public class Preferences {
     private static Preferences sPreferences;
     private SharedPreferences mSharedPreferences;
 
-    public static synchronized Preferences getPreferences(Context context) {
+    public static synchronized Preferences getInstance(Context context) {
         if (sPreferences == null) {
             sPreferences = new Preferences(context);
         }

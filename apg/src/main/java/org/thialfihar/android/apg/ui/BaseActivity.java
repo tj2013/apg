@@ -75,7 +75,7 @@ public class BaseActivity extends Activity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mPreferences = Preferences.getPreferences(this);
+        mPreferences = Preferences.getInstance(this);
         setLanguage(this, mPreferences.getLanguage());
     }
 
