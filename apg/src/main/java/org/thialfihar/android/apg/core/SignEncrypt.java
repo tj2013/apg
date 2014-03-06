@@ -21,6 +21,7 @@ import android.content.Context;
 
 import org.bouncycastle2.bcpg.ArmoredOutputStream;
 import org.bouncycastle2.bcpg.BCPGOutputStream;
+import org.bouncycastle2.jce.provider.BouncyCastleProvider;
 import org.bouncycastle2.openpgp.PGPCompressedDataGenerator;
 import org.bouncycastle2.openpgp.PGPEncryptedDataGenerator;
 import org.bouncycastle2.openpgp.PGPException;
@@ -260,7 +261,7 @@ public class SignEncrypt {
             // has Integrity packet enabled!
             JcePGPDataEncryptorBuilder encryptorBuilder =
                     new JcePGPDataEncryptorBuilder(mSymmetricEncryptionAlgorithm)
-                            .setProvider(Constants.BOUNCY_CASTLE_PROVIDER_NAME)
+                            .setProvider(BouncyCastleProvider.PROVIDER_NAME)
                             .setWithIntegrityPacket(true);
 
             cPk = new PGPEncryptedDataGenerator(encryptorBuilder);
@@ -302,7 +303,7 @@ public class SignEncrypt {
             JcaPGPContentSignerBuilder contentSignerBuilder =
                 new JcaPGPContentSignerBuilder(
                     signingKey.getPublicKey().getAlgorithm(), mSignatureHashAlgorithm)
-                    .setProvider(Constants.BOUNCY_CASTLE_PROVIDER_NAME);
+                    .setProvider(BouncyCastleProvider.PROVIDER_NAME);
 
             if (mSignatureForceV3) {
                 signatureV3Generator = new PGPV3SignatureGenerator(contentSignerBuilder);
@@ -502,7 +503,7 @@ public class SignEncrypt {
         JcaPGPContentSignerBuilder contentSignerBuilder =
             new JcaPGPContentSignerBuilder(
                 signingKey.getPublicKey().getAlgorithm(), mSignatureHashAlgorithm)
-                .setProvider(Constants.BOUNCY_CASTLE_PROVIDER_NAME);
+                .setProvider(BouncyCastleProvider.PROVIDER_NAME);
 
         PGPSignatureGenerator signatureGenerator = null;
         PGPV3SignatureGenerator signatureV3Generator = null;

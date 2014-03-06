@@ -17,6 +17,7 @@
 package org.thialfihar.android.apg.core;
 
 import org.bouncycastle2.bcpg.sig.KeyFlags;
+import org.bouncycastle2.jce.provider.BouncyCastleProvider;
 import org.bouncycastle2.openpgp.PGPException;
 import org.bouncycastle2.openpgp.PGPPrivateKey;
 import org.bouncycastle2.openpgp.PGPPublicKey;
@@ -271,7 +272,7 @@ public class Key {
         }
         PBESecretKeyDecryptor keyDecryptor =
             new JcePBESecretKeyDecryptorBuilder().setProvider(
-                Constants.BOUNCY_CASTLE_PROVIDER_NAME).build(passphrase.toCharArray());
+                BouncyCastleProvider.PROVIDER_NAME).build(passphrase.toCharArray());
         return extractPrivateKey(keyDecryptor);
     }
 

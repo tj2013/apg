@@ -16,12 +16,9 @@
 
 package org.thialfihar.android.apg.core;
 
-import org.bouncycastle2.jce.provider.BouncyCastleProvider;
-
 import java.util.regex.Pattern;
 
 public final class Constants {
-    public static final String BOUNCY_CASTLE_PROVIDER_NAME = BouncyCastleProvider.PROVIDER_NAME;
     public static final String TAG = "APG";
 
     public static final Pattern PGP_MESSAGE =

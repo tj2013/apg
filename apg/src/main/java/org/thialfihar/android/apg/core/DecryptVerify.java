@@ -25,6 +25,7 @@ import org.bouncycastle2.bcpg.BCPGInputStream;
 import org.bouncycastle2.bcpg.SignaturePacket;
 import org.bouncycastle2.bcpg.SignatureSubpacket;
 import org.bouncycastle2.bcpg.SignatureSubpacketTags;
+import org.bouncycastle2.jce.provider.BouncyCastleProvider;
 import org.bouncycastle2.openpgp.PGPCompressedData;
 import org.bouncycastle2.openpgp.PGPEncryptedData;
 import org.bouncycastle2.openpgp.PGPEncryptedDataList;
@@ -257,10 +258,10 @@ public class DecryptVerify {
 
             PGPDigestCalculatorProvider digestCalcProvider =
                 new JcaPGPDigestCalculatorProviderBuilder()
-                    .setProvider(Constants.BOUNCY_CASTLE_PROVIDER_NAME).build();
+                    .setProvider(BouncyCastleProvider.PROVIDER_NAME).build();
             PBEDataDecryptorFactory decryptorFactory =
                 new JcePBEDataDecryptorFactoryBuilder(digestCalcProvider)
-                    .setProvider(Constants.BOUNCY_CASTLE_PROVIDER_NAME)
+                    .setProvider(BouncyCastleProvider.PROVIDER_NAME)
                     .build(mPassphrase.toCharArray());
 
             clear = pbe.getDataStream(decryptorFactory);
@@ -307,7 +308,7 @@ public class DecryptVerify {
 
             PublicKeyDataDecryptorFactory decryptorFactory =
                 new JcePublicKeyDataDecryptorFactoryBuilder()
-                    .setProvider(Constants.BOUNCY_CASTLE_PROVIDER_NAME)
+                    .setProvider(BouncyCastleProvider.PROVIDER_NAME)
                     .build(privateKey);
 
             clear = pbe.getDataStream(decryptorFactory);
@@ -364,7 +365,7 @@ public class DecryptVerify {
             if (signature != null) {
                 JcaPGPContentVerifierBuilderProvider contentVerifierBuilderProvider =
                     new JcaPGPContentVerifierBuilderProvider()
-                        .setProvider(Constants.BOUNCY_CASTLE_PROVIDER_NAME);
+                        .setProvider(BouncyCastleProvider.PROVIDER_NAME);
 
                 signature.init(contentVerifierBuilderProvider, signatureKey.getPublicKey());
             } else {
@@ -550,7 +551,7 @@ public class DecryptVerify {
 
         JcaPGPContentVerifierBuilderProvider contentVerifierBuilderProvider =
                 new JcaPGPContentVerifierBuilderProvider()
-                        .setProvider(Constants.BOUNCY_CASTLE_PROVIDER_NAME);
+                        .setProvider(BouncyCastleProvider.PROVIDER_NAME);
 
         signature.init(contentVerifierBuilderProvider, signatureKey.getPublicKey());
 
@@ -606,7 +607,7 @@ public class DecryptVerify {
         boolean primkeyBindingIsOk = false;
         JcaPGPContentVerifierBuilderProvider contentVerifierBuilderProvider =
             new JcaPGPContentVerifierBuilderProvider()
-                .setProvider(Constants.BOUNCY_CASTLE_PROVIDER_NAME);
+                .setProvider(BouncyCastleProvider.PROVIDER_NAME);
 
         for (PGPSignature signature : signingKey.getSignatures()) {
             // what does gpg do if the subkey binding is wrong?
@@ -675,7 +676,7 @@ public class DecryptVerify {
         boolean primkeyBindingIsOk = false;
         JcaPGPContentVerifierBuilderProvider contentVerifierBuilderProvider =
             new JcaPGPContentVerifierBuilderProvider()
-                .setProvider(Constants.BOUNCY_CASTLE_PROVIDER_NAME);
+                .setProvider(BouncyCastleProvider.PROVIDER_NAME);
         PGPSignatureList eSigList;
 
         if (packets.hasSubpacket(SignatureSubpacketTags.EMBEDDED_SIGNATURE)) {
