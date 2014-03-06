@@ -13,28 +13,27 @@
      See the License for the specific language governing permissions and
      limitations under the License.
 -->
-
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:orientation="vertical"
-    android:paddingTop="5dip">
+<android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:bootstrapbutton="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/drawer_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
     <ScrollView
-        android:layout_width="fill_parent"
-        android:layout_height="0dip"
-        android:layout_weight="1"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:fillViewport="true">
 
         <LinearLayout
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:orientation="vertical"
-            android:layout_marginLeft="5dip">
+            android:paddingLeft="5dip"
+            android:paddingRight="5dip"
+            >
 
             <LinearLayout
-                android:layout_width="fill_parent"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
 
@@ -47,7 +46,7 @@
                 <TextView
                     android:id="@+id/sourceLabel"
                     android:layout_width="0dip"
-                    android:layout_height="fill_parent"
+                    android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:text="@string/label_message"
                     android:textAppearance="?android:attr/textAppearanceMedium"
@@ -64,20 +63,20 @@
 
             <ViewFlipper
                 android:id="@+id/source"
-                android:layout_width="fill_parent"
+                android:layout_width="match_parent"
                 android:layout_height="0dip"
                 android:layout_weight="1">
 
                 <LinearLayout
                     android:id="@+id/sourceMessage"
-                    android:layout_width="fill_parent"
-                    android:layout_height="fill_parent"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
                     android:orientation="vertical">
 
                     <EditText
                         android:id="@+id/message"
-                        android:layout_width="fill_parent"
-                        android:layout_height="fill_parent"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
                         android:gravity="top"
                         android:inputType="text|textCapSentences|textMultiLine|textLongMessage"/>
 
@@ -85,12 +84,12 @@
 
                 <LinearLayout
                     android:id="@+id/sourceFile"
-                    android:layout_width="fill_parent"
-                    android:layout_height="fill_parent"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
                     android:orientation="vertical">
 
                     <LinearLayout
-                        android:layout_width="fill_parent"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal">
 
@@ -109,7 +108,7 @@
                     </LinearLayout>
 
                     <LinearLayout
-                         android:layout_width="fill_parent"
+                         android:layout_width="match_parent"
                          android:layout_height="wrap_content"
                          android:orientation="horizontal">
 
@@ -132,7 +131,7 @@
                     </LinearLayout>
 
                     <LinearLayout
-                        android:layout_width="fill_parent"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal">
 
@@ -155,7 +154,7 @@
                     </LinearLayout>
 
                     <LinearLayout
-                        android:layout_width="fill_parent"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal">
 
@@ -182,13 +181,13 @@
             </ViewFlipper>
 
             <View
-                android:layout_width="fill_parent"
+                android:layout_width="match_parent"
                 android:layout_height="1dip"
                 android:background="?android:attr/listDivider"
                 android:layout_marginBottom="5dip"/>
 
             <LinearLayout
-                android:layout_width="fill_parent"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
 
@@ -201,7 +200,7 @@
                 <TextView
                     android:id="@+id/modeLabel"
                     android:layout_width="0dip"
-                    android:layout_height="fill_parent"
+                    android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:text="@string/label_asymmetric"
                     android:textAppearance="?android:attr/textAppearanceMedium"
@@ -218,17 +217,17 @@
 
             <ViewFlipper
                 android:id="@+id/mode"
-                android:layout_width="fill_parent"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
                 <LinearLayout
                     android:id="@+id/modeAsymmetric"
-                    android:layout_width="fill_parent"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
 
                     <LinearLayout
-                        android:layout_width="fill_parent"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal">
 
@@ -275,7 +274,7 @@
                     </LinearLayout>
 
                     <LinearLayout
-                        android:layout_width="fill_parent"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:paddingBottom="3dip"
                         android:orientation="horizontal">
@@ -302,7 +301,7 @@
                 <TableLayout
                     android:id="@+id/modeSymmetric"
                     android:layout_height="wrap_content"
-                    android:layout_width="fill_parent"
+                    android:layout_width="match_parent"
                     android:stretchColumns="1">
 
                     <TableRow>
@@ -319,7 +318,7 @@
                         <EditText
                             android:id="@+id/passphrase"
                             android:layout_height="wrap_content"
-                            android:layout_width="fill_parent"
+                            android:layout_width="match_parent"
                             android:inputType="textPassword"/>
 
                     </TableRow>
@@ -338,7 +337,7 @@
                         <EditText
                             android:id="@+id/passphraseAgain"
                             android:layout_height="wrap_content"
-                            android:layout_width="fill_parent"
+                            android:layout_width="match_parent"
                             android:inputType="textPassword"/>
 
                     </TableRow>
@@ -347,36 +346,36 @@
 
             </ViewFlipper>
 
-            <View
-                android:layout_width="fill_parent"
-                android:layout_height="1dip"
-                android:background="?android:attr/listDivider"
-                android:layout_marginBottom="5dip"/>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <com.beardedhen.androidbootstrap.BootstrapButton
+                    android:id="@+id/btn_encryptToClipboard"
+                    android:layout_width="match_parent"
+                    android:layout_height="60dp"
+                    android:padding="4dp"
+                    android:layout_weight="1"
+                    android:text="@string/btn_encrypt_to_clipboard"
+                    bootstrapbutton:bb_icon_left="fa-lock"
+                    bootstrapbutton:bb_type="info" />
+
+                <com.beardedhen.androidbootstrap.BootstrapButton
+                    android:id="@+id/btn_encrypt"
+                    android:layout_width="match_parent"
+                    android:layout_height="60dp"
+                    android:padding="4dp"
+                    android:layout_weight="1"
+                    android:text="@string/btn_encrypt"
+                    bootstrapbutton:bb_icon_left="fa-lock"
+                    bootstrapbutton:bb_type="info" />
+            </LinearLayout>
 
         </LinearLayout>
 
     </ScrollView>
 
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        style="@android:style/ButtonBar">
+    <include layout="@layout/drawer_list" />
 
-        <Button
-            android:id="@+id/btn_encryptToClipboard"
-            android:text="@string/btn_encrypt_to_clipboard"
-            android:layout_weight="1"
-            android:layout_width="0dip"
-            android:layout_height="fill_parent"/>
-
-        <Button
-            android:id="@+id/btn_encrypt"
-            android:text="@string/btn_encrypt"
-            android:layout_weight="1"
-            android:layout_width="0dip"
-            android:layout_height="fill_parent"/>
-
-    </LinearLayout>
-
-</LinearLayout>
+</android.support.v4.widget.DrawerLayout>

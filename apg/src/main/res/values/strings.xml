@@ -17,7 +17,7 @@
 <resources>
     <string name="app_name">APG</string>
 
-    <!-- title_lowerCase: capitalized words, no punctuation -->
+    <!-- title_lower_case: capitalized words, no punctuation -->
     <string name="title_mail_inbox">Mail Inbox</string>
     <string name="title_manage_keys">Manage Keys</string>
     <string name="title_manage_own_keys">My Keys</string>
@@ -45,14 +45,14 @@
     <string name="title_key_server_query">Query Key Server</string>
     <string name="title_unknown_signature_key">Unknown Signature Key</string>
 
-    <!-- section_lowerCase: capitalized words, no punctuation -->
+    <!-- section_lower_case: capitalized words, no punctuation -->
     <string name="section_user_ids">User IDs</string>
     <string name="section_keys">Keys</string>
     <string name="section_general">General</string>
     <string name="section_defaults">Defaults</string>
     <string name="section_advanced">Advanced</string>
 
-    <!-- btn_lowerCase: capitalized words, no punctuation -->
+    <!-- btn_lower_case: capitalized words, no punctuation -->
     <string name="btn_sign_to_clipboard">Sign To Clipboard</string>
     <string name="btn_encrypt_to_clipboard">Encrypt To Clipboard</string>
     <string name="btn_encrypt_and_email">Encrypt And Email</string>
@@ -76,7 +76,13 @@
     <string name="btn_set_passphrase">Set Pass Phrase</string>
     <string name="btn_search">Search</string>
 
-    <!-- menu_lowerCase: capitalized words, no punctuation -->
+    <!-- nav_lower_case: capitalized single words -->
+    <string name="nav_encrypt">Encrypt</string>
+
+    <string name="drawer_open">Open navigation drawer</string>
+    <string name="drawer_close">Close navigation drawer</string>
+
+    <!-- menu_lower_case: capitalized words, no punctuation -->
     <string name="menu_about">About</string>
     <string name="menu_manage_public_keys">Manage Public Keys</string>
     <string name="menu_manage_secret_keys">Manage Secret Keys</string>
@@ -92,7 +98,7 @@
     <string name="menu_key_server">Key Server</string>
     <string name="menu_update_key">Update</string>
 
-    <!-- label_lowerCase: capitalized words, no punctuation -->
+    <!-- label_lower_case: capitalized words, no punctuation -->
     <string name="label_sign">Sign</string>
     <string name="label_message">Message</string>
     <string name="label_file">File</string>
@@ -140,7 +146,7 @@
     <string name="n_key_servers">%s key server(s)</string>
     <string name="fingerprint">fingerprint</string>
 
-    <!-- choice_lowerCase: capitalized first word, no punctuation -->
+    <!-- choice_lower_case: capitalized first word, no punctuation -->
     <string name="choice_none">None</string>
     <string name="choice_sign_only">Sign only</string>
     <string name="choice_encrypt_only">Encrypt only</string>
@@ -216,7 +222,7 @@
     <string name="bad_keys_encountered">%s bad secret key(s) ignored. Perhaps you exported with the option\n --export-secret-subkeys\nMake sure you export with\n --export-secret-keys\ninstead.</string>
     <string name="lookup_unknown_key">Unknown key %s, do you want to try finding it on a keyserver?</string>
 
-    <!-- error_lowerCase: phrases, no punctuation, all lowercase,
+    <!-- error_lower_case: phrases, no punctuation, all lowercase,
          they will be put after "error_message", e.g. "Error: file not found" -->
     <string name="error_file_delete_failed">deleting \'%s\' failed</string>
     <string name="error_file_not_found">file not found</string>
@@ -245,7 +251,7 @@
     <string name="error_saving_keys">error saving some key(s)</string>
     <string name="error_could_not_extract_private_key">could not extract private key</string>
 
-    <!-- progress_lowerCase: lowercase, phrases, usually ending in '...' -->
+    <!-- progress_lower_case: lowercase, phrases, usually ending in '...' -->
     <string name="progress_done">done.</string>
     <string name="progress_initializing">initializing...</string>
     <string name="progress_saving">saving...</string>
@@ -307,6 +313,13 @@
 \n\nFirst you need some keys. Either import them via the option menus in \"Manage Public Keys\" and \"Manage Secret Keys\" or create them in \"Manage Secret Keys\".
 \n\nCheck out the option menus in the various activities to find more functions.
     </string>
+
+    <!-- help -->
+    <string name="help_tab_start">Start</string>
+    <string name="help_tab_nfc_beam">NFC Beam</string>
+    <string name="help_tab_changelog">Changelog</string>
+    <string name="help_tab_about">About</string>
+    <string name="help_about_version">Version:</string>
 
 </resources>
 

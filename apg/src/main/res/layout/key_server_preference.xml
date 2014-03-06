@@ -65,8 +65,7 @@
             android:layout_marginLeft="4dip"
             android:layout_marginRight="6dip"
             android:layout_gravity="center_vertical"
-            android:clickable="true"
-            style="@style/PlusButton"/>
+            android:clickable="true"/>
 
     </LinearLayout>
 
