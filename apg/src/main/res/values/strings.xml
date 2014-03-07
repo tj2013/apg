@@ -27,13 +27,13 @@
     <string name="title_select_signature">Select Signature</string>
     <string name="title_encrypt">Encrypt</string>
     <string name="title_decrypt">Decrypt</string>
-    <string name="title_authentication">Pass Phrase</string>
+    <string name="title_authentication">Passphrase</string>
     <string name="title_create_key">Create Key</string>
     <string name="title_edit_key">Edit Key</string>
     <string name="title_preferences">Preferences</string>
     <string name="title_key_server_preference">Key Server Preference</string>
-    <string name="title_change_passphrase">Change Pass Phrase</string>
-    <string name="title_set_passphrase">Set Pass Phrase</string>
+    <string name="title_change_passphrase">Change Passphrase</string>
+    <string name="title_set_passphrase">Set Passphrase</string>
     <string name="title_send_email">"Send Mail..."</string>
     <string name="title_encrypt_to_file">Encrypt To File</string>
     <string name="title_decrypt_to_file">Decrypt To File</string>
@@ -51,6 +51,14 @@
     <string name="section_general">General</string>
     <string name="section_defaults">Defaults</string>
     <string name="section_advanced">Advanced</string>
+    <string name="section_master_key">Master Key</string>
+    <string name="section_master_user_id">Master User ID</string>
+    <string name="section_actions">Actions</string>
+    <string name="section_certification_key">Your Key used for certification</string>
+    <string name="section_upload_key">Upload Key</string>
+    <string name="section_key_server">Keyserver</string>
+    <string name="section_encrypt_and_or_sign">Encrypt and/or Sign</string>
+    <string name="section_decrypt_verify">Decrypt and Verify</string>
 
     <!-- btn_lower_case: capitalized words, no punctuation -->
     <string name="btn_sign_to_clipboard">Sign To Clipboard</string>
@@ -72,12 +80,13 @@
     <string name="btn_delete">Delete</string>
     <string name="btn_no_date">None</string>
     <string name="btn_clear_filter">Clear Filter</string>
-    <string name="btn_change_passphrase">Change Pass Phrase</string>
-    <string name="btn_set_passphrase">Set Pass Phrase</string>
+    <string name="btn_change_passphrase">Change Passphrase</string>
+    <string name="btn_set_passphrase">Set Passphrase</string>
     <string name="btn_search">Search</string>
     <string name="btn_okay">Ok</string>
 
     <!-- nav_lower_case: capitalized single words -->
+    <string name="nav_public_keys">Public Keys</string>
     <string name="nav_encrypt">Encrypt</string>
 
     <string name="drawer_open">Open navigation drawer</string>
@@ -97,13 +106,33 @@
     <string name="menu_search">Search</string>
     <string name="menu_help">Help</string>
     <string name="menu_key_server">Key Server</string>
-    <string name="menu_update_key">Update</string>
+    <string name="menu_import_from_file">Import from file</string>
+    <string name="menu_import_from_qr_code">Import from QR Code</string>
+    <string name="menu_import">Import</string>
+    <string name="menu_import_from_nfc">Import from NFC</string>
+    <string name="menu_create_key_expert">Create key (expert)</string>
+    <string name="menu_update_key">Update from keyserver</string>
+    <string name="menu_export_key_to_server">Upload to key server</string>
+    <string name="menu_share">Share</string>
+    <string name="menu_share_title_fingerprint">Share fingerprint…</string>
+    <string name="menu_share_title">Share whole key…</string>
+    <string name="menu_share_default_fingerprint">with…</string>
+    <string name="menu_share_default">with…</string>
+    <string name="menu_share_qr_code">with QR Code</string>
+    <string name="menu_share_qr_code_fingerprint">with QR Code</string>
+    <string name="menu_share_nfc">with NFC</string>
+    <string name="menu_copy_to_clipboard">Copy to clipboard</string>
+    <string name="menu_sign_key">Sign key</string>
+    <string name="menu_beam_preferences">Beam settings</string>
+    <string name="menu_key_edit_cancel">Cancel</string>
+    <string name="menu_encrypt_to">Encrypt to…</string>
 
     <!-- label_lower_case: capitalized words, no punctuation -->
     <string name="label_sign">Sign</string>
     <string name="label_message">Message</string>
     <string name="label_file">File</string>
-    <string name="label_passphrase">Pass Phrase</string>
+    <string name="label_no_passphrase">No Passphrase</string>
+    <string name="label_passphrase">Passphrase</string>
     <string name="label_passphrase_again">Again</string>
     <string name="label_algorithm">Algorithm</string>
     <string name="label_ascii_armor">ASCII Armor</string>
@@ -114,8 +143,8 @@
     <string name="label_encryption_algorithm">Encryption Algorithm</string>
     <string name="label_hash_algorithm">Hash Algorithm</string>
     <string name="label_asymmetric">Public Key</string>
-    <string name="label_symmetric">Pass Phrase</string>
-    <string name="label_passphrase_cache_ttl">Pass Phrase Cache</string>
+    <string name="label_symmetric">Passphrase</string>
+    <string name="label_passphrase_cache_ttl">Passphrase Cache</string>
     <string name="label_message_compression">Message Compression</string>
     <string name="label_file_compression">File Compression</string>
     <string name="label_language">Language</string>
@@ -130,6 +159,7 @@
     <string name="label_name">Name</string>
     <string name="label_comment">Comment</string>
     <string name="label_email">Email</string>
+    <string name="label_fingerprint">Fingerprint</string>
 
     <string name="no_keys_selected">Select</string>
     <string name="one_key_selected">1 Selected</string>
@@ -142,7 +172,9 @@
     <string name="unknown_status"></string>
     <string name="can_encrypt">can encrypt</string>
     <string name="can_sign">can sign</string>
+    <string name="can_certify">can certify</string>
     <string name="expired">expired</string>
+    <string name="revoked">revoked</string>
     <string name="not_valid">not valid</string>
     <string name="n_key_servers">%s key server(s)</string>
     <string name="fingerprint">fingerprint</string>
@@ -253,8 +285,20 @@
     <string name="error_saving_keys">error saving some key(s)</string>
     <string name="error_could_not_extract_private_key">could not extract private key</string>
 
+    <plurals name="key_list_selected_keys">
+        <item quantity="one">1 key selected.</item>
+        <item quantity="other">%d keys selected.</item>
+    </plurals>
+
+    <string name="key_list_empty_text1">No keys available yet…</string>
+    <string name="key_list_empty_text2">You can start by</string>
+    <string name="key_list_empty_text3">or</string>
+    <string name="key_list_empty_button_create">creating your own key</string>
+    <string name="key_list_empty_button_import">importing keys.</string>
+
     <!-- progress_lower_case: lowercase, phrases, usually ending in '...' -->
     <string name="progress_done">done.</string>
+    <string name="progress_cancel">cancelled.</string>
     <string name="progress_initializing">initializing...</string>
     <string name="progress_saving">saving...</string>
     <string name="progress_importing">importing...</string>
@@ -311,7 +355,14 @@
 
     <string name="hint_public_keys">Search Public Keys</string>
     <string name="hint_secret_keys">Search Secret Keys</string>
+    <string name="action_share_key_with">Share Key with…</string>
     <string name="filter_info">Filter: \"%s\"</string>
+
+    <!-- Key view -->
+    <string name="key_view_action_encrypt">Encrypt to this contact</string>
+    <string name="key_view_action_certify">Certify this contact\'s key</string>
+    <string name="key_view_tab_main">Info</string>
+    <string name="key_view_tab_certs">Certifications</string>
 
     <!-- misc -->
     <string name="fast">fast</string>

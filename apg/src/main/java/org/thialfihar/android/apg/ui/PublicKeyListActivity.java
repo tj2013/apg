@@ -1,132 +1,69 @@
 /*
- * Copyright (C) 2010 Thialfihar <thi@thialfihar.org>
+ * Copyright (C) 2012-2014 Dominik Schürmann <dominik@dominikschuermann.de>
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package org.thialfihar.android.apg.ui;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.ContextMenu;
-import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.ExpandableListView;
-import android.widget.ExpandableListView.ExpandableListContextMenuInfo;
 
-import org.thialfihar.android.apg.Apg;
-import org.thialfihar.android.apg.Constants;
-import org.thialfihar.android.apg.Id;
 import org.thialfihar.android.apg.R;
-import org.thialfihar.android.apg.core.KeyRing;
+//import org.thialfihar.android.apg.helper.ExportHelper;
 
-public class PublicKeyListActivity extends KeyListActivity {
+public class PublicKeyListActivity extends DrawerActivity {
+
+    //ExportHelper mExportHelper;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        mExportFilename = Constants.path.app_dir + "/pubexport.asc";
-        mKeyType = Id.type.public_key;
         super.onCreate(savedInstanceState);
+
+        //mExportHelper = new ExportHelper(this);
+
+        setContentView(R.layout.public_key_list_activity);
+
+        // now setup navigation drawer in DrawerActivity...
+        setupDrawerNavigation(savedInstanceState);
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        menu.add(0, Id.menu.option.import_keys, 0, R.string.menu_import_keys)
-                .setIcon(android.R.drawable.ic_menu_add);
-        menu.add(0, Id.menu.option.export_keys, 1, R.string.menu_export_keys)
-                .setIcon(android.R.drawable.ic_menu_save);
-        menu.add(1, Id.menu.option.search, 2, R.string.menu_search)
-                .setIcon(android.R.drawable.ic_menu_search);
-        menu.add(1, Id.menu.option.preferences, 3, R.string.menu_preferences)
-                .setIcon(android.R.drawable.ic_menu_preferences);
-        menu.add(1, Id.menu.option.about, 4, R.string.menu_about)
-                .setIcon(android.R.drawable.ic_menu_info_details);
+        super.onCreateOptionsMenu(menu);
+        getMenuInflater().inflate(R.menu.public_key_list, menu);
         return true;
     }
 
     @Override
-    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
-        super.onCreateContextMenu(menu, v, menuInfo);
-        ExpandableListView.ExpandableListContextMenuInfo info =
-                (ExpandableListView.ExpandableListContextMenuInfo) menuInfo;
-        int type = ExpandableListView.getPackedPositionType(info.packedPosition);
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+        case R.id.menu_public_key_list_import:
+            //Intent intentImport = new Intent(this, ImportKeysActivity.class);
+            //startActivityForResult(intentImport, 0);
 
-        if (type == ExpandableListView.PACKED_POSITION_TYPE_GROUP) {
-            // TODO: user id? menu.setHeaderTitle("Key");
-            menu.add(0, Id.menu.export, 0, R.string.menu_export_key);
-            menu.add(0, Id.menu.delete, 1, R.string.menu_delete_key);
-            menu.add(0, Id.menu.update, 1, R.string.menu_update_key);
+            return true;
+        case R.id.menu_public_key_list_export:
+            //mExportHelper.showExportKeysDialog(null, Id.type.public_key, Constants.path.APP_DIR
+            //        + "/pubexport.asc");
+
+            return true;
+        default:
+            return super.onOptionsItemSelected(item);
         }
     }
 
-    @Override
-    public boolean onContextItemSelected(MenuItem menuItem) {
-        ExpandableListContextMenuInfo info = (ExpandableListContextMenuInfo) menuItem.getMenuInfo();
-        int type = ExpandableListView.getPackedPositionType(info.packedPosition);
-        int groupPosition = ExpandableListView.getPackedPositionGroup(info.packedPosition);
-
-        if (type != ExpandableListView.PACKED_POSITION_TYPE_GROUP) {
-            return super.onContextItemSelected(menuItem);
-        }
-
-        switch (menuItem.getItemId()) {
-            case Id.menu.update: {
-                mSelectedItem = groupPosition;
-                final int keyRingId = mListAdapter.getKeyRingId(groupPosition);
-                long keyId = 0;
-                KeyRing keyRing = Apg.getKeyRing(keyRingId);
-                if (keyRing != null && keyRing.isPublic()) {
-                    keyId = keyRing.getMasterKey().getKeyId();
-                }
-                if (keyId == 0) {
-                    // this shouldn't happen
-                    return true;
-                }
-
-                Intent intent = new Intent(this, KeyServerQueryActivity.class);
-                intent.setAction(Apg.Intent.LOOK_UP_KEY_ID_AND_RETURN);
-                intent.putExtra(Apg.EXTRA_KEY_ID, keyId);
-                startActivityForResult(intent, Id.request.look_up_key_id);
-                return true;
-            }
-
-            default: {
-                return super.onContextItemSelected(menuItem);
-            }
-        }
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        switch (requestCode) {
-            case Id.request.look_up_key_id: {
-                if (resultCode == RESULT_CANCELED || data == null ||
-                    data.getStringExtra(Apg.EXTRA_TEXT) == null) {
-                    return;
-                }
-
-                Intent intent = new Intent(this, PublicKeyListActivity.class);
-                intent.setAction(Apg.Intent.IMPORT);
-                intent.putExtra(Apg.EXTRA_TEXT, data.getStringExtra(Apg.EXTRA_TEXT));
-                handleIntent(intent);
-                break;
-            }
-
-            default: {
-                super.onActivityResult(requestCode, resultCode, data);
-                break;
-            }
-        }
-    }
 }

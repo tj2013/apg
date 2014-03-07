@@ -10,3 +10,7 @@ apg.sublime-*
 apg/build
 .gradle
 Makefile
+libs/AndroidBootstrap
+libs/HtmlTextView
+libs/StickyListHeaders
+deprecated

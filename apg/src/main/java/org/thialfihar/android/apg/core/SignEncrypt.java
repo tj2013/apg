@@ -235,7 +235,7 @@ public class SignEncrypt {
         KeyRing signingKeyRing = null;
         PGPPrivateKey signaturePrivateKey = null;
         if (enableSignature) {
-            signingKeyRing = mKeyProvider.getSecretKeyRing(mSignatureKeyId);
+            signingKeyRing = mKeyProvider.getSecretKeyRingByKeyId(mSignatureKeyId);
             signingKey = signingKeyRing.getSigningKey();
             if (signingKey == null) {
                 throw new PgpGeneralException(mContext.getString(R.string.error_signature_failed));
@@ -276,7 +276,7 @@ public class SignEncrypt {
             } else {
                 // Asymmetric encryption
                 for (long id : mEncryptionKeyIds) {
-                    KeyRing keyRing = mKeyProvider.getPublicKeyRing(id);
+                    KeyRing keyRing = mKeyProvider.getPublicKeyRingByMasterKeyId(id);
                     if (keyRing == null) {
                         // TODO: this should likely be an error
                         continue;
@@ -471,7 +471,7 @@ public class SignEncrypt {
             throw new PgpGeneralException(mContext.getString(R.string.error_no_signature_key));
         }
 
-        KeyRing signingKeyRing = mKeyProvider.getSecretKeyRing(mSignatureKeyId);
+        KeyRing signingKeyRing = mKeyProvider.getSecretKeyRingByKeyId(mSignatureKeyId);
         Key signingKey = signingKeyRing.getSigningKey();
         if (signingKey == null) {
             // TODO: this sort of error should be caught by the Builder pattern and should never

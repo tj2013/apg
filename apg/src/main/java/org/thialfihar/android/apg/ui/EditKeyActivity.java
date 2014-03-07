@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2012-2013 Dominik Schürmann <dominik@dominikschuermann.de>
  * Copyright (C) 2010 Thialfihar <thi@thialfihar.org>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,279 +17,684 @@
 
 package org.thialfihar.android.apg.ui;
 
-import android.app.AlertDialog;
-import android.app.Dialog;
+import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.Message;
+import android.os.Messenger;
+import android.support.v7.app.ActionBarActivity;
 import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.Button;
-import android.widget.EditText;
+import android.view.ViewGroup;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
-import org.bouncycastle2.openpgp.PGPException;
+import com.beardedhen.androidbootstrap.BootstrapButton;
 
-import org.thialfihar.android.apg.Apg;
 import org.thialfihar.android.apg.Constants;
 import org.thialfihar.android.apg.Id;
 import org.thialfihar.android.apg.R;
 import org.thialfihar.android.apg.core.Key;
 import org.thialfihar.android.apg.core.KeyRing;
-import org.thialfihar.android.apg.provider.KeychainProvider;
+import org.thialfihar.android.apg.core.exception.PgpGeneralException;
+//import org.thialfihar.android.apg.helper.ExportHelper;
+//import org.thialfihar.android.apg.pgp.PgpConversionHelper;
+//import org.thialfihar.android.apg.pgp.PgpKeyHelper;
+import org.thialfihar.android.apg.provider.ProviderHelper;
+import org.thialfihar.android.apg.service.ApgIntentService;
+import org.thialfihar.android.apg.service.ApgIntentServiceHandler;
 import org.thialfihar.android.apg.service.PassphraseCacheService;
+import org.thialfihar.android.apg.ui.dialog.DeleteKeyDialogFragment;
+import org.thialfihar.android.apg.ui.dialog.PassphraseDialogFragment;
+import org.thialfihar.android.apg.ui.dialog.SetPassphraseDialogFragment;
 import org.thialfihar.android.apg.ui.widget.KeyEditor;
 import org.thialfihar.android.apg.ui.widget.SectionView;
+import org.thialfihar.android.apg.ui.widget.UserIdEditor;
+import org.thialfihar.android.apg.util.ActionBarHelper;
+import org.thialfihar.android.apg.util.IterableIterator;
+import org.thialfihar.android.apg.util.Log;
 
-import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.SignatureException;
+import java.util.ArrayList;
+import java.util.GregorianCalendar;
 import java.util.Vector;
 
-public class EditKeyActivity extends BaseActivity implements OnClickListener {
+public class EditKeyActivity extends ActionBarActivity {
 
-    private KeyRing mKeyRing = null;
+    // Actions for internal use only:
+    public static final String ACTION_CREATE_KEY = Constants.INTENT_PREFIX + "CREATE_KEY";
+    public static final String ACTION_EDIT_KEY = Constants.INTENT_PREFIX + "EDIT_KEY";
 
-    private SectionView mUserIds;
-    private SectionView mKeys;
+    // possible extra keys
+    public static final String EXTRA_USER_IDS = "user_ids";
+    public static final String EXTRA_NO_PASSPHRASE = "no_passphrase";
+    public static final String EXTRA_GENERATE_DEFAULT_KEYS = "generate_default_keys";
 
-    private Button mSaveButton;
-    private Button mDiscardButton;
+    // results when saving key
+    public static final String RESULT_EXTRA_MASTER_KEY_ID = "master_key_id";
+    public static final String RESULT_EXTRA_USER_ID = "user_id";
+
+    // EDIT
+    private Uri mDataUri;
+
+    private ProviderHelper mProvider;
+
+    private SectionView mUserIdsView;
+    private SectionView mKeysView;
 
     private String mCurrentPassphrase = null;
     private String mNewPassphrase = null;
+    private String mSavedNewPassphrase = null;
+    private boolean mIsPassphraseSet;
 
-    private Button mChangePassphrase;
+    private BootstrapButton mChangePassphrase;
+
+    private CheckBox mNoPassphrase;
+
+    private KeyRing mKeyRing = null;
+    Vector<String> mUserIds;
+    Vector<Key> mKeys;
+    Vector<Integer> mKeysUsages;
+    boolean mMasterCanSign = true;
+
+    //ExportHelper mExportHelper;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.edit_key);
 
-        Vector<String> userIds = new Vector<String>();
-        Vector<Key> keys = new Vector<Key>();
+        mProvider = new ProviderHelper(this);
+        //mExportHelper = new ExportHelper(this);
 
+        mUserIds = new Vector<String>();
+        mKeys = new Vector<Key>();
+        mKeysUsages = new Vector<Integer>();
+
+        // Catch Intents opened from other apps
         Intent intent = getIntent();
-        long keyId = 0;
-        if (intent.getExtras() != null) {
-            keyId = intent.getExtras().getLong(Apg.EXTRA_KEY_ID);
+        String action = intent.getAction();
+        if (ACTION_CREATE_KEY.equals(action)) {
+            handleActionCreateKey(intent);
+        } else if (ACTION_EDIT_KEY.equals(action)) {
+            handleActionEditKey(intent);
         }
-
-        if (keyId != 0) {
-            Key masterKey = null;
-            mKeyRing = Apg.getSecretKeyRing(keyId);
-            if (mKeyRing != null) {
-                masterKey = mKeyRing.getMasterKey();
-                for (Key key : mKeyRing.getSecretKeys()) {
-                    keys.add(key);
-                }
-            }
-            if (masterKey != null) {
-                for (String userId : masterKey.getUserIds()) {
-                    userIds.add(userId);
-                }
-            }
-        }
-
-        mChangePassphrase = (Button) findViewById(R.id.btn_change_passphrase);
-        mChangePassphrase.setOnClickListener(new OnClickListener() {
-            public void onClick(View v) {
-                showDialog(Id.dialog.new_passphrase);
-            }
-        });
-
-        mSaveButton = (Button) findViewById(R.id.btn_save);
-        mDiscardButton = (Button) findViewById(R.id.btn_discard);
-
-        mSaveButton.setOnClickListener(this);
-        mDiscardButton.setOnClickListener(this);
-
-        LayoutInflater inflater =
-                (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-
-        LinearLayout container = (LinearLayout) findViewById(R.id.container);
-        mUserIds = (SectionView) inflater.inflate(R.layout.edit_key_section, container, false);
-        mUserIds.setType(Id.type.user_id);
-        mUserIds.setUserIds(userIds);
-        container.addView(mUserIds);
-        mKeys = (SectionView) inflater.inflate(R.layout.edit_key_section, container, false);
-        mKeys.setType(Id.type.key);
-        mKeys.setKeys(keys);
-        container.addView(mKeys);
-
-        mCurrentPassphrase = Apg.getEditPassphrase();
-        if (mCurrentPassphrase == null) {
-            mCurrentPassphrase = "";
-        }
-
-        updatePassphraseButtonText();
-
-        Toast.makeText(this, getString(R.string.warning_message, getString(R.string.key_editing_is_beta)),
-                       Toast.LENGTH_LONG).show();
     }
 
-    private long getMasterKeyId() {
-        if (mKeys.getEditors().getChildCount() == 0) {
-            return 0;
+    /**
+     * Handle intent action to create new key
+     *
+     * @param intent
+     */
+    private void handleActionCreateKey(Intent intent) {
+        // Inflate a "Done"/"Cancel" custom action bar
+        ActionBarHelper.setDoneCancelView(getSupportActionBar(), R.string.btn_save,
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        saveClicked();
+                    }
+                }, R.string.btn_do_not_save, new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        cancelClicked();
+                    }
+                });
+
+        Bundle extras = intent.getExtras();
+
+        mCurrentPassphrase = "";
+
+        if (extras != null) {
+            // if userId is given, prefill the fields
+            if (extras.containsKey(EXTRA_USER_IDS)) {
+                Log.d(Constants.TAG, "UserIds are given!");
+                mUserIds.add(extras.getString(EXTRA_USER_IDS));
+            }
+
+            // if no passphrase is given
+            if (extras.containsKey(EXTRA_NO_PASSPHRASE)) {
+                boolean noPassphrase = extras.getBoolean(EXTRA_NO_PASSPHRASE);
+                if (noPassphrase) {
+                    // check "no passphrase" checkbox and remove button
+                    mNoPassphrase.setChecked(true);
+                    mChangePassphrase.setVisibility(View.GONE);
+                }
+            }
+
+            // generate key
+            if (extras.containsKey(EXTRA_GENERATE_DEFAULT_KEYS)) {
+                boolean generateDefaultKeys = extras.getBoolean(EXTRA_GENERATE_DEFAULT_KEYS);
+                if (generateDefaultKeys) {
+
+                    // Send all information needed to service generate keys in other thread
+                    final Intent serviceIntent = new Intent(this, ApgIntentService.class);
+                    serviceIntent.setAction(ApgIntentService.ACTION_GENERATE_DEFAULT_RSA_KEYS);
+
+                    // fill values for this action
+                    Bundle data = new Bundle();
+                    data.putString(ApgIntentService.GENERATE_KEY_SYMMETRIC_PASSPHRASE,
+                            mCurrentPassphrase);
+
+                    serviceIntent.putExtra(ApgIntentService.EXTRA_DATA, data);
+
+                    // Message is received after generating is done in ApgService
+                    ApgIntentServiceHandler saveHandler = new ApgIntentServiceHandler(
+                            this, R.string.progress_generating, ProgressDialog.STYLE_SPINNER, true,
+
+                            new DialogInterface.OnCancelListener() {
+                                @Override
+                                public void onCancel(DialogInterface dialog) {
+                                    // Stop key generation on cancel
+                                    stopService(serviceIntent);
+                                    EditKeyActivity.this.setResult(Activity.RESULT_CANCELED);
+                                    EditKeyActivity.this.finish();
+                                }
+                            }) {
+
+                        @Override
+                        public void handleMessage(Message message) {
+                            // handle messages by standard ApgHandler first
+                            super.handleMessage(message);
+
+                            if (message.arg1 == ApgIntentServiceHandler.MESSAGE_OKAY) {
+                                // get new key from data bundle returned from service
+                                Bundle data = message.getData();
+                                Key masterKey = Key.decode(data.getByteArray(ApgIntentService.RESULT_NEW_KEY));
+                                Key subKey = Key.decode(data.getByteArray(ApgIntentService.RESULT_NEW_KEY2));
+
+                                // add master key
+                                mKeys.add(masterKey);
+                                mKeysUsages.add(Id.choice.usage.sign_only); //TODO: get from key flags
+
+                                // add sub key
+                                mKeys.add(subKey);
+                                mKeysUsages.add(Id.choice.usage.encrypt_only); //TODO: get from key flags
+
+                                buildLayout();
+                            }
+                        };
+                    };
+
+                    // Create a new Messenger for the communication back
+                    Messenger messenger = new Messenger(saveHandler);
+                    serviceIntent.putExtra(ApgIntentService.EXTRA_MESSENGER, messenger);
+
+                    saveHandler.showProgressDialog(this);
+
+                    // start service with intent
+                    startService(serviceIntent);
+                }
+            }
+        } else {
+            buildLayout();
         }
-        return ((KeyEditor) mKeys.getEditors().getChildAt(0)).getValue().getKeyId();
     }
 
-    public boolean havePassphrase() {
-        return (!mCurrentPassphrase.equals("")) ||
-               (mNewPassphrase != null && !mNewPassphrase.equals(""));
+    /**
+     * Handle intent action to edit existing key
+     *
+     * @param intent
+     */
+    private void handleActionEditKey(Intent intent) {
+        // Inflate a "Done"/"Cancel" custom action bar
+        ActionBarHelper.setDoneView(getSupportActionBar(), R.string.btn_save,
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        saveClicked();
+                    }
+                });
+
+        mDataUri = intent.getData();
+        if (mDataUri == null) {
+            Log.e(Constants.TAG, "Intent data missing. Should be Uri of key!");
+            finish();
+            return;
+        } else {
+            Log.d(Constants.TAG, "uri: " + mDataUri);
+
+            long keyRingRowId = Long.valueOf(mDataUri.getLastPathSegment());
+
+            // get master key id using row id
+            KeyRing keyRing = mProvider.getSecretKeyRingByRowId(keyRingRowId);
+
+            mMasterCanSign = keyRing.getMasterKey().isSigningKey();
+            finallyEdit(keyRing.getMasterKey().getKeyId(), mMasterCanSign);
+        }
+    }
+
+    private void showPassphraseDialog(final long masterKeyId, final boolean mMasterCanSign) {
+        // Message is received after passphrase is cached
+        Handler returnHandler = new Handler() {
+            @Override
+            public void handleMessage(Message message) {
+                if (message.what == PassphraseDialogFragment.MESSAGE_OKAY) {
+                    String passPhrase = PassphraseCacheService.getCachedPassphrase(
+                            EditKeyActivity.this, masterKeyId);
+                    mCurrentPassphrase = passPhrase;
+                    finallySaveClicked();
+                }
+            }
+        };
+
+        // Create a new Messenger for the communication back
+        Messenger messenger = new Messenger(returnHandler);
+
+        try {
+            PassphraseDialogFragment passphraseDialog = PassphraseDialogFragment.newInstance(
+                    EditKeyActivity.this, messenger, masterKeyId);
+
+            passphraseDialog.show(getSupportFragmentManager(), "passphraseDialog");
+        } catch (PgpGeneralException e) {
+            Log.d(Constants.TAG, "No passphrase for this secret key!");
+            // send message to handler to start encryption directly
+            returnHandler.sendEmptyMessage(PassphraseDialogFragment.MESSAGE_OKAY);
+        }
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        // show menu only on edit
+        if (mDataUri != null) {
+            return super.onPrepareOptionsMenu(menu);
+        } else {
+            return false;
+        }
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        menu.add(0, Id.menu.option.preferences, 0, R.string.menu_preferences)
-                .setIcon(android.R.drawable.ic_menu_preferences);
-        menu.add(0, Id.menu.option.about, 1, R.string.menu_about)
-                .setIcon(android.R.drawable.ic_menu_info_details);
+        super.onCreateOptionsMenu(menu);
+        getMenuInflater().inflate(R.menu.key_edit, menu);
         return true;
     }
 
     @Override
-    protected Dialog onCreateDialog(int id) {
-        switch (id) {
-            case Id.dialog.new_passphrase: {
-                AlertDialog.Builder alert = new AlertDialog.Builder(this);
-
-                if (havePassphrase()) {
-                    alert.setTitle(R.string.title_change_passphrase);
-                } else {
-                    alert.setTitle(R.string.title_set_passphrase);
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+        case R.id.menu_key_edit_cancel:
+            cancelClicked();
+            return true;
+        case R.id.menu_key_edit_export_file:
+            //mExportHelper.showExportKeysDialog(mDataUri, Id.type.secret_key, Constants.path.APP_DIR
+            //        + "/secexport.asc");
+            return true;
+        case R.id.menu_key_edit_delete: {
+            // Message is received after key is deleted
+            Handler returnHandler = new Handler() {
+                @Override
+                public void handleMessage(Message message) {
+                    if (message.what == DeleteKeyDialogFragment.MESSAGE_OKAY) {
+                        setResult(RESULT_CANCELED);
+                        finish();
+                    }
                 }
-                alert.setMessage(R.string.enter_passphrase_twice);
+            };
 
-                LayoutInflater inflater =
-                    (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                View view = inflater.inflate(R.layout.passphrase, null);
-                final EditText input1 = (EditText) view.findViewById(R.id.passphrase);
-                final EditText input2 = (EditText) view.findViewById(R.id.passphraseAgain);
+            //mExportHelper.deleteKey(mDataUri, Id.type.secret_key, returnHandler);
+            return true;
+        }
+        }
+        return super.onOptionsItemSelected(item);
+    }
 
-                alert.setView(view);
-
-                alert.setPositiveButton(android.R.string.ok,
-                                        new DialogInterface.OnClickListener() {
-                                            public void onClick(DialogInterface dialog, int id) {
-                                                removeDialog(Id.dialog.new_passphrase);
-
-                                                String passphrase1 = "" + input1.getText();
-                                                String passphrase2 = "" + input2.getText();
-                                                if (!passphrase1.equals(passphrase2)) {
-                                                    showDialog(Id.dialog.passphrases_do_not_match);
-                                                    return;
-                                                }
-
-                                                if (passphrase1.equals("")) {
-                                                    showDialog(Id.dialog.no_passphrase);
-                                                    return;
-                                                }
-
-                                                mNewPassphrase = passphrase1;
-                                                updatePassphraseButtonText();
-                                            }
-                                        });
-
-                alert.setNegativeButton(android.R.string.cancel,
-                                        new DialogInterface.OnClickListener() {
-                                            public void onClick(DialogInterface dialog, int id) {
-                                                removeDialog(Id.dialog.new_passphrase);
-                                            }
-                                        });
-
-                return alert.create();
+    private void finallyEdit(final long masterKeyId, final boolean mMasterCanSign) {
+        if (masterKeyId != 0) {
+            Key masterKey = null;
+            mKeyRing = mProvider.getSecretKeyRingByMasterKeyId(masterKeyId);
+            if (mKeyRing != null) {
+                masterKey = mKeyRing.getMasterKey();
+                for (Key key : mKeyRing.getSecretKeys()) {
+                    mKeys.add(key);
+                    mKeysUsages.add(-1); // get usage when view is created
+                }
+            } else {
+                Log.e(Constants.TAG, "Keyring not found with masterKeyId: " + masterKeyId);
+                Toast.makeText(this, R.string.error_no_secret_key_found, Toast.LENGTH_LONG).show();
             }
-
-            default: {
-                return super.onCreateDialog(id);
+            if (masterKey != null) {
+                for (String userId : masterKey.getUserIds()) {
+                    Log.d(Constants.TAG, "Added userId " + userId);
+                    mUserIds.add(userId);
+                }
             }
+        }
+
+        mCurrentPassphrase = "";
+
+        buildLayout();
+        mIsPassphraseSet = PassphraseCacheService.hasPassphrase(this, masterKeyId);
+        if (!mIsPassphraseSet) {
+            // check "no passphrase" checkbox and remove button
+            mNoPassphrase.setChecked(true);
+            mChangePassphrase.setVisibility(View.GONE);
         }
     }
 
-    public void onClick(View v) {
-        if (v == mSaveButton) {
-            // TODO: some warning
-            saveClicked();
-        } else if (v == mDiscardButton) {
-            finish();
+    /**
+     * Shows the dialog to set a new passphrase
+     */
+    private void showSetPassphraseDialog() {
+        // Message is received after passphrase is cached
+        Handler returnHandler = new Handler() {
+            @Override
+            public void handleMessage(Message message) {
+                if (message.what == SetPassphraseDialogFragment.MESSAGE_OKAY) {
+                    Bundle data = message.getData();
+
+                    // set new returned passphrase!
+                    mNewPassphrase = data
+                            .getString(SetPassphraseDialogFragment.MESSAGE_NEW_PASSPHRASE);
+
+                    updatePassphraseButtonText();
+                }
+            }
+        };
+
+        // Create a new Messenger for the communication back
+        Messenger messenger = new Messenger(returnHandler);
+
+        // set title based on isPassphraseSet()
+        int title = -1;
+        if (isPassphraseSet()) {
+            title = R.string.title_change_passphrase;
+        } else {
+            title = R.string.title_set_passphrase;
+        }
+
+        SetPassphraseDialogFragment setPassphraseDialog = SetPassphraseDialogFragment.newInstance(
+                messenger, title);
+
+        setPassphraseDialog.show(getSupportFragmentManager(), "setPassphraseDialog");
+    }
+
+    /**
+     * Build layout based on mUserId, mKeys and mKeysUsages Vectors. It creates Views for every user
+     * id and key.
+     */
+    private void buildLayout() {
+        setContentView(R.layout.edit_key_activity);
+
+        // find views
+        mChangePassphrase = (BootstrapButton) findViewById(R.id.edit_key_btn_change_passphrase);
+        mNoPassphrase = (CheckBox) findViewById(R.id.edit_key_no_passphrase);
+
+        // Build layout based on given userIds and keys
+        LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
+        LinearLayout container = (LinearLayout) findViewById(R.id.edit_key_container);
+        mUserIdsView = (SectionView) inflater.inflate(R.layout.edit_key_section, container, false);
+        mUserIdsView.setType(Id.type.user_id);
+        mUserIdsView.setCanEdit(mMasterCanSign);
+        mUserIdsView.setUserIds(mUserIds);
+        container.addView(mUserIdsView);
+        mKeysView = (SectionView) inflater.inflate(R.layout.edit_key_section, container, false);
+        mKeysView.setType(Id.type.key);
+        mKeysView.setCanEdit(mMasterCanSign);
+        mKeysView.setKeys(mKeys, mKeysUsages);
+        container.addView(mKeysView);
+
+        updatePassphraseButtonText();
+
+        mChangePassphrase.setOnClickListener(new OnClickListener() {
+            public void onClick(View v) {
+                showSetPassphraseDialog();
+            }
+        });
+
+        // disable passphrase when no passphrase checkobox is checked!
+        mNoPassphrase.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    // remove passphrase
+                    mSavedNewPassphrase = mNewPassphrase;
+                    mNewPassphrase = "";
+                    mChangePassphrase.setVisibility(View.GONE);
+                } else {
+                    mNewPassphrase = mSavedNewPassphrase;
+                    mChangePassphrase.setVisibility(View.VISIBLE);
+                }
+            }
+        });
+    }
+
+    private long getMasterKeyId() {
+        if (mKeysView.getEditors().getChildCount() == 0) {
+            return 0;
+        }
+        return ((KeyEditor) mKeysView.getEditors().getChildAt(0)).getValue().getKeyId();
+    }
+
+    public boolean isPassphraseSet() {
+        if (mNoPassphrase.isChecked()) {
+            return true;
+        } else if ((mIsPassphraseSet)
+                || (mNewPassphrase != null && !mNewPassphrase.equals(""))) {
+            return true;
+        } else {
+            return false;
         }
     }
 
     private void saveClicked() {
-        if (!havePassphrase()) {
-            Toast.makeText(this, R.string.set_a_passphrase, Toast.LENGTH_SHORT).show();
-            return;
-        }
-        showDialog(Id.dialog.saving);
-        startThread();
-    }
-
-    @Override
-    public void run() {
-        String error = null;
-        Bundle data = new Bundle();
-        Message msg = new Message();
-
+        long masterKeyId = getMasterKeyId();
         try {
-            String oldPassphrase = mCurrentPassphrase;
-            String newPassphrase = mNewPassphrase;
-            if (newPassphrase == null) {
-                newPassphrase = oldPassphrase;
+            if (!isPassphraseSet()) {
+                throw new PgpGeneralException(this.getString(R.string.set_a_passphrase));
             }
-            Apg.buildSecretKey(this, mUserIds, mKeys, oldPassphrase, newPassphrase, this);
-            PassphraseCacheService.addCachedPassphrase(this, getMasterKeyId(), newPassphrase);
-        } catch (NoSuchProviderException e) {
-            error = "" + e;
-        } catch (NoSuchAlgorithmException e) {
-            error = "" + e;
-        } catch (PGPException e) {
-            error = "" + e;
-        } catch (SignatureException e) {
-            error = "" + e;
-        } catch (Apg.GeneralException e) {
-            error = "" + e;
-        } catch (IOException e) {
-            error = "" + e;
+
+            String passphrase = null;
+            if (mIsPassphraseSet)
+                passphrase = PassphraseCacheService.getCachedPassphrase(this, masterKeyId);
+            else
+                passphrase = "";
+            if (passphrase == null) {
+                showPassphraseDialog(masterKeyId, mMasterCanSign);
+            } else {
+                mCurrentPassphrase = passphrase;
+                finallySaveClicked();
+            }
+        } catch (PgpGeneralException e) {
+            //Toast.makeText(this, getString(R.string.error_message, e.getMessage()),
+            //        Toast.LENGTH_SHORT).show();
         }
-
-        data.putInt(Constants.extras.status, Id.message.done);
-
-        if (error != null) {
-            data.putString(Apg.EXTRA_ERROR, error);
-        }
-
-        msg.setData(data);
-        sendMessage(msg);
     }
 
-    @Override
-    public void doneCallback(Message msg) {
-        super.doneCallback(msg);
+    private void finallySaveClicked() {
+        try {
+            // Send all information needed to service to edit key in other thread
+            Intent intent = new Intent(this, ApgIntentService.class);
 
-        Bundle data = msg.getData();
-        removeDialog(Id.dialog.saving);
+            intent.setAction(ApgIntentService.ACTION_SAVE_KEYRING);
 
-        String error = data.getString(Apg.EXTRA_ERROR);
-        if (error != null) {
-            Toast.makeText(EditKeyActivity.this,
-                           getString(R.string.error_message, error), Toast.LENGTH_SHORT).show();
-        } else {
-            Toast.makeText(EditKeyActivity.this, R.string.key_saved, Toast.LENGTH_SHORT).show();
-            setResult(RESULT_OK);
-            finish();
+            // fill values for this action
+            Bundle data = new Bundle();
+            data.putString(ApgIntentService.SAVE_KEYRING_CURRENT_PASSPHRASE,
+                    mCurrentPassphrase);
+            data.putString(ApgIntentService.SAVE_KEYRING_NEW_PASSPHRASE, mNewPassphrase);
+            data.putStringArrayList(ApgIntentService.SAVE_KEYRING_USER_IDS,
+                    getUserIds(mUserIdsView));
+            ArrayList<Key> keys = getKeys(mKeysView);
+            data.putByteArray(ApgIntentService.SAVE_KEYRING_KEYS,
+                    PgpConversionHelper.PGPSecretKeyArrayListToBytes(keys));
+            data.putIntegerArrayList(ApgIntentService.SAVE_KEYRING_KEYS_USAGES,
+                    getKeysUsages(mKeysView));
+            data.putSerializable(ApgIntentService.SAVE_KEYRING_KEYS_EXPIRY_DATES,
+                    getKeysExpiryDates(mKeysView));
+            data.putLong(ApgIntentService.SAVE_KEYRING_MASTER_KEY_ID, getMasterKeyId());
+            data.putBoolean(ApgIntentService.SAVE_KEYRING_CAN_SIGN, mMasterCanSign);
+
+            intent.putExtra(ApgIntentService.EXTRA_DATA, data);
+
+            // Message is received after saving is done in ApgService
+            ApgIntentServiceHandler saveHandler = new ApgIntentServiceHandler(this,
+                    R.string.progress_saving, ProgressDialog.STYLE_HORIZONTAL) {
+                public void handleMessage(Message message) {
+                    // handle messages by standard ApgHandler first
+                    super.handleMessage(message);
+
+                    if (message.arg1 == ApgIntentServiceHandler.MESSAGE_OKAY) {
+                        Intent data = new Intent();
+                        data.putExtra(RESULT_EXTRA_MASTER_KEY_ID, getMasterKeyId());
+                        ArrayList<String> userIds = null;
+                        try {
+                            userIds = getUserIds(mUserIdsView);
+                        } catch (PgpGeneralException e) {
+                            Log.e(Constants.TAG, "exception while getting user ids", e);
+                        }
+                        data.putExtra(RESULT_EXTRA_USER_ID, userIds.get(0));
+                        setResult(RESULT_OK, data);
+                        finish();
+                    }
+                };
+            };
+
+            // Create a new Messenger for the communication back
+            Messenger messenger = new Messenger(saveHandler);
+            intent.putExtra(ApgIntentService.EXTRA_MESSENGER, messenger);
+
+            saveHandler.showProgressDialog(this);
+
+            // start service with intent
+            startService(intent);
+        } catch (PgpGeneralException e) {
+            //Toast.makeText(this, getString(R.string.error_message, e.getMessage()),
+            //        Toast.LENGTH_SHORT).show();
         }
+    }
+
+    private void cancelClicked() {
+        setResult(RESULT_CANCELED);
+        finish();
+    }
+
+    /**
+     * Returns user ids from the SectionView
+     *
+     * @param userIdsView
+     * @return
+     */
+    private ArrayList<String> getUserIds(SectionView userIdsView) throws PgpGeneralException {
+        ArrayList<String> userIds = new ArrayList<String>();
+
+        ViewGroup userIdEditors = userIdsView.getEditors();
+
+        boolean gotMainUserId = false;
+        for (int i = 0; i < userIdEditors.getChildCount(); ++i) {
+            UserIdEditor editor = (UserIdEditor) userIdEditors.getChildAt(i);
+            String userId = null;
+            try {
+                userId = editor.getValue();
+            } catch (UserIdEditor.NoNameException e) {
+                throw new PgpGeneralException(this.getString(R.string.error_user_id_needs_a_name));
+            } catch (UserIdEditor.NoEmailException e) {
+                throw new PgpGeneralException(
+                        this.getString(R.string.error_user_id_needs_an_email_address));
+            } catch (UserIdEditor.InvalidEmailException e) {
+                throw new PgpGeneralException(e.getMessage());
+            }
+
+            if (userId.equals("")) {
+                continue;
+            }
+
+            if (editor.isMainUserId()) {
+                userIds.add(0, userId);
+                gotMainUserId = true;
+            } else {
+                userIds.add(userId);
+            }
+        }
+
+        if (userIds.size() == 0) {
+            throw new PgpGeneralException(getString(R.string.error_key_needs_a_user_id));
+        }
+
+        if (!gotMainUserId) {
+            throw new PgpGeneralException(getString(R.string.error_main_user_id_must_not_be_empty));
+        }
+
+        return userIds;
+    }
+
+    /**
+     * Returns keys from the SectionView
+     *
+     * @param keysView
+     * @return
+     */
+    private ArrayList<Key> getKeys(SectionView keysView) throws PgpGeneralException {
+        ArrayList<Key> keys = new ArrayList<Key>();
+
+        ViewGroup keyEditors = keysView.getEditors();
+
+        if (keyEditors.getChildCount() == 0) {
+            throw new PgpGeneralException(getString(R.string.error_key_needs_master_key));
+        }
+
+        for (int i = 0; i < keyEditors.getChildCount(); ++i) {
+            KeyEditor editor = (KeyEditor) keyEditors.getChildAt(i);
+            keys.add(editor.getValue());
+        }
+
+        return keys;
+    }
+
+    /**
+     * Returns usage selections of keys from the SectionView
+     *
+     * @param keysView
+     * @return
+     */
+    private ArrayList<Integer> getKeysUsages(SectionView keysView) throws PgpGeneralException {
+        ArrayList<Integer> keysUsages = new ArrayList<Integer>();
+
+        ViewGroup keyEditors = keysView.getEditors();
+
+        if (keyEditors.getChildCount() == 0) {
+            throw new PgpGeneralException(getString(R.string.error_key_needs_master_key));
+        }
+
+        for (int i = 0; i < keyEditors.getChildCount(); ++i) {
+            KeyEditor editor = (KeyEditor) keyEditors.getChildAt(i);
+            keysUsages.add(editor.getUsage());
+        }
+
+        return keysUsages;
+    }
+
+    private ArrayList<GregorianCalendar> getKeysExpiryDates(SectionView keysView) throws PgpGeneralException {
+        ArrayList<GregorianCalendar> keysExpiryDates = new ArrayList<GregorianCalendar>();
+
+        ViewGroup keyEditors = keysView.getEditors();
+
+        if (keyEditors.getChildCount() == 0) {
+            throw new PgpGeneralException(getString(R.string.error_key_needs_master_key));
+        }
+
+        for (int i = 0; i < keyEditors.getChildCount(); ++i) {
+            KeyEditor editor = (KeyEditor) keyEditors.getChildAt(i);
+            keysExpiryDates.add(editor.getExpiryDate());
+        }
+
+        return keysExpiryDates;
     }
 
     private void updatePassphraseButtonText() {
-        mChangePassphrase.setText(
-                havePassphrase() ? R.string.btn_change_passphrase : R.string.btn_set_passphrase);
+        mChangePassphrase.setText(isPassphraseSet() ? getString(R.string.btn_change_passphrase)
+                : getString(R.string.btn_set_passphrase));
     }
+
 }

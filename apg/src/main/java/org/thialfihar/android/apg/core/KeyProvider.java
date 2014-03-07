@@ -17,8 +17,12 @@
 package org.thialfihar.android.apg.core;
 
 public interface KeyProvider {
-    public KeyRing getSecretKeyRing(long keyId);
-    public KeyRing getPublicKeyRing(long keyId);
-    public Key getSecretKey(long keyId);
-    public Key getPublicKey(long keyId);
+    public KeyRing getPublicKeyRingByRowId(long rowId);
+    public KeyRing getPublicKeyRingByMasterKeyId(long masterKeyId);
+    public KeyRing getPublicKeyRingByKeyId(long keyId);
+    public KeyRing getSecretKeyRingByRowId(long rowId);
+    public KeyRing getSecretKeyRingByMasterKeyId(long masterKeyId);
+    public KeyRing getSecretKeyRingByKeyId(long keyId);
+    public Key getPublicKeyByKeyId(long keyId);
+    public Key getSecretKeyByKeyId(long keyId);
 }

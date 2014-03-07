@@ -279,7 +279,7 @@ public class DecryptVerify {
                 Object obj = it.next();
                 if (obj instanceof PGPPublicKeyEncryptedData) {
                     PGPPublicKeyEncryptedData encData = (PGPPublicKeyEncryptedData) obj;
-                    secretKey = mKeyProvider.getSecretKey(encData.getKeyID());
+                    secretKey = mKeyProvider.getSecretKeyByKeyId(encData.getKeyID());
                     if (secretKey != null) {
                         pbe = encData;
                         break;
@@ -341,7 +341,7 @@ public class DecryptVerify {
             PGPOnePassSignatureList sigList = (PGPOnePassSignatureList) dataChunk;
             for (int i = 0; i < sigList.size(); ++i) {
                 signature = sigList.get(i);
-                signatureKey = mKeyProvider.getPublicKey(signature.getKeyID());
+                signatureKey = mKeyProvider.getPublicKeyByKeyId(signature.getKeyID());
                 if (signatureKeyId == 0) {
                     signatureKeyId = signature.getKeyID();
                 }
@@ -351,7 +351,7 @@ public class DecryptVerify {
                     signatureIndex = i;
                     signatureKeyId = signature.getKeyID();
                     String userId = null;
-                    KeyRing signKeyRing = mKeyProvider.getPublicKeyRing(signatureKeyId);
+                    KeyRing signKeyRing = mKeyProvider.getPublicKeyRingByKeyId(signatureKeyId);
                     if (signKeyRing != null) {
                         userId = signKeyRing.getMasterKey().getMainUserId();
                     }
@@ -522,7 +522,7 @@ public class DecryptVerify {
         Key signatureKey = null;
         for (int i = 0; i < sigList.size(); ++i) {
             signature = sigList.get(i);
-            signatureKey = mKeyProvider.getPublicKey(signature.getKeyID());
+            signatureKey = mKeyProvider.getPublicKeyByKeyId(signature.getKeyID());
             if (signatureKeyId == 0) {
                 signatureKeyId = signature.getKeyID();
             }
@@ -532,7 +532,7 @@ public class DecryptVerify {
             } else {
                 signatureKeyId = signature.getKeyID();
                 String userId = null;
-                KeyRing signKeyRing = mKeyProvider.getPublicKeyRing(signatureKeyId);
+                KeyRing signKeyRing = mKeyProvider.getPublicKeyRingByKeyId(signatureKeyId);
                 if (signKeyRing != null) {
                     userId = signKeyRing.getMasterKey().getMainUserId();
                 }
@@ -587,7 +587,7 @@ public class DecryptVerify {
         long signatureKeyId = signature.getKeyID();
         boolean keyBindingIsOk = false;
         String userId = null;
-        KeyRing signKeyRing = mKeyProvider.getPublicKeyRing(signatureKeyId);
+        KeyRing signKeyRing = mKeyProvider.getPublicKeyRingByKeyId(signatureKeyId);
         Key mKey = null;
         if (signKeyRing != null) {
             mKey = signKeyRing.getMasterKey();

@@ -1,9 +1,15 @@
 apply plugin: 'android'
 
 dependencies {
+    compile 'com.android.support:support-v4:19.0.1'
+    compile 'com.android.support:appcompat-v7:19.0.1'
+    compile 'com.github.johnkil.android-appmsg:appmsg:1.2.0'
+    compile project(':libs:HtmlTextView')
     compile project(':libs:bc:core')
     compile project(':libs:bc:pg')
     compile project(':libs:bc:prov')
+    compile project(':libs:AndroidBootstrap')
+    compile project(':libs:StickyListHeaders:library')
 }
 
 android {

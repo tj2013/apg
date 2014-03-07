@@ -64,7 +64,7 @@ public class PassphraseDialogFragment extends DialogFragment implements OnEditor
 
     private Messenger mMessenger;
     private EditText mPassphraseEditText;
-    private boolean canKB;
+    private boolean mCanUseSoftKeyboard;
 
     /**
      * Creates new instance of this dialog fragment
@@ -133,7 +133,7 @@ public class PassphraseDialogFragment extends DialogFragment implements OnEditor
                     }
                 });
                 alert.setCancelable(false);
-                canKB = false;
+                mCanUseSoftKeyboard = false;
                 return alert.create();
             }
             String userId = "";//PgpKeyHelper.getMainUserIdSafe(activity, secretKey);
@@ -226,14 +226,14 @@ public class PassphraseDialogFragment extends DialogFragment implements OnEditor
             }
         });
 
-        canKB = true;
+        mCanUseSoftKeyboard = true;
         return alert.create();
     }
 
     @Override
     public void onActivityCreated(Bundle arg0) {
         super.onActivityCreated(arg0);
-        if (canKB) {
+        if (mCanUseSoftKeyboard) {
             // request focus and open soft keyboard
             mPassphraseEditText.requestFocus();
             getDialog().getWindow().setSoftInputMode(LayoutParams.SOFT_INPUT_STATE_VISIBLE);

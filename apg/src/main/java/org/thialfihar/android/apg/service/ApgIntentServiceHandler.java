@@ -18,6 +18,8 @@
 package org.thialfihar.android.apg.service;
 
 import android.app.Activity;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnCancelListener;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -25,10 +27,11 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.widget.Toast;
 
-//import org.thialfihar.android.apg.ui.dialog.ProgressDialogFragment;
+import org.thialfihar.android.apg.ui.dialog.ProgressDialogFragment;
 import org.thialfihar.android.apg.R;
 
 public class ApgIntentServiceHandler extends Handler {
+
     // possible messages send from this service to handler on ui
     public static final int MESSAGE_OKAY = 1;
     public static final int MESSAGE_EXCEPTION = 2;
@@ -40,7 +43,7 @@ public class ApgIntentServiceHandler extends Handler {
     public static final String DATA_PROGRESS_MAX = "max";
     public static final String DATA_MESSAGE = "message";
     public static final String DATA_MESSAGE_ID = "message_id";
-/*
+
     Activity mActivity;
     ProgressDialogFragment mProgressDialogFragment;
 
@@ -54,9 +57,15 @@ public class ApgIntentServiceHandler extends Handler {
     }
 
     public ApgIntentServiceHandler(Activity activity, int progressDialogMessageId, int progressDialogStyle) {
+        this(activity, progressDialogMessageId, progressDialogStyle, false, null);
+    }
+
+    public ApgIntentServiceHandler(Activity activity, int progressDialogMessageId,
+                                        int progressDialogStyle, boolean cancelable,
+                                        OnCancelListener onCancelListener) {
         this.mActivity = activity;
         this.mProgressDialogFragment = ProgressDialogFragment.newInstance(progressDialogMessageId,
-                progressDialogStyle);
+                progressDialogStyle, cancelable, onCancelListener);
     }
 
     public void showProgressDialog(FragmentActivity activity) {
@@ -114,5 +123,4 @@ public class ApgIntentServiceHandler extends Handler {
             break;
         }
     }
-    */
 }

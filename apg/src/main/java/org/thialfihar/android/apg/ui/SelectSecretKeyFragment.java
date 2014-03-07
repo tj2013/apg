@@ -34,7 +34,6 @@ import org.thialfihar.android.apg.R;
 import org.thialfihar.android.apg.provider.KeychainContract.KeyRings;
 import org.thialfihar.android.apg.provider.KeychainContract.Keys;
 import org.thialfihar.android.apg.provider.KeychainContract.UserIds;
-import org.thialfihar.android.apg.provider.KeychainDatabase;
 import org.thialfihar.android.apg.provider.KeychainDatabase.Tables;
 import org.thialfihar.android.apg.ui.adapter.SelectKeyCursorAdapter;
 

@@ -19,14 +19,18 @@ package org.thialfihar.android.apg.core;
 import org.bouncycastle2.bcpg.sig.KeyFlags;
 import org.bouncycastle2.jce.provider.BouncyCastleProvider;
 import org.bouncycastle2.openpgp.PGPException;
+import org.bouncycastle2.openpgp.PGPObjectFactory;
 import org.bouncycastle2.openpgp.PGPPrivateKey;
 import org.bouncycastle2.openpgp.PGPPublicKey;
+import org.bouncycastle2.openpgp.PGPPublicKeyRing;
 import org.bouncycastle2.openpgp.PGPSecretKey;
+import org.bouncycastle2.openpgp.PGPSecretKeyRing;
 import org.bouncycastle2.openpgp.PGPSignature;
 import org.bouncycastle2.openpgp.PGPSignatureSubpacketVector;
 import org.bouncycastle2.openpgp.operator.PBESecretKeyDecryptor;
 import org.bouncycastle2.openpgp.operator.jcajce.JcePBESecretKeyDecryptorBuilder;
 
+import org.thialfihar.android.apg.core.KeyRing;
 import org.thialfihar.android.apg.util.IterableIterator;
 
 import java.io.IOException;
@@ -36,8 +40,36 @@ import java.util.GregorianCalendar;
 import java.util.Vector;
 
 public class Key {
+    public static final int ELGAMAL_ENCRYPT = PGPPublicKey.ELGAMAL_ENCRYPT;
+    public static final int DSA = PGPPublicKey.DSA;
+
     private PGPSecretKey mSecretKey;
     private PGPPublicKey mPublicKey;
+
+    public static Key decode(byte[] data) {
+        PGPObjectFactory factory = new PGPObjectFactory(data);
+        Object obj = null;
+
+        try {
+            obj = factory.nextObject();
+        } catch (IOException e) {
+            return null;
+        }
+
+        if (obj instanceof PGPSecretKey) {
+            return new Key((PGPSecretKey) obj);
+        } else if (obj instanceof PGPPublicKey) {
+            return new Key((PGPPublicKey) obj);
+        } else if (obj instanceof PGPSecretKeyRing) {
+            KeyRing keyRing = new KeyRing((PGPSecretKeyRing) obj);
+            return keyRing.getMasterKey();
+        } else if (obj instanceof PGPPublicKeyRing) {
+            KeyRing keyRing = new KeyRing((PGPPublicKeyRing) obj);
+            return keyRing.getMasterKey();
+        }
+
+        return null;
+    }
 
     public Key(PGPPublicKey publicKey) {
         mPublicKey = mPublicKey;

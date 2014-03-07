@@ -16,6 +16,7 @@
 
 package org.thialfihar.android.apg.core;
 
+import org.bouncycastle2.openpgp.PGPObjectFactory;
 import org.bouncycastle2.openpgp.PGPPublicKey;
 import org.bouncycastle2.openpgp.PGPPublicKeyRing;
 import org.bouncycastle2.openpgp.PGPSecretKey;
@@ -29,6 +30,25 @@ import java.util.Vector;
 public class KeyRing {
     private PGPSecretKeyRing mSecretKeyRing;
     private PGPPublicKeyRing mPublicKeyRing;
+
+    public static KeyRing decode(byte[] data) {
+        PGPObjectFactory factory = new PGPObjectFactory(data);
+        KeyRing keyRing = null;
+        try {
+            Object obj = factory.nextObject();
+            if (obj == null) {
+                return null;
+            } else if (obj instanceof PGPPublicKeyRing) {
+                keyRing = new KeyRing((PGPPublicKeyRing) obj);
+            } else if (obj instanceof PGPSecretKeyRing) {
+                keyRing = new KeyRing((PGPSecretKeyRing) obj);
+            }
+        } catch (IOException e) {
+            return null;
+        }
+
+        return keyRing;
+    }
 
     public KeyRing(PGPPublicKeyRing publicKeyRing) {
         mPublicKeyRing = mPublicKeyRing;

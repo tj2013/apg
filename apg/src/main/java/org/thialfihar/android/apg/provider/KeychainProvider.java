@@ -32,9 +32,9 @@ import android.text.TextUtils;
 import org.thialfihar.android.apg.Constants;
 import org.thialfihar.android.apg.provider.KeychainContract.KeyRings;
 import org.thialfihar.android.apg.provider.KeychainContract.KeyRingsColumns;
+import org.thialfihar.android.apg.provider.KeychainContract.KeyTypes;
 import org.thialfihar.android.apg.provider.KeychainContract.Keys;
 import org.thialfihar.android.apg.provider.KeychainContract.KeysColumns;
-import org.thialfihar.android.apg.provider.KeychainContract.KeyTypes;
 import org.thialfihar.android.apg.provider.KeychainContract.UserIds;
 import org.thialfihar.android.apg.provider.KeychainContract.UserIdsColumns;
 import org.thialfihar.android.apg.provider.KeychainDatabase.Tables;
@@ -747,4 +747,5 @@ public class KeychainProvider extends ContentProvider {
 
     private void sendBroadcastDatabaseChange(int keyType, String contentItemType) {
     }
+
 }

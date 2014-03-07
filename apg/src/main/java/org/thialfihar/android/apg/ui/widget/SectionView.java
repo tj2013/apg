@@ -16,96 +16,60 @@
 
 package org.thialfihar.android.apg.ui.widget;
 
-import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.Message;
+import android.os.Messenger;
+import android.support.v7.app.ActionBarActivity;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import org.bouncycastle2.openpgp.PGPException;
+import com.beardedhen.androidbootstrap.BootstrapButton;
 
-import org.thialfihar.android.apg.Apg;
 import org.thialfihar.android.apg.Id;
 import org.thialfihar.android.apg.R;
 import org.thialfihar.android.apg.core.Key;
+import org.thialfihar.android.apg.service.ApgIntentService;
+import org.thialfihar.android.apg.service.ApgIntentServiceHandler;
 import org.thialfihar.android.apg.service.PassphraseCacheService;
+import org.thialfihar.android.apg.ui.dialog.CreateKeyDialogFragment;
+import org.thialfihar.android.apg.ui.dialog.ProgressDialogFragment;
 import org.thialfihar.android.apg.ui.widget.Editor.EditorListener;
 import org.thialfihar.android.apg.util.Choice;
 
-import java.security.InvalidAlgorithmParameterException;
-import java.security.InvalidParameterException;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
 import java.util.Vector;
 
-public class SectionView extends LinearLayout implements OnClickListener, EditorListener, Runnable {
+public class SectionView extends LinearLayout implements OnClickListener, EditorListener {
     private LayoutInflater mInflater;
-    private View mAdd;
+    private BootstrapButton mPlusButton;
     private ViewGroup mEditors;
     private TextView mTitle;
     private int mType = 0;
 
     private Choice mNewKeyAlgorithmChoice;
     private int mNewKeySize;
+    private boolean canEdit = true;
 
-    private volatile Key mNewKey;
-    private ProgressDialog mProgressDialog;
-    private Thread mRunningThread = null;
+    private ActionBarActivity mActivity;
 
-    private Handler mHandler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            Bundle data = msg.getData();
-            if (data != null) {
-                boolean closeProgressDialog = data.getBoolean("closeProgressDialog");
-                if (closeProgressDialog) {
-                    if (mProgressDialog != null) {
-                        mProgressDialog.dismiss();
-                        mProgressDialog = null;
-                    }
-                }
-
-                String error = data.getString(Apg.EXTRA_ERROR);
-                if (error != null) {
-                    Toast.makeText(getContext(),
-                                   getContext().getString(R.string.error_message, error),
-                                   Toast.LENGTH_SHORT).show();
-                }
-
-                boolean gotNewKey = data.getBoolean("gotNewKey");
-                if (gotNewKey) {
-                    KeyEditor view =
-                        (KeyEditor) mInflater.inflate(R.layout.edit_key_key_item,
-                                                      mEditors, false);
-                    view.setEditorListener(SectionView.this);
-                    boolean isMasterKey = (mEditors.getChildCount() == 0);
-                    view.setValue(mNewKey, isMasterKey);
-                    mEditors.addView(view);
-                    SectionView.this.updateEditorsVisible();
-                }
-            }
-        }
-    };
+    private ProgressDialogFragment mGeneratingDialog;
 
     public SectionView(Context context) {
         super(context);
+        mActivity = (ActionBarActivity) context;
     }
 
     public SectionView(Context context, AttributeSet attrs) {
         super(context, attrs);
+        mActivity = (ActionBarActivity) context;
     }
 
     public ViewGroup getEditors() {
@@ -115,19 +79,26 @@ public class SectionView extends LinearLayout implements OnClickListener, Editor
     public void setType(int type) {
         mType = type;
         switch (type) {
-            case Id.type.user_id: {
-                mTitle.setText(R.string.section_user_ids);
-                break;
-            }
+        case Id.type.user_id: {
+            mTitle.setText(R.string.section_user_ids);
+            break;
+        }
 
-            case Id.type.key: {
-                mTitle.setText(R.string.section_keys);
-                break;
-            }
+        case Id.type.key: {
+            mTitle.setText(R.string.section_keys);
+            break;
+        }
 
-            default: {
-                break;
-            }
+        default: {
+            break;
+        }
+        }
+    }
+
+    public void setCanEdit(boolean bCanEdit) {
+        canEdit = bCanEdit;
+        if (!canEdit) {
+            mPlusButton.setVisibility(View.INVISIBLE);
         }
     }
 
@@ -139,8 +110,8 @@ public class SectionView extends LinearLayout implements OnClickListener, Editor
         setDrawingCacheEnabled(true);
         setAlwaysDrawnWithCacheEnabled(true);
 
-        mAdd = findViewById(R.id.header);
-        mAdd.setOnClickListener(this);
+        mPlusButton = (BootstrapButton) findViewById(R.id.plusbutton);
+        mPlusButton.setOnClickListener(this);
 
         mEditors = (ViewGroup) findViewById(R.id.editors);
         mTitle = (TextView) findViewById(R.id.title);
@@ -161,11 +132,11 @@ public class SectionView extends LinearLayout implements OnClickListener, Editor
 
     /** {@inheritDoc} */
     public void onClick(View v) {
-        switch (mType) {
+        if (canEdit) {
+            switch (mType) {
             case Id.type.user_id: {
-                UserIdEditor view =
-                        (UserIdEditor) mInflater.inflate(R.layout.edit_key_user_id_item,
-                                                         mEditors, false);
+                UserIdEditor view = (UserIdEditor) mInflater.inflate(
+                        R.layout.edit_key_user_id_item, mEditors, false);
                 view.setEditorListener(this);
                 if (mEditors.getChildCount() == 0) {
                     view.setIsMainUserId(true);
@@ -175,75 +146,25 @@ public class SectionView extends LinearLayout implements OnClickListener, Editor
             }
 
             case Id.type.key: {
-                AlertDialog.Builder dialog = new AlertDialog.Builder(getContext());
-
-                View view = mInflater.inflate(R.layout.create_key, null);
-                dialog.setView(view);
-                dialog.setTitle(R.string.title_create_key);
-                dialog.setMessage(R.string.key_creation_el_gamal_info);
-
-                boolean wouldBeMasterKey = (mEditors.getChildCount() == 0);
-
-                final Spinner algorithm = (Spinner) view.findViewById(R.id.algorithm);
-                Vector<Choice> choices = new Vector<Choice>();
-                choices.add(new Choice(Id.choice.algorithm.dsa,
-                                       getResources().getString(R.string.dsa)));
-                if (!wouldBeMasterKey) {
-                    choices.add(new Choice(Id.choice.algorithm.elgamal,
-                                           getResources().getString(R.string.elgamal)));
-                }
-
-                choices.add(new Choice(Id.choice.algorithm.rsa,
-                                       getResources().getString(R.string.rsa)));
-
-                ArrayAdapter<Choice> adapter =
-                        new ArrayAdapter<Choice>(getContext(),
-                                                 android.R.layout.simple_spinner_item,
-                                                 choices);
-                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                algorithm.setAdapter(adapter);
-                // make RSA the default
-                for (int i = 0; i < choices.size(); ++i) {
-                    if (choices.get(i).getId() == Id.choice.algorithm.rsa) {
-                        algorithm.setSelection(i);
-                        break;
-                    }
-                }
-
-                final EditText keySize = (EditText) view.findViewById(R.id.size);
-
-                dialog.setPositiveButton(android.R.string.ok,
-                                         new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface di, int id) {
-                        di.dismiss();
-                        try {
-                            mNewKeySize = Integer.parseInt("" + keySize.getText());
-                        } catch (NumberFormatException e) {
-                            mNewKeySize = 0;
-                        }
-
-                        mNewKeyAlgorithmChoice = (Choice) algorithm.getSelectedItem();
+                CreateKeyDialogFragment mCreateKeyDialogFragment = CreateKeyDialogFragment.newInstance(mEditors.getChildCount());
+                mCreateKeyDialogFragment.setOnAlgorithmSelectedListener(new CreateKeyDialogFragment.OnAlgorithmSelectedListener() {
+                    @Override
+                    public void onAlgorithmSelected(Choice algorithmChoice, int keySize) {
+                        mNewKeyAlgorithmChoice = algorithmChoice;
+                        mNewKeySize = keySize;
                         createKey();
                     }
                 });
-
-                dialog.setCancelable(true);
-                dialog.setNegativeButton(android.R.string.cancel,
-                                         new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface di, int id) {
-                        di.dismiss();
-                    }
-                });
-
-                dialog.create().show();
+                mCreateKeyDialogFragment.show(mActivity.getSupportFragmentManager(), "createKeyDialog");
                 break;
             }
 
             default: {
                 break;
             }
+            }
+            this.updateEditorsVisible();
         }
-        this.updateEditorsVisible();
     }
 
     public void setUserIds(Vector<String> list) {
@@ -253,31 +174,35 @@ public class SectionView extends LinearLayout implements OnClickListener, Editor
 
         mEditors.removeAllViews();
         for (String userId : list) {
-            UserIdEditor view =
-                (UserIdEditor) mInflater.inflate(R.layout.edit_key_user_id_item, mEditors, false);
+            UserIdEditor view = (UserIdEditor) mInflater.inflate(R.layout.edit_key_user_id_item,
+                    mEditors, false);
             view.setEditorListener(this);
             view.setValue(userId);
             if (mEditors.getChildCount() == 0) {
                 view.setIsMainUserId(true);
             }
+            view.setCanEdit(canEdit);
             mEditors.addView(view);
         }
 
         this.updateEditorsVisible();
     }
 
-    public void setKeys(Vector<Key> list) {
+    public void setKeys(Vector<Key> list, Vector<Integer> usages) {
         if (mType != Id.type.key) {
             return;
         }
 
         mEditors.removeAllViews();
-        for (Key key : list) {
-            KeyEditor view =
-                (KeyEditor) mInflater.inflate(R.layout.edit_key_key_item, mEditors, false);
+
+        // go through all keys and set view based on them
+        for (int i = 0; i < list.size(); i++) {
+            KeyEditor view = (KeyEditor) mInflater.inflate(R.layout.edit_key_key_item, mEditors,
+                    false);
             view.setEditorListener(this);
             boolean isMasterKey = (mEditors.getChildCount() == 0);
-            view.setValue(key, isMasterKey);
+            view.setValue(list.get(i), isMasterKey, usages.get(i));
+            view.setCanEdit(canEdit);
             mEditors.addView(view);
         }
 
@@ -285,53 +210,73 @@ public class SectionView extends LinearLayout implements OnClickListener, Editor
     }
 
     private void createKey() {
-        mProgressDialog = new ProgressDialog(getContext());
-        mProgressDialog.setMessage(getContext().getString(R.string.progress_generating));
-        mProgressDialog.setCancelable(false);
-        mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-        mProgressDialog.show();
-        mRunningThread = new Thread(this);
-        mRunningThread.start();
+        // Send all information needed to service to edit key in other thread
+        final Intent intent = new Intent(mActivity, ApgIntentService.class);
+
+        intent.setAction(ApgIntentService.ACTION_GENERATE_KEY);
+
+        // fill values for this action
+        Bundle data = new Bundle();
+        Boolean isMasterKey;
+
+        String passphrase;
+        if (mEditors.getChildCount() > 0) {
+            Key masterKey = ((KeyEditor) mEditors.getChildAt(0)).getValue();
+            passphrase = PassphraseCacheService.getCachedPassphrase(mActivity, masterKey.getKeyId());
+            isMasterKey = false;
+        } else {
+            passphrase = "";
+            isMasterKey = true;
+        }
+        data.putBoolean(ApgIntentService.GENERATE_KEY_MASTER_KEY, isMasterKey);
+        data.putString(ApgIntentService.GENERATE_KEY_SYMMETRIC_PASSPHRASE, passphrase);
+        data.putInt(ApgIntentService.GENERATE_KEY_ALGORITHM, mNewKeyAlgorithmChoice.getId());
+        data.putInt(ApgIntentService.GENERATE_KEY_KEY_SIZE, mNewKeySize);
+
+        intent.putExtra(ApgIntentService.EXTRA_DATA, data);
+
+        // show progress dialog
+        mGeneratingDialog = ProgressDialogFragment.newInstance(R.string.progress_generating,
+                ProgressDialog.STYLE_SPINNER, true, new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+                mActivity.stopService(intent);
+            }
+        });
+
+        // Message is received after generating is done in ApgService
+        ApgIntentServiceHandler saveHandler = new ApgIntentServiceHandler(mActivity,
+                mGeneratingDialog) {
+            public void handleMessage(Message message) {
+                // handle messages by standard ApgHandler first
+                super.handleMessage(message);
+
+                if (message.arg1 == ApgIntentServiceHandler.MESSAGE_OKAY) {
+                    // get new key from data bundle returned from service
+                    Bundle data = message.getData();
+                    Key newKey = Key.decode(data.getByteArray(ApgIntentService.RESULT_NEW_KEY));
+                    addGeneratedKeyToView(newKey);
+                }
+            };
+        };
+
+        // Create a new Messenger for the communication back
+        Messenger messenger = new Messenger(saveHandler);
+        intent.putExtra(ApgIntentService.EXTRA_MESSENGER, messenger);
+
+        mGeneratingDialog.show(mActivity.getSupportFragmentManager(), "dialog");
+
+        // start service with intent
+        mActivity.startService(intent);
     }
 
-    public void run() {
-        String error = null;
-        try {
-            Key masterKey = null;
-            String passphrase;
-            if (mEditors.getChildCount() > 0) {
-                masterKey = ((KeyEditor) mEditors.getChildAt(0)).getValue();
-                passphrase = PassphraseCacheService.getCachedPassphrase(getContext(), masterKey.getKeyId());
-            } else {
-                passphrase = "";
-            }
-            mNewKey = Apg.createKey(getContext(),
-                                    mNewKeyAlgorithmChoice.getId(),
-                                    mNewKeySize, passphrase,
-                                    masterKey);
-        } catch (NoSuchProviderException e) {
-            error = "" + e;
-        } catch (NoSuchAlgorithmException e) {
-            error = "" + e;
-        } catch (PGPException e) {
-            error = "" + e;
-        } catch (InvalidParameterException e) {
-            error = "" + e;
-        } catch (InvalidAlgorithmParameterException e) {
-            error = "" + e;
-        } catch (Apg.GeneralException e) {
-            error = "" + e;
-        }
-
-        Message message = new Message();
-        Bundle data = new Bundle();
-        data.putBoolean("closeProgressDialog", true);
-        if (error != null) {
-            data.putString(Apg.EXTRA_ERROR, error);
-        } else {
-            data.putBoolean("gotNewKey", true);
-        }
-        message.setData(data);
-        mHandler.sendMessage(message);
+    private void addGeneratedKeyToView(Key newKey) {
+        // add view with new key
+        KeyEditor view = (KeyEditor) mInflater.inflate(R.layout.edit_key_key_item,
+                mEditors, false);
+        view.setEditorListener(SectionView.this);
+        view.setValue(newKey, newKey.isMasterKey(), -1);
+        mEditors.addView(view);
+        SectionView.this.updateEditorsVisible();
     }
 }
